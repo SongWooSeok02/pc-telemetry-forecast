@@ -1,8 +1,10 @@
 {
   "contract_version": "0.1.0-draft.2",
-  "base_revision": "52d847955f85926fa46d9eebe805955d5d3bd853",
+  "base_revision": "3ce05b93bda9153e60d5939bef4ed4b912433cd6",
+  "ci_run_url": null,
+  "ci_head_revision": null,
   "source_hashes": {
-    ".github/workflows/contracts.yml": "bf785abed0b6d1cf25febbdd5e7578223bf83d656a9728c9486d36089e716e9b",
+    ".github/workflows/contracts.yml": "7a61dae8fdc92a65fac88914543a8f099f500c5bf11b06f63433484c59f5be8e",
     "contracts/fixtures/batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
     "contracts/fixtures/hash-vectors.json": "26da36fdd21c0f3f8eef7287578edc4c5d11e035e0f65f8ca4b646a04a2b2c6e",
     "contracts/fixtures/sensor-configs.json": "a8321097bd418217881cd12233d0c536103184c67924a59eb3aa4cc5e6ad686b",
@@ -13,11 +15,11 @@
     "tests/probe_windows_clock.py": "9aac4a0029d0e0fd8771716d8a7cdc1353eb57909857e019afe06b7798fc18ae",
     "tests/README.md": "44a407e131715cb62f87a77d6d0047af779fbd4a814a399c82b064c43c128f09",
     "tests/reference_api.py": "9b1522a9cecb07fae4f1037d693a91b4e389d57ab3d159b591ac532e0f8176f0",
-    "tests/run_contracts.py": "d769a3a7e37ec31edf580a4a1b8ff01b90779748047d51d602350ffc97347fea",
+    "tests/run_contracts.py": "7ff2deb927e5d3a0d15d49928b560ba498dc2a1e8dc9c07fbbc242c481b1454a",
     "tests/test_integration.py": "6315aca8fe353c8559dba5b25c21017ff6009a1ad7a8a8d7dec1a9eb5385bc50",
     "tests/verify_contract.py": "ece333ca387979f2b0755ab0ca239f359915a73a707f53b7fa59c4679d482d52"
   },
-  "executed_at_utc": "2026-10-28T18:40:03.679938+00:00",
+  "executed_at_utc": "2026-10-28T18:41:26.707161+00:00",
   "environment": {
     "os": "Windows-10-10.0.19045-SP0",
     "pc": "DESKTOP-CC6CD6C",
@@ -57,8 +59,8 @@
           "expected": "False"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.017743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.017743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.042607+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.042607+00:00"
     },
     {
       "case": "verify_contract.Checks.test_bad_quality_value",
@@ -67,8 +69,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T18:39:57.017743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.019743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.042607+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.044607+00:00"
     },
     {
       "case": "verify_contract.Checks.test_canonical_golden",
@@ -88,8 +90,8 @@
           "expected": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.019743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.019743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.044607+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.044607+00:00"
     },
     {
       "case": "verify_contract.Checks.test_clock_reverse_sleep",
@@ -109,8 +111,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.019743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.019743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.044607+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.045608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_duplicate_sample",
@@ -119,8 +121,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T18:39:57.019743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.020743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.045608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.045608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_invalid_json_numbers",
@@ -129,8 +131,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T18:39:57.020743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.020743+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.045608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.045608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_new_id_same_sample",
@@ -145,8 +147,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.020743+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.021744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.045608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.046608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_no_partial_success",
@@ -166,8 +168,8 @@
           "expected": "({}, set())"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.021744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.022744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.046608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.047608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_normal_unsupported_missing",
@@ -176,8 +178,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T18:39:57.022744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.022744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.047608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.047608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_replay_after_response_loss",
@@ -202,8 +204,8 @@
           "expected": "1"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.022744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.023744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.047608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.048608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_rollback_retry",
@@ -228,8 +230,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.023744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.024744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.048608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.049608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_rtt_boundary",
@@ -249,8 +251,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.024744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.024744+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.049608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.049608+00:00"
     },
     {
       "case": "verify_contract.Checks.test_same_id_changed_content",
@@ -265,8 +267,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.024744+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.025745+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.049608+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.050609+00:00"
     },
     {
       "case": "verify_contract.Checks.test_time_id_server",
@@ -286,8 +288,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.025745+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.025745+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.050609+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.050609+00:00"
     },
     {
       "case": "verify_contract.Checks.test_time_normal_and_sign",
@@ -307,8 +309,8 @@
           "expected": "6000"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.025745+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.025745+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.050609+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.050609+00:00"
     },
     {
       "case": "verify_contract.Checks.test_unit_mismatch",
@@ -317,8 +319,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T18:39:57.025745+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.025745+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.050609+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.051609+00:00"
     },
     {
       "case": "test_integration.Integration.test_actual_transaction_rollback",
@@ -343,8 +345,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.025745+00:00",
-      "finished_at_utc": "2026-10-28T18:39:57.626884+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.051609+00:00",
+      "finished_at_utc": "2026-10-28T18:41:20.667670+00:00"
     },
     {
       "case": "test_integration.Integration.test_auth_hash_and_unsupported_zero",
@@ -379,8 +381,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:57.626884+00:00",
-      "finished_at_utc": "2026-10-28T18:39:58.306861+00:00"
+      "started_at_utc": "2026-10-28T18:41:20.667670+00:00",
+      "finished_at_utc": "2026-10-28T18:41:21.334006+00:00"
     },
     {
       "case": "test_integration.Integration.test_changed_id_and_content",
@@ -405,8 +407,8 @@
           "expected": "3"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:58.306861+00:00",
-      "finished_at_utc": "2026-10-28T18:39:58.939002+00:00"
+      "started_at_utc": "2026-10-28T18:41:21.334006+00:00",
+      "finished_at_utc": "2026-10-28T18:41:21.970306+00:00"
     },
     {
       "case": "test_integration.Integration.test_concurrent_identical_requests",
@@ -431,8 +433,8 @@
           "expected": "1"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:58.939002+00:00",
-      "finished_at_utc": "2026-10-28T18:39:59.506933+00:00"
+      "started_at_utc": "2026-10-28T18:41:21.970306+00:00",
+      "finished_at_utc": "2026-10-28T18:41:22.522518+00:00"
     },
     {
       "case": "test_integration.Integration.test_hash_collision_still_compares_body",
@@ -452,8 +454,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T18:39:59.507932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:00.109074+00:00"
+      "started_at_utc": "2026-10-28T18:41:22.522518+00:00",
+      "finished_at_utc": "2026-10-28T18:41:23.126800+00:00"
     },
     {
       "case": "test_integration.Integration.test_independent_producer_golden",
@@ -538,8 +540,8 @@
           "expected": "'{\"v\":1000000000000.000001}'"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:00.109074+00:00",
-      "finished_at_utc": "2026-10-28T18:40:00.631197+00:00"
+      "started_at_utc": "2026-10-28T18:41:23.126800+00:00",
+      "finished_at_utc": "2026-10-28T18:41:23.647170+00:00"
     },
     {
       "case": "test_integration.Integration.test_invalid_last_sample_no_partial_success",
@@ -559,8 +561,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:00.631197+00:00",
-      "finished_at_utc": "2026-10-28T18:40:01.198595+00:00"
+      "started_at_utc": "2026-10-28T18:41:23.647170+00:00",
+      "finished_at_utc": "2026-10-28T18:41:24.203772+00:00"
     },
     {
       "case": "test_integration.Integration.test_invalid_types_and_duplicate_json",
@@ -595,8 +597,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:01.198595+00:00",
-      "finished_at_utc": "2026-10-28T18:40:01.819742+00:00"
+      "started_at_utc": "2026-10-28T18:41:24.203772+00:00",
+      "finished_at_utc": "2026-10-28T18:41:24.840724+00:00"
     },
     {
       "case": "test_integration.Integration.test_normal_replay_response_and_quality",
@@ -612,8 +614,8 @@
         },
         {
           "assertion": "assertEqual",
-          "actual": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:40:01.874924Z'})",
-          "expected": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:40:01.874924Z'})"
+          "actual": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:41:24.893736Z'})",
+          "expected": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:41:24.893736Z'})"
         },
         {
           "assertion": "assertEqual",
@@ -626,8 +628,8 @@
           "expected": "[('missing', None), ('ok', 52.5), ('unsupported', None)]"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:01.819742+00:00",
-      "finished_at_utc": "2026-10-28T18:40:02.422053+00:00"
+      "started_at_utc": "2026-10-28T18:41:24.840724+00:00",
+      "finished_at_utc": "2026-10-28T18:41:25.444866+00:00"
     },
     {
       "case": "test_integration.Integration.test_old_catalog_and_pending_registration",
@@ -652,8 +654,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:02.422053+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.058159+00:00"
+      "started_at_utc": "2026-10-28T18:41:25.444866+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.079016+00:00"
     },
     {
       "case": "test_integration.Integration.test_time_http_and_error",
@@ -674,8 +676,8 @@
         },
         {
           "assertion": "assertLessEqual",
-          "actual": "'2026-10-28T18:40:03.111535Z'",
-          "expected": "'2026-10-28T18:40:03.111535Z'"
+          "actual": "'2026-10-28T18:41:26.134027Z'",
+          "expected": "'2026-10-28T18:41:26.134027Z'"
         },
         {
           "assertion": "assertEqual",
@@ -688,8 +690,8 @@
           "expected": "(503, 'CLOCK_UNTRUSTED', '44444444-4444-4444-8444-444444444444')"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.058159+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.653932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.079016+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.681155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_elapsed_timeout_even_if_callback_delayed",
@@ -709,8 +711,8 @@
           "expected": "('unknown', 0, None)"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.653932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.653932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.681155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.681155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_large_rtt_breaks_streak",
@@ -735,8 +737,8 @@
           "expected": "('unknown', 1)"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.654932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.654932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.681155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.682155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_reverse_time_reset",
@@ -751,8 +753,8 @@
           "expected": "(['clock_jump'], 'unknown', None)"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.654932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.654932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.682155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.682155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_sleep_reset_and_late_response",
@@ -782,8 +784,8 @@
           "expected": "'normal'"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.654932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.654932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.682155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.682155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_three_consecutive_threshold_and_recovery",
@@ -803,8 +805,8 @@
           "expected": "('normal', 0)"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.654932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.654932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.682155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.682155+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_timeout_and_stale_id",
@@ -834,8 +836,8 @@
           "expected": "('normal', 0)"
         }
       ],
-      "started_at_utc": "2026-10-28T18:40:03.654932+00:00",
-      "finished_at_utc": "2026-10-28T18:40:03.654932+00:00"
+      "started_at_utc": "2026-10-28T18:41:26.682155+00:00",
+      "finished_at_utc": "2026-10-28T18:41:26.682155+00:00"
     }
   ],
   "scope": "Independent JavaScript producer -> real loopback HTTP Python adapter -> SQLite transactions; synthetic clock state inputs",

@@ -64,6 +64,9 @@ if __name__ == '__main__':
              and p.name != 'review-record.json']
     report = dict(contract_version='0.1.0-draft.2',
         base_revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        ci_run_url=('https://github.com/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['GITHUB_RUN_ID'])
+            if os.environ.get('GITHUB_RUN_ID') else None,
+        ci_head_revision=os.environ.get('GITHUB_SHA'),
         source_hashes={p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(files)},
         executed_at_utc=datetime.now(timezone.utc).isoformat(),
         environment=dict(os=platform.platform(), pc=platform.node(), python=sys.version,
@@ -77,7 +80,7 @@ if __name__ == '__main__':
         limitations=['Not the production .NET/FastAPI/PostgreSQL stack',
             'No physical sleep/resume, deployment clock accuracy or synchronization verification',
             'No human approvals; this report alone cannot mark S1-01 Done'])
-    output = ROOT/'tests/results/s1-01-contracts.json'
+    output = Path(os.environ.get('CONTRACT_REPORT', ROOT/'tests/results/s1-01-contracts.json'))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     sys.exit(not report['success'])

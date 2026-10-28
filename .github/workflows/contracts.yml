@@ -13,6 +13,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
+    env:
+      CONTRACT_REPORT: tests/results/ci/s1-01-contracts.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,4 +31,5 @@ jobs:
         if: always()
         with:
           name: s1-01-evidence-${{ matrix.os }}
-          path: tests/results/s1-01-contracts.json
+          path: tests/results/ci/s1-01-contracts.json
+          if-no-files-found: error
