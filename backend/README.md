@@ -1,6 +1,7 @@
 # S1-03 수집 API / PostgreSQL
 
-상태: 구현 및 로컬 PostgreSQL 통합 검증 완료, **S1-01 계약 승인·다른 팀원 리뷰·원격 CI 확인 전**.
+상태: 구현 및 로컬 PostgreSQL 통합 검증 완료, **S1-01 계약 승인·다른 팀원 리뷰 전**.
+원격 자동 검증 결과는 PR checks에서 확인한다.
 현재 S1-01 `0.1.0-draft.2`를 변경 없이 적용한다. 작업을 Done으로 변경하지 않았다.
 
 ## 실행
@@ -81,7 +82,9 @@ python tests/run_contracts.py
 
 [사례 코드](../tests/test_backend.py)와 [실행 보고서](../tests/results/s1-03-backend.json)에
 환경·버전·기반 커밋·소스 SHA-256·UTC 실행 시각·재현 명령·기대값/실제 assertion·성공/실패를 기록한다.
-DB 환경 변수가 없으면 PostgreSQL 검사는 `not_executed`, 보고서 success=false다.
+DB 환경 변수가 없으면 PostgreSQL 검사는 `not_executed`, 보고서 success=false와 종료 코드 1이다.
+DB 초기 연결/마이그레이션 실패와 실패한 subtest도 결과 JSON에 남긴다. 실행기 회귀 검사는
+`python -m unittest discover -s tests -p test_backend_runner.py`로 실행한다.
 CI는 PostgreSQL 16 서비스로 실행하며 보고서를 업로드한다. CI 구성 파일 존재는 통과 증거가 아니다.
 가상 데이터는 [fixture](../tests/fixtures/s1-03-batch.json)에 정상/미지원/결측을 포함하며
 검사가 관측 시각 이상·날짜 경계·중복·불량 요청을 파생한다. 실제 PC 센서값은 사용하지 않았다.
@@ -93,4 +96,5 @@ CI는 PostgreSQL 16 서비스로 실행하며 보고서를 업로드한다. CI �
 남은 작업: S1-01 공동 승인(A/B/C, 10-30 KST 확인), 다른 팀원 1명 코드 리뷰,
 원격 CI 실행 확인(B, PR 시), S2-03 등록·인증 발급 API, 운영 시계 신뢰도 기반 시각 API,
 S2-04/S3-03/S4-03의 중복·집계·규모 확장 검증. 현재 요청 범위에 대한 자동 통합 검사는
-로컬에서 실행했으며 외부 이슈 상태 변경·메시지 발송·PR 생성은 수행하지 않았다.
+로컬에서 실행했으며 [PR #2](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/2)에서
+원격 CI와 PR 기준 재리뷰를 진행한다. 외부 작업 상태는 변경하지 않았다.

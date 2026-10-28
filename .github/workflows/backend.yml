@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install -r backend/requirements.txt
+      - run: python -m unittest discover -s tests -p test_backend_runner.py
       - run: python tests/run_backend.py
       - run: git diff --check
       - uses: actions/upload-artifact@v4

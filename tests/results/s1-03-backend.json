@@ -1,6 +1,6 @@
 {
-  "executed_at_utc": "2026-10-28T19:20:26.788089+00:00",
-  "base_commit": "995fc40ccee02f6f0e62f76afbd1be809f85e088",
+  "executed_at_utc": "2026-10-28T19:27:52.495225+00:00",
+  "base_commit": "89ca0a39ccef467a688aeaccbc92d0de86dbc59f",
   "pc": "DESKTOP-CC6CD6C",
   "os": "Windows-10-10.0.19045-SP0",
   "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
@@ -11,18 +11,20 @@
     "httpx": "0.28.1"
   },
   "postgres_version": "PostgreSQL 16.15, compiled by Visual C++ build 1944, 64-bit",
+  "postgres_version_error": null,
   "source_sha256": {
-    ".github\\workflows\\backend.yml": "ee6b9cae9140cd3e354bf8e811e6e00eb1c3baf1fa7131a59029867a0f0a335f",
-    "backend\\__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
-    "backend\\app.py": "68dc04fb82b20be8b69db80f19fcaf4205ca8d54c3c86fb38711f4cb8f780b9c",
-    "backend\\contract.py": "466a0345e022fc03121a716d7ac0bcadc3047b5c698aec1406c8a19c1233bc31",
-    "backend\\partitions.py": "8aab9000692b6d6731abd27cadf8023078fe2baa01d73bd9e9369005a669b013",
-    "backend\\README.md": "b34cbb8c5a10c5cf4aa5df913baa50f9a4c32eee212f99416da7c3c8be4b17b2",
-    "backend\\requirements.txt": "acf11610f80999bbb8a369c2bc0eee514fad9384cb5a4745b0c0a0096fd6b16c",
-    "database\\migrations\\001_ingestion.sql": "84294d318de9c03f2299b96b338247aec47969e908b07d0277f1425dc8c890dd",
-    "tests\\fixtures\\s1-03-batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
-    "tests\\run_backend.py": "854319c06f26984319e4935303ba2793cc623e160260809929f039508963bd7e",
-    "tests\\test_backend.py": "c3a33ce7b5650253723efdccc126db3daca2a15b47ddf94fb65a039e11bbecc1"
+    ".github/workflows/backend.yml": "a8358fa3f66412a7376420c726843b4d76a32e3f04c8a50f80a42a66eb69f705",
+    "backend/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "backend/app.py": "68dc04fb82b20be8b69db80f19fcaf4205ca8d54c3c86fb38711f4cb8f780b9c",
+    "backend/contract.py": "466a0345e022fc03121a716d7ac0bcadc3047b5c698aec1406c8a19c1233bc31",
+    "backend/partitions.py": "8aab9000692b6d6731abd27cadf8023078fe2baa01d73bd9e9369005a669b013",
+    "backend/README.md": "e733b2f24b65a1ca9a560a5bc540a7a31980e322f82eed49d8b0cab3c1eb924a",
+    "backend/requirements.txt": "acf11610f80999bbb8a369c2bc0eee514fad9384cb5a4745b0c0a0096fd6b16c",
+    "database/migrations/001_ingestion.sql": "84294d318de9c03f2299b96b338247aec47969e908b07d0277f1425dc8c890dd",
+    "tests/fixtures/s1-03-batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
+    "tests/run_backend.py": "1c7cd438fe2353971c8f7488d365b478826fbe1201678daf33efcf7e7e9b1362",
+    "tests/test_backend.py": "c3a33ce7b5650253723efdccc126db3daca2a15b47ddf94fb65a039e11bbecc1",
+    "tests/test_backend_runner.py": "98e6333b691b0dc028986e866355a1edc8cce4e9296a6350df62c011a94e8a50"
   },
   "postgres_executed": true,
   "success": true,
@@ -40,7 +42,7 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.158699+00:00",
+      "executed_at_utc": "2026-10-28T19:27:49.766704+00:00",
       "duration_seconds": 0.0
     },
     {
@@ -101,7 +103,7 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.161700+00:00",
+      "executed_at_utc": "2026-10-28T19:27:49.768705+00:00",
       "duration_seconds": 0.0
     },
     {
@@ -127,8 +129,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.161700+00:00",
-      "duration_seconds": 0.015
+      "executed_at_utc": "2026-10-28T19:27:49.769705+00:00",
+      "duration_seconds": 0.016
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_auth_config_hash_and_limits",
@@ -173,7 +175,7 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.363518+00:00",
+      "executed_at_utc": "2026-10-28T19:27:49.870728+00:00",
       "duration_seconds": 0.25
     },
     {
@@ -194,8 +196,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.611576+00:00",
-      "duration_seconds": 0.25
+      "executed_at_utc": "2026-10-28T19:27:50.111785+00:00",
+      "duration_seconds": 0.125
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_concurrent_replay",
@@ -220,7 +222,7 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:24.863635+00:00",
+      "executed_at_utc": "2026-10-28T19:27:50.243817+00:00",
       "duration_seconds": 0.266
     },
     {
@@ -251,8 +253,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:25.136699+00:00",
-      "duration_seconds": 0.25
+      "executed_at_utc": "2026-10-28T19:27:50.512063+00:00",
+      "duration_seconds": 0.343
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_database_error_and_retry",
@@ -277,8 +279,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:25.387759+00:00",
-      "duration_seconds": 0.187
+      "executed_at_utc": "2026-10-28T19:27:50.854326+00:00",
+      "duration_seconds": 0.313
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_last_sample_invalid",
@@ -298,8 +300,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:25.565801+00:00",
-      "duration_seconds": 0.125
+      "executed_at_utc": "2026-10-28T19:27:51.159703+00:00",
+      "duration_seconds": 0.219
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_observed_anomaly_received_partition",
@@ -334,8 +336,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:25.690830+00:00",
-      "duration_seconds": 0.203
+      "executed_at_utc": "2026-10-28T19:27:51.382962+00:00",
+      "duration_seconds": 0.187
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_partitions_failure_monitor_and_rollback",
@@ -370,8 +372,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:25.899880+00:00",
-      "duration_seconds": 0.375
+      "executed_at_utc": "2026-10-28T19:27:51.567006+00:00",
+      "duration_seconds": 0.469
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_replay_response_loss_and_midnight",
@@ -396,8 +398,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:26.277969+00:00",
-      "duration_seconds": 0.219
+      "executed_at_utc": "2026-10-28T19:27:52.041118+00:00",
+      "duration_seconds": 0.187
     },
     {
       "case": "test_backend.PostgreSQLIngestion.test_retention_separate_from_measurements",
@@ -427,8 +429,8 @@
         }
       ],
       "status": "pass",
-      "executed_at_utc": "2026-10-28T19:20:26.485018+00:00",
-      "duration_seconds": 0.25
+      "executed_at_utc": "2026-10-28T19:27:52.222160+00:00",
+      "duration_seconds": 0.203
     }
   ]
 }

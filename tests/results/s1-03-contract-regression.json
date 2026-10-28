@@ -1,10 +1,10 @@
 {
   "contract_version": "0.1.0-draft.2",
-  "base_revision": "995fc40ccee02f6f0e62f76afbd1be809f85e088",
+  "base_revision": "89ca0a39ccef467a688aeaccbc92d0de86dbc59f",
   "ci_run_url": null,
   "ci_head_revision": null,
   "source_hashes": {
-    ".github/workflows/backend.yml": "ee6b9cae9140cd3e354bf8e811e6e00eb1c3baf1fa7131a59029867a0f0a335f",
+    ".github/workflows/backend.yml": "a8358fa3f66412a7376420c726843b4d76a32e3f04c8a50f80a42a66eb69f705",
     ".github/workflows/contracts.yml": "7a61dae8fdc92a65fac88914543a8f099f500c5bf11b06f63433484c59f5be8e",
     "contracts/fixtures/batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
     "contracts/fixtures/hash-vectors.json": "26da36fdd21c0f3f8eef7287578edc4c5d11e035e0f65f8ca4b646a04a2b2c6e",
@@ -17,13 +17,14 @@
     "tests/probe_windows_clock.py": "9aac4a0029d0e0fd8771716d8a7cdc1353eb57909857e019afe06b7798fc18ae",
     "tests/README.md": "2f6a520c88e27a8bcd59543421471d4f80236c3fb7d3bfd6738a407424888fc5",
     "tests/reference_api.py": "9b1522a9cecb07fae4f1037d693a91b4e389d57ab3d159b591ac532e0f8176f0",
-    "tests/run_backend.py": "854319c06f26984319e4935303ba2793cc623e160260809929f039508963bd7e",
+    "tests/run_backend.py": "1c7cd438fe2353971c8f7488d365b478826fbe1201678daf33efcf7e7e9b1362",
     "tests/run_contracts.py": "7ff2deb927e5d3a0d15d49928b560ba498dc2a1e8dc9c07fbbc242c481b1454a",
     "tests/test_backend.py": "c3a33ce7b5650253723efdccc126db3daca2a15b47ddf94fb65a039e11bbecc1",
+    "tests/test_backend_runner.py": "98e6333b691b0dc028986e866355a1edc8cce4e9296a6350df62c011a94e8a50",
     "tests/test_integration.py": "6315aca8fe353c8559dba5b25c21017ff6009a1ad7a8a8d7dec1a9eb5385bc50",
     "tests/verify_contract.py": "ece333ca387979f2b0755ab0ca239f359915a73a707f53b7fa59c4679d482d52"
   },
-  "executed_at_utc": "2026-10-28T19:21:14.489232+00:00",
+  "executed_at_utc": "2026-10-28T19:27:59.434148+00:00",
   "environment": {
     "os": "Windows-10-10.0.19045-SP0",
     "pc": "DESKTOP-CC6CD6C",
@@ -63,8 +64,8 @@
           "expected": "False"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.817182+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.817182+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.821301+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.822302+00:00"
     },
     {
       "case": "verify_contract.Checks.test_bad_quality_value",
@@ -73,8 +74,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T19:21:07.817182+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.819183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.822302+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.824302+00:00"
     },
     {
       "case": "verify_contract.Checks.test_canonical_golden",
@@ -94,8 +95,8 @@
           "expected": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.819183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.819183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.824302+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.824302+00:00"
     },
     {
       "case": "verify_contract.Checks.test_clock_reverse_sleep",
@@ -115,8 +116,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.819183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.819183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.824302+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.824302+00:00"
     },
     {
       "case": "verify_contract.Checks.test_duplicate_sample",
@@ -125,8 +126,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T19:21:07.819183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.820183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.824302+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.825303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_invalid_json_numbers",
@@ -135,8 +136,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T19:21:07.820183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.820183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.825303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.825303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_new_id_same_sample",
@@ -151,8 +152,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.820183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.821183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.825303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.826303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_no_partial_success",
@@ -172,8 +173,8 @@
           "expected": "({}, set())"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.821183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.821183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.826303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.826303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_normal_unsupported_missing",
@@ -182,8 +183,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T19:21:07.821183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.822183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.826303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.827303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_replay_after_response_loss",
@@ -208,8 +209,8 @@
           "expected": "1"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.822183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.823183+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.827303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.828303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_rollback_retry",
@@ -234,8 +235,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.823183+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.824184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.828303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.829303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_rtt_boundary",
@@ -255,8 +256,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.824184+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.824184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.829303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.829303+00:00"
     },
     {
       "case": "verify_contract.Checks.test_same_id_changed_content",
@@ -271,8 +272,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.824184+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.824184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.829303+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.830304+00:00"
     },
     {
       "case": "verify_contract.Checks.test_time_id_server",
@@ -292,8 +293,8 @@
           "expected": "None"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.824184+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.825184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.830304+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.830304+00:00"
     },
     {
       "case": "verify_contract.Checks.test_time_normal_and_sign",
@@ -313,8 +314,8 @@
           "expected": "6000"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.825184+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.825184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.830304+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.830304+00:00"
     },
     {
       "case": "verify_contract.Checks.test_unit_mismatch",
@@ -323,8 +324,8 @@
       "actual": "All assertions passed",
       "status": "PASS",
       "assertions": [],
-      "started_at_utc": "2026-10-28T19:21:07.825184+00:00",
-      "finished_at_utc": "2026-10-28T19:21:07.825184+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.830304+00:00",
+      "finished_at_utc": "2026-10-28T19:27:52.830304+00:00"
     },
     {
       "case": "test_integration.Integration.test_actual_transaction_rollback",
@@ -349,8 +350,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:07.828191+00:00",
-      "finished_at_utc": "2026-10-28T19:21:08.462409+00:00"
+      "started_at_utc": "2026-10-28T19:27:52.833304+00:00",
+      "finished_at_utc": "2026-10-28T19:27:53.443445+00:00"
     },
     {
       "case": "test_integration.Integration.test_auth_hash_and_unsupported_zero",
@@ -385,8 +386,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:08.463410+00:00",
-      "finished_at_utc": "2026-10-28T19:21:09.132565+00:00"
+      "started_at_utc": "2026-10-28T19:27:53.443445+00:00",
+      "finished_at_utc": "2026-10-28T19:27:54.112800+00:00"
     },
     {
       "case": "test_integration.Integration.test_changed_id_and_content",
@@ -411,8 +412,8 @@
           "expected": "3"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:09.132565+00:00",
-      "finished_at_utc": "2026-10-28T19:21:09.771717+00:00"
+      "started_at_utc": "2026-10-28T19:27:54.112800+00:00",
+      "finished_at_utc": "2026-10-28T19:27:54.732947+00:00"
     },
     {
       "case": "test_integration.Integration.test_concurrent_identical_requests",
@@ -437,8 +438,8 @@
           "expected": "1"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:09.771717+00:00",
-      "finished_at_utc": "2026-10-28T19:21:10.328907+00:00"
+      "started_at_utc": "2026-10-28T19:27:54.732947+00:00",
+      "finished_at_utc": "2026-10-28T19:27:55.277075+00:00"
     },
     {
       "case": "test_integration.Integration.test_hash_collision_still_compares_body",
@@ -458,8 +459,8 @@
           "expected": "409"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:10.328907+00:00",
-      "finished_at_utc": "2026-10-28T19:21:10.930063+00:00"
+      "started_at_utc": "2026-10-28T19:27:55.277075+00:00",
+      "finished_at_utc": "2026-10-28T19:27:55.880568+00:00"
     },
     {
       "case": "test_integration.Integration.test_independent_producer_golden",
@@ -544,8 +545,8 @@
           "expected": "'{\"v\":1000000000000.000001}'"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:10.930063+00:00",
-      "finished_at_utc": "2026-10-28T19:21:11.458176+00:00"
+      "started_at_utc": "2026-10-28T19:27:55.880568+00:00",
+      "finished_at_utc": "2026-10-28T19:27:56.398912+00:00"
     },
     {
       "case": "test_integration.Integration.test_invalid_last_sample_no_partial_success",
@@ -565,8 +566,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:11.458176+00:00",
-      "finished_at_utc": "2026-10-28T19:21:12.012307+00:00"
+      "started_at_utc": "2026-10-28T19:27:56.398912+00:00",
+      "finished_at_utc": "2026-10-28T19:27:56.953556+00:00"
     },
     {
       "case": "test_integration.Integration.test_invalid_types_and_duplicate_json",
@@ -601,8 +602,8 @@
           "expected": "[0, 0, 0, 0]"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:12.012307+00:00",
-      "finished_at_utc": "2026-10-28T19:21:12.644562+00:00"
+      "started_at_utc": "2026-10-28T19:27:56.953556+00:00",
+      "finished_at_utc": "2026-10-28T19:27:57.603879+00:00"
     },
     {
       "case": "test_integration.Integration.test_normal_replay_response_and_quality",
@@ -618,8 +619,8 @@
         },
         {
           "assertion": "assertEqual",
-          "actual": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T19:21:12.688572Z'})",
-          "expected": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T19:21:12.688572Z'})"
+          "actual": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T19:27:57.648890Z'})",
+          "expected": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T19:27:57.648890Z'})"
         },
         {
           "assertion": "assertEqual",
@@ -632,8 +633,8 @@
           "expected": "[('missing', None), ('ok', 52.5), ('unsupported', None)]"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:12.644562+00:00",
-      "finished_at_utc": "2026-10-28T19:21:13.226453+00:00"
+      "started_at_utc": "2026-10-28T19:27:57.603879+00:00",
+      "finished_at_utc": "2026-10-28T19:27:58.191424+00:00"
     },
     {
       "case": "test_integration.Integration.test_old_catalog_and_pending_registration",
@@ -658,8 +659,8 @@
           "expected": "200"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:13.226453+00:00",
-      "finished_at_utc": "2026-10-28T19:21:13.860859+00:00"
+      "started_at_utc": "2026-10-28T19:27:58.191424+00:00",
+      "finished_at_utc": "2026-10-28T19:27:58.821003+00:00"
     },
     {
       "case": "test_integration.Integration.test_time_http_and_error",
@@ -680,8 +681,8 @@
         },
         {
           "assertion": "assertLessEqual",
-          "actual": "'2026-10-28T19:21:13.914871Z'",
-          "expected": "'2026-10-28T19:21:13.914871Z'"
+          "actual": "'2026-10-28T19:27:58.864013Z'",
+          "expected": "'2026-10-28T19:27:58.864013Z'"
         },
         {
           "assertion": "assertEqual",
@@ -694,8 +695,8 @@
           "expected": "(503, 'CLOCK_UNTRUSTED', '44444444-4444-4444-8444-444444444444')"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:13.860859+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.464226+00:00"
+      "started_at_utc": "2026-10-28T19:27:58.821003+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_elapsed_timeout_even_if_callback_delayed",
@@ -715,8 +716,8 @@
           "expected": "('unknown', 0, None)"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.464226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.464226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_large_rtt_breaks_streak",
@@ -741,8 +742,8 @@
           "expected": "('unknown', 1)"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.464226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.465226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_reverse_time_reset",
@@ -757,8 +758,8 @@
           "expected": "(['clock_jump'], 'unknown', None)"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.465226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.465226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_sleep_reset_and_late_response",
@@ -788,8 +789,8 @@
           "expected": "'normal'"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.465226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.465226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_three_consecutive_threshold_and_recovery",
@@ -809,8 +810,8 @@
           "expected": "('normal', 0)"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.465226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.465226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     },
     {
       "case": "test_integration.StateTransitions.test_timeout_and_stale_id",
@@ -840,8 +841,8 @@
           "expected": "('normal', 0)"
         }
       ],
-      "started_at_utc": "2026-10-28T19:21:14.465226+00:00",
-      "finished_at_utc": "2026-10-28T19:21:14.465226+00:00"
+      "started_at_utc": "2026-10-28T19:27:59.409142+00:00",
+      "finished_at_utc": "2026-10-28T19:27:59.409142+00:00"
     }
   ],
   "scope": "Independent JavaScript producer -> real loopback HTTP Python adapter -> SQLite transactions; synthetic clock state inputs",
