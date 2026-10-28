@@ -1,0 +1,29 @@
+{
+  "contract_version": "0.1.0-draft.1",
+  "base_revision": "84d0b047791105e7aba83c20ffe9c83ac3c053bc",
+  "source_state": "working tree; exact tested source hashes below",
+  "source_hashes": {
+    "contracts/README.md": "7e25f56f2ea3e48602b3c64f8fee7a9fce9bebac27b6cc8aaf18d5245db611b5",
+    "contracts/fixtures/batch.json": "b36519c231b864bb4406d3b89c0bfd852572cb8f3b5c326c6ba6bbf40126a8a7",
+    "tests/verify_contract.py": "615d78f99c6aa5af89f55b8f874135aa96817fe5333f7e50470f7d3ab9be46e4"
+  },
+  "environment": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "pc": "local development PC; synthetic data, no sensors accessed",
+  "executed_at_utc": "2026-10-28T18:23:18.808910+00:00",
+  "reproduction": "python tests/verify_contract.py",
+  "expected": "16 checks pass; test assertions define expected values/status",
+  "actual": {
+    "run": 16,
+    "failures": 0,
+    "errors": 0
+  },
+  "success": true,
+  "details": [],
+  "limitations": [
+    "single-process Python specification model",
+    "independent .NET/API validation pending",
+    "no real PostgreSQL, HTTP, concurrency, crash or sleep tests",
+    "A/C review and CI pending"
+  ]
+}

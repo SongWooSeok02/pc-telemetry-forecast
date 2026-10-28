@@ -1,5 +1,8 @@
 # PC Telemetry & Forecast
 
+- [S1-01 수집·시각 API 계약 초안](contracts/README.md) — 공동 검토 대기
+- [S1-01 계약 검증 안내](tests/README.md)
+
 - [GitHub 저장소](https://github.com/SongWooSeok02/pc-telemetry-forecast)
 - [개발 Project 및 43개 작업](https://github.com/users/SongWooSeok02/projects/1)
 - 로컬 작업 경로: `C:\DEV\pc-telemetry-forecast`
