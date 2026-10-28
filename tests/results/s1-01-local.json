@@ -1,16 +1,17 @@
 {
-  "contract_version": "0.1.0-draft.1",
-  "base_revision": "84d0b047791105e7aba83c20ffe9c83ac3c053bc",
+  "contract_version": "0.1.0-draft.2",
+  "base_revision": "52d847955f85926fa46d9eebe805955d5d3bd853",
   "source_state": "working tree; exact tested source hashes below",
   "source_hashes": {
-    "contracts/README.md": "7e25f56f2ea3e48602b3c64f8fee7a9fce9bebac27b6cc8aaf18d5245db611b5",
-    "contracts/fixtures/batch.json": "b36519c231b864bb4406d3b89c0bfd852572cb8f3b5c326c6ba6bbf40126a8a7",
-    "tests/verify_contract.py": "615d78f99c6aa5af89f55b8f874135aa96817fe5333f7e50470f7d3ab9be46e4"
+    "contracts/README.md": "98ea7857bf9f88c97159a79758946bbb1990d559fe3927190d75f0e87b9ef28c",
+    "contracts/fixtures/batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
+    "contracts/fixtures/sensor-configs.json": "a8321097bd418217881cd12233d0c536103184c67924a59eb3aa4cc5e6ad686b",
+    "tests/verify_contract.py": "ece333ca387979f2b0755ab0ca239f359915a73a707f53b7fa59c4679d482d52"
   },
   "environment": "Windows-10-10.0.19045-SP0",
   "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
   "pc": "local development PC; synthetic data, no sensors accessed",
-  "executed_at_utc": "2026-10-28T18:23:18.808910+00:00",
+  "executed_at_utc": "2026-10-28T18:39:01.551859+00:00",
   "reproduction": "python tests/verify_contract.py",
   "expected": "16 checks pass; test assertions define expected values/status",
   "actual": {

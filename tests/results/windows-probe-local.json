@@ -1,0 +1,17 @@
+{
+  "contract_version": "0.1.0-draft.2",
+  "executed_at_utc": "2026-10-28T18:38:15.530814+00:00",
+  "pc": "DESKTOP-CC6CD6C",
+  "environment": "Windows-10-10.0.19045-SP0",
+  "source": "QueryUnbiasedInterruptTime (100ns units, sleep excluded)",
+  "sample": {
+    "wall_100ns": 134376862955278756,
+    "biased_100ns": 20783391555917,
+    "unbiased_100ns": 2925208648631
+  },
+  "probe_samples": 50000,
+  "observed_wall_step_us_min": 1.2,
+  "accuracy_verified": false,
+  "physical_sleep_verified": false,
+  "note": "Call spacing is not guaranteed clock accuracy/resolution; synchronization needs separate evidence."
+}

@@ -1,0 +1,31 @@
+{
+  "contract_version": "0.1.0-draft.2",
+  "status": "pending_joint_review",
+  "review_deadline_kst": "2026-10-30T23:59:59+09:00",
+  "pr_url": "https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/1",
+  "approvals": {
+    "A": null,
+    "B": null,
+    "C": null
+  },
+  "decision_parameters": {
+    "status": "proposed_pending_A_B_C",
+    "rtt_limit_ms": 250,
+    "time_timeout_ms": 2000,
+    "measurement_period_ms": 60000,
+    "client_resolution_budget_ms": 16,
+    "server_precision_budget_us": 1000,
+    "collection_timeout_ms": 10000,
+    "batch_limit_bytes": 1048576,
+    "batch_limit_samples": 3600,
+    "ledger_retention": "machine_registration_lifetime"
+  },
+  "ci": null,
+  "physical_windows_evidence": null,
+  "project_schedule_confirmation": null,
+  "blockers": [
+    {"cause":"A/B/C approval and numeric budget acceptance pending","owner":"B coordinates A/C","next_check_kst":"2026-10-30T18:00:00+09:00"},
+    {"cause":"Physical Windows sleep and clock resolution evidence pending","owner":"A","next_check_kst":"2026-10-30T18:00:00+09:00"},
+    {"cause":"GitHub Project schedule and linked cards not confirmed","owner":"B","next_check_kst":"2026-10-30T18:00:00+09:00"}
+  ]
+}
