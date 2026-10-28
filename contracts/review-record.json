@@ -20,12 +20,22 @@
     "batch_limit_samples": 3600,
     "ledger_retention": "machine_registration_lifetime"
   },
-  "ci": null,
+  "ci": {
+    "status": "success",
+    "tested_commit": "656a600732491a8c8005edd5430342031ca0ebf5",
+    "run_url": "https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/40747525854",
+    "jobs": {
+      "windows-latest": "success",
+      "ubuntu-latest": "success"
+    },
+    "evidence": "s1-01-evidence-windows-latest and s1-01-evidence-ubuntu-latest workflow artifacts",
+    "note": "This records a verified code commit; review-record.json metadata is excluded from test source hashes."
+  },
   "physical_windows_evidence": null,
   "project_schedule_confirmation": null,
   "blockers": [
     {"cause":"A/B/C approval and numeric budget acceptance pending","owner":"B coordinates A/C","next_check_kst":"2026-10-30T18:00:00+09:00"},
     {"cause":"Physical Windows sleep and clock resolution evidence pending","owner":"A","next_check_kst":"2026-10-30T18:00:00+09:00"},
-    {"cause":"GitHub Project schedule and linked cards not confirmed","owner":"B","next_check_kst":"2026-10-30T18:00:00+09:00"}
+    {"cause":"GitHub GraphQL returned INSUFFICIENT_SCOPES: read:project is required; schedule and linked cards remain unconfirmed","owner":"B","next_check_kst":"2026-10-30T18:00:00+09:00"}
   ]
 }
