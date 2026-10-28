@@ -1,0 +1,32 @@
+[
+  {
+    "name": "full_batch",
+    "input": "{\n  \"schema_version\": \"0.1.0\",\n  \"sensor_config_id\": \"66666666-6666-4666-8666-666666666666\",\n  \"machine_id\": \"11111111-1111-4111-8111-111111111111\",\n  \"boot_session_id\": \"22222222-2222-4222-8222-222222222222\",\n  \"batch_id\": \"33333333-3333-4333-8333-333333333333\",\n  \"samples\": [{\n    \"sample_seq\": 0,\n    \"observed_at\": \"2026-10-29T00:00:00.000000Z\",\n    \"monotonic_ms\": 1000,\n    \"readings\": [\n      {\"sensor_id\": \"cpu/package/temp\", \"unit\": \"Cel\", \"quality\": \"ok\", \"value\": 52.5},\n      {\"sensor_id\": \"gpu/board/power\", \"unit\": \"W\", \"quality\": \"unsupported\", \"value\": null},\n      {\"sensor_id\": \"cpu/fan\", \"unit\": \"rpm\", \"quality\": \"missing\", \"value\": null, \"reason\": \"not_ready\"}\n    ]\n  }]\n}\n",
+    "canonical": "{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}",
+    "sha256": "11d4f9c82ba52f358678cd492a1ca954148ffadecd94484dbb615fecee0568a6"
+  },
+  {
+    "name": "numeric",
+    "input": "{\"z\":-0,\"a\":[1.00,1e1,\"x\"]}",
+    "canonical": "{\"a\":[1,10,\"x\"],\"z\":0}",
+    "sha256": "9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9"
+  },
+  {
+    "name": "escapes",
+    "input": "{\"s\":\"\\/\\u003c\\u003e\\u0026\\u0027\\\"\\\\\"}",
+    "canonical": "{\"s\":\"/<>&'\\\"\\\\\"}",
+    "sha256": "897c020e49165ab87da44086b51bdbbf21e166e98a09c9dc288d112ed0efa978"
+  },
+  {
+    "name": "safe_integer",
+    "input": "{\"v\":9007199254740991,\"f\":0.000001}",
+    "canonical": "{\"f\":0.000001,\"v\":9007199254740991}",
+    "sha256": "44f8554fd6ec6d82d63f79a3537d31bae948df58f8c0ce2899592ca5bed179b0"
+  },
+  {
+    "name": "decimal_not_binary64",
+    "input": "{\"v\":1000000000000.000001}",
+    "canonical": "{\"v\":1000000000000.000001}",
+    "sha256": "17544568830670c239a58ecf53e07c91ce669315b852e22674954fc5b980e52d"
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "66666666-6666-4666-8666-666666666666": {
+    "machine_id": "11111111-1111-4111-8111-111111111111",
+    "sensors": {
+      "cpu/package/temp": {"component_id":"cpu0","kind":"temperature","unit":"Cel","source":"synthetic","scope":"cpu_package","support":"supported"},
+      "gpu/board/power": {"component_id":"gpu0","kind":"power","unit":"W","source":"synthetic","scope":"gpu_board","support":"unsupported"},
+      "cpu/fan": {"component_id":"cpu0","kind":"fan","unit":"rpm","source":"synthetic","scope":"cpu_fan","support":"supported"}
+    }
+  },
+  "77777777-7777-4777-8777-777777777777": {
+    "machine_id": "11111111-1111-4111-8111-111111111111",
+    "sensors": {
+      "cpu/package/temp": {"component_id":"cpu0","kind":"temperature","unit":"Cel","source":"synthetic","scope":"cpu_package","support":"supported"}
+    }
+  }
+}

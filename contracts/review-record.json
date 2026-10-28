@@ -1,0 +1,56 @@
+{
+  "contract_version": "0.1.0-draft.2",
+  "status": "pending_joint_review",
+  "review_deadline_kst": "2026-10-30T23:59:59+09:00",
+  "pr_url": "https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/1",
+  "merge_authorization": {
+    "authority": "team_lead_user_in_this_conversation",
+    "instruction": "순서대로 수행하고 이상없으면 머지해줘",
+    "scope": "Merge PR #1 as a contract draft after automated checks, latest CI and conflict checks pass",
+    "technical_joint_review_complete": false,
+    "task_done_authorized": false
+  },
+  "approvals": {
+    "A": null,
+    "B": null,
+    "C": null
+  },
+  "decision_parameters": {
+    "status": "proposed_pending_A_B_C",
+    "rtt_limit_ms": 250,
+    "time_timeout_ms": 2000,
+    "measurement_period_ms": 60000,
+    "client_resolution_budget_ms": 16,
+    "server_precision_budget_us": 1000,
+    "collection_timeout_ms": 10000,
+    "batch_limit_bytes": 1048576,
+    "batch_limit_samples": 3600,
+    "ledger_retention": "machine_registration_lifetime"
+  },
+  "ci": {
+    "status": "success",
+    "tested_commit": "656a600732491a8c8005edd5430342031ca0ebf5",
+    "run_url": "https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/40747525854",
+    "jobs": {
+      "windows-latest": "success",
+      "ubuntu-latest": "success"
+    },
+    "evidence": "s1-01-evidence-windows-latest and s1-01-evidence-ubuntu-latest workflow artifacts",
+    "note": "This records a verified code commit; review-record.json metadata is excluded from test source hashes."
+  },
+  "physical_windows_evidence": {
+    "status": "windows_11_physical_test_deferred",
+    "observed_os": "Microsoft Windows 10 Home 10.0.19045",
+    "local_api_probe": "tests/results/windows-probe-local.json",
+    "physical_sleep_verified": false,
+    "follow_up_tasks": ["S1-02a", "S1-02b", "S4-04"],
+    "owner": "A",
+    "next_check_kst": "2026-10-30T18:00:00+09:00"
+  },
+  "project_schedule_confirmation": null,
+  "blockers": [
+    {"cause":"A/B/C approval and numeric budget acceptance pending","owner":"B coordinates A/C","next_check_kst":"2026-10-30T18:00:00+09:00"},
+    {"cause":"Only Windows 10 Home 19045 is available; Windows 11 physical sleep and clock resolution evidence deferred to S1-02a/S1-02b/S4-04","owner":"A","next_check_kst":"2026-10-30T18:00:00+09:00"},
+    {"cause":"GitHub GraphQL returned INSUFFICIENT_SCOPES: read:project is required; schedule and linked cards remain unconfirmed","owner":"B","next_check_kst":"2026-10-30T18:00:00+09:00"}
+  ]
+}

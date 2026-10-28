@@ -1,0 +1,35 @@
+name: S1-01 contract validation
+on:
+  pull_request:
+  push:
+    branches: [main, 'codex/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contract:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      CONTRACT_REPORT: tests/results/ci/s1-01-contracts.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Independent producer, HTTP API, transactions and clock state
+        run: python tests/run_contracts.py
+      - name: Whitespace check
+        run: git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-01-evidence-${{ matrix.os }}
+          path: tests/results/ci/s1-01-contracts.json
+          if-no-files-found: error

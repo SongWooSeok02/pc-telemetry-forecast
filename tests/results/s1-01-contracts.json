@@ -1,0 +1,849 @@
+{
+  "contract_version": "0.1.0-draft.2",
+  "base_revision": "be542471efcb46132c558a1a6a35f8ee0bdc9efd",
+  "ci_run_url": null,
+  "ci_head_revision": null,
+  "source_hashes": {
+    ".github/workflows/contracts.yml": "7a61dae8fdc92a65fac88914543a8f099f500c5bf11b06f63433484c59f5be8e",
+    "contracts/fixtures/batch.json": "19ee6dbcc45f7e985049f40d39ad4f96704320278d03ebb242fc4fd630cfd9f9",
+    "contracts/fixtures/hash-vectors.json": "26da36fdd21c0f3f8eef7287578edc4c5d11e035e0f65f8ca4b646a04a2b2c6e",
+    "contracts/fixtures/sensor-configs.json": "a8321097bd418217881cd12233d0c536103184c67924a59eb3aa4cc5e6ad686b",
+    "contracts/README.md": "98ea7857bf9f88c97159a79758946bbb1990d559fe3927190d75f0e87b9ef28c",
+    "contracts/REVIEW.md": "b8c51f4013d2232fd81295993aad5aac09d55d13316bca72550af9fe503400e5",
+    "tests/agent_producer.mjs": "78da35aa2c9527cefd4ec75fcf7b71c13be81e55e4acd078866cef360753680d",
+    "tests/clock_state.py": "0043f3f6033a807da875b499e64a8a5e4a54dbba4068900015e5b58df7846e64",
+    "tests/probe_windows_clock.py": "9aac4a0029d0e0fd8771716d8a7cdc1353eb57909857e019afe06b7798fc18ae",
+    "tests/README.md": "44a407e131715cb62f87a77d6d0047af779fbd4a814a399c82b064c43c128f09",
+    "tests/reference_api.py": "9b1522a9cecb07fae4f1037d693a91b4e389d57ab3d159b591ac532e0f8176f0",
+    "tests/run_contracts.py": "7ff2deb927e5d3a0d15d49928b560ba498dc2a1e8dc9c07fbbc242c481b1454a",
+    "tests/test_integration.py": "6315aca8fe353c8559dba5b25c21017ff6009a1ad7a8a8d7dec1a9eb5385bc50",
+    "tests/verify_contract.py": "ece333ca387979f2b0755ab0ca239f359915a73a707f53b7fa59c4679d482d52"
+  },
+  "executed_at_utc": "2026-10-28T18:49:04.342627+00:00",
+  "environment": {
+    "os": "Windows-10-10.0.19045-SP0",
+    "pc": "DESKTOP-CC6CD6C",
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "node": "v24.22.1"
+  },
+  "reproduction": "python tests/run_contracts.py (Node.js on PATH or NODE_BINARY set)",
+  "expected": "Every contract case passes without skips",
+  "actual": {
+    "run": 33,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "success": true,
+  "cases": [
+    {
+      "case": "verify_contract.Checks.test_auth_hash_failure",
+      "reproduction": "python -m unittest verify_contract.Checks.test_auth_hash_failure",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertFalse",
+          "actual": "set()",
+          "expected": "False"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.686598+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.687599+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_bad_quality_value",
+      "reproduction": "python -m unittest verify_contract.Checks.test_bad_quality_value",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [],
+      "started_at_utc": "2026-10-28T18:48:57.687599+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.689600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_canonical_golden",
+      "reproduction": "python -m unittest verify_contract.Checks.test_canonical_golden",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "b'{\"a\":[1,10,\"x\"],\"z\":0}'",
+          "expected": "b'{\"a\":[1,10,\"x\"],\"z\":0}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'",
+          "expected": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.689600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.689600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_clock_reverse_sleep",
+      "reproduction": "python -m unittest verify_contract.Checks.test_clock_reverse_sleep",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.689600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.689600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_duplicate_sample",
+      "reproduction": "python -m unittest verify_contract.Checks.test_duplicate_sample",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [],
+      "started_at_utc": "2026-10-28T18:48:57.689600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.690600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_invalid_json_numbers",
+      "reproduction": "python -m unittest verify_contract.Checks.test_invalid_json_numbers",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [],
+      "started_at_utc": "2026-10-28T18:48:57.690600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.690600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_new_id_same_sample",
+      "reproduction": "python -m unittest verify_contract.Checks.test_new_id_same_sample",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "409",
+          "expected": "409"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.690600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.691600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_no_partial_success",
+      "reproduction": "python -m unittest verify_contract.Checks.test_no_partial_success",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "({}, set())",
+          "expected": "({}, set())"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.691600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.692600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_normal_unsupported_missing",
+      "reproduction": "python -m unittest verify_contract.Checks.test_normal_unsupported_missing",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [],
+      "started_at_utc": "2026-10-28T18:48:57.692600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.692600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_replay_after_response_loss",
+      "reproduction": "python -m unittest verify_contract.Checks.test_replay_after_response_loss",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "1",
+          "expected": "1"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.692600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.693600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_rollback_retry",
+      "reproduction": "python -m unittest verify_contract.Checks.test_rollback_retry",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertFalse",
+          "actual": "set()",
+          "expected": "False"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.693600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.694600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_rtt_boundary",
+      "reproduction": "python -m unittest verify_contract.Checks.test_rtt_boundary",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNotNone",
+          "actual": "(0.0, 250, 142.0)",
+          "expected": "not None"
+        },
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.694600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.694600+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_same_id_changed_content",
+      "reproduction": "python -m unittest verify_contract.Checks.test_same_id_changed_content",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "409",
+          "expected": "409"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.694600+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.695601+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_time_id_server",
+      "reproduction": "python -m unittest verify_contract.Checks.test_time_id_server",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.695601+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.695601+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_time_normal_and_sign",
+      "reproduction": "python -m unittest verify_contract.Checks.test_time_normal_and_sign",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "(0.0, 100, 67.0)",
+          "expected": "(0, 100, 67)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "6000.0",
+          "expected": "6000"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.695601+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.695601+00:00"
+    },
+    {
+      "case": "verify_contract.Checks.test_unit_mismatch",
+      "reproduction": "python -m unittest verify_contract.Checks.test_unit_mismatch",
+      "expected": "All assertions in this named test pass",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [],
+      "started_at_utc": "2026-10-28T18:48:57.695601+00:00",
+      "finished_at_utc": "2026-10-28T18:48:57.695601+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_actual_transaction_rollback",
+      "reproduction": "python -m unittest test_integration.Integration.test_actual_transaction_rollback",
+      "expected": "Expected: injected failure after INSERTs rolls back all tables; identical retry -> 200.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[0, 0, 0, 0]",
+          "expected": "[0, 0, 0, 0]"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:57.696601+00:00",
+      "finished_at_utc": "2026-10-28T18:48:58.324747+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_auth_hash_and_unsupported_zero",
+      "reproduction": "python -m unittest test_integration.Integration.test_auth_hash_and_unsupported_zero",
+      "expected": "Expected: bad token 401, other machine 403, bad hash 422, unsupported zero 422; no writes.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "403",
+          "expected": "403"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[0, 0, 0, 0]",
+          "expected": "[0, 0, 0, 0]"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:58.324747+00:00",
+      "finished_at_utc": "2026-10-28T18:48:58.987904+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_changed_id_and_content",
+      "reproduction": "python -m unittest test_integration.Integration.test_changed_id_and_content",
+      "expected": "Expected: same ID changed value -> BATCH_CONFLICT; new ID same sample -> SAMPLE_CONFLICT.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "(409, 'BATCH_CONFLICT')",
+          "expected": "(409, 'BATCH_CONFLICT')"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(409, 'SAMPLE_CONFLICT')",
+          "expected": "(409, 'SAMPLE_CONFLICT')"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "3",
+          "expected": "3"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:58.987904+00:00",
+      "finished_at_utc": "2026-10-28T18:48:59.618406+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_concurrent_identical_requests",
+      "reproduction": "python -m unittest test_integration.Integration.test_concurrent_identical_requests",
+      "expected": "Expected: 4 concurrent HTTP posts return the same 200 body and one stored sample.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "[200, 200, 200, 200]",
+          "expected": "[200, 200, 200, 200]"
+        },
+        {
+          "assertion": "assertTrue",
+          "actual": "True",
+          "expected": "True"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "1",
+          "expected": "1"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:48:59.618406+00:00",
+      "finished_at_utc": "2026-10-28T18:49:00.185184+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_hash_collision_still_compares_body",
+      "reproduction": "python -m unittest test_integration.Integration.test_hash_collision_still_compares_body",
+      "expected": "Expected: artificially equal hashes cannot bypass canonical content comparison -> 409.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "409",
+          "expected": "409"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:00.185184+00:00",
+      "finished_at_utc": "2026-10-28T18:49:00.774323+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_independent_producer_golden",
+      "reproduction": "python -m unittest test_integration.Integration.test_independent_producer_golden",
+      "expected": "Expected: independent JS/Python canonical bytes and pinned SHA match.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'",
+          "expected": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'11d4f9c82ba52f358678cd492a1ca954148ffadecd94484dbb615fecee0568a6'",
+          "expected": "'11d4f9c82ba52f358678cd492a1ca954148ffadecd94484dbb615fecee0568a6'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'",
+          "expected": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"a\":[1,10,\"x\"],\"z\":0}'",
+          "expected": "'{\"a\":[1,10,\"x\"],\"z\":0}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'",
+          "expected": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"a\":[1,10,\"x\"],\"z\":0}'",
+          "expected": "'{\"a\":[1,10,\"x\"],\"z\":0}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'",
+          "expected": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'897c020e49165ab87da44086b51bdbbf21e166e98a09c9dc288d112ed0efa978'",
+          "expected": "'897c020e49165ab87da44086b51bdbbf21e166e98a09c9dc288d112ed0efa978'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'",
+          "expected": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"f\":0.000001,\"v\":9007199254740991}'",
+          "expected": "'{\"f\":0.000001,\"v\":9007199254740991}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'44f8554fd6ec6d82d63f79a3537d31bae948df58f8c0ce2899592ca5bed179b0'",
+          "expected": "'44f8554fd6ec6d82d63f79a3537d31bae948df58f8c0ce2899592ca5bed179b0'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"f\":0.000001,\"v\":9007199254740991}'",
+          "expected": "'{\"f\":0.000001,\"v\":9007199254740991}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"v\":1000000000000.000001}'",
+          "expected": "'{\"v\":1000000000000.000001}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'17544568830670c239a58ecf53e07c91ce669315b852e22674954fc5b980e52d'",
+          "expected": "'17544568830670c239a58ecf53e07c91ce669315b852e22674954fc5b980e52d'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"v\":1000000000000.000001}'",
+          "expected": "'{\"v\":1000000000000.000001}'"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:00.774323+00:00",
+      "finished_at_utc": "2026-10-28T18:49:01.299791+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_invalid_last_sample_no_partial_success",
+      "reproduction": "python -m unittest test_integration.Integration.test_invalid_last_sample_no_partial_success",
+      "expected": "Expected: last sample invalid -> 422; all four tables empty.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[0, 0, 0, 0]",
+          "expected": "[0, 0, 0, 0]"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:01.299791+00:00",
+      "finished_at_utc": "2026-10-28T18:49:01.857923+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_invalid_types_and_duplicate_json",
+      "reproduction": "python -m unittest test_integration.Integration.test_invalid_types_and_duplicate_json",
+      "expected": "Expected: malformed batch types -> 422; duplicate JSON keys -> 400; no writes.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "400",
+          "expected": "400"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[0, 0, 0, 0]",
+          "expected": "[0, 0, 0, 0]"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:01.857923+00:00",
+      "finished_at_utc": "2026-10-28T18:49:02.491192+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_normal_replay_response_and_quality",
+      "reproduction": "python -m unittest test_integration.Integration.test_normal_replay_response_and_quality",
+      "expected": "Expected: replay body incl. received_at identical, exactly 1/1/3/1 rows.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:49:02.538203Z'})",
+          "expected": "(200, {'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-10-28T18:49:02.538203Z'})"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'batches': 1, 'samples': 1, 'measurements': 3, 'reaggregate': 1}",
+          "expected": "{'batches': 1, 'samples': 1, 'measurements': 3, 'reaggregate': 1}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[('missing', None), ('ok', 52.5), ('unsupported', None)]",
+          "expected": "[('missing', None), ('ok', 52.5), ('unsupported', None)]"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:02.491192+00:00",
+      "finished_at_utc": "2026-10-28T18:49:03.078328+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_old_catalog_and_pending_registration",
+      "reproduction": "python -m unittest test_integration.Integration.test_old_catalog_and_pending_registration",
+      "expected": "Expected: old catalog still accepts; missing catalog retryable 409, same frozen body succeeds after registration.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(409, 'SENSOR_CONFIG_PENDING', True)",
+          "expected": "(409, 'SENSOR_CONFIG_PENDING', True)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:03.078328+00:00",
+      "finished_at_utc": "2026-10-28T18:49:03.720479+00:00"
+    },
+    {
+      "case": "test_integration.Integration.test_time_http_and_error",
+      "reproduction": "python -m unittest test_integration.Integration.test_time_http_and_error",
+      "expected": "Expected: request ID echoed, ordered UTC, precision=1000; unsynced -> CLOCK_UNTRUSTED.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'44444444-4444-4444-8444-444444444444'",
+          "expected": "'44444444-4444-4444-8444-444444444444'"
+        },
+        {
+          "assertion": "assertLessEqual",
+          "actual": "'2026-10-28T18:49:03.771492Z'",
+          "expected": "'2026-10-28T18:49:03.771492Z'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "1000",
+          "expected": "1000"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(503, 'CLOCK_UNTRUSTED', '44444444-4444-4444-8444-444444444444')",
+          "expected": "(503, 'CLOCK_UNTRUSTED', '44444444-4444-4444-8444-444444444444')"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:03.720479+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_elapsed_timeout_even_if_callback_delayed",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_elapsed_timeout_even_if_callback_delayed",
+      "expected": "Expected: 2s total timeout rejects a response even when network RTT alone is acceptable.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "('unknown', 0, None)",
+          "expected": "('unknown', 0, None)"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_large_rtt_breaks_streak",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_large_rtt_breaks_streak",
+      "expected": "Expected: excessive RTT invalidates streak; next high offset counts as first.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "('unknown', 0)",
+          "expected": "('unknown', 0)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "('unknown', 1)",
+          "expected": "('unknown', 1)"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_reverse_time_reset",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_reverse_time_reset",
+      "expected": "Expected: backward wall clock -> jump event, unknown, no stale baseline.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "(['clock_jump'], 'unknown', None)",
+          "expected": "(['clock_jump'], 'unknown', None)"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_sleep_reset_and_late_response",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_sleep_reset_and_late_response",
+      "expected": "Expected: resume clears baseline/count/pending; late response ignored; no jump; fresh sample needed.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "('unknown', 0, None)",
+          "expected": "('unknown', 0, None)"
+        },
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "['resume']",
+          "expected": "['resume']"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'normal'",
+          "expected": "'normal'"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_three_consecutive_threshold_and_recovery",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_three_consecutive_threshold_and_recovery",
+      "expected": "Expected: 3 high offsets -> suspected; normal sample -> normal/count=0.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "('clock_skew_suspected', 3)",
+          "expected": "('clock_skew_suspected', 3)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "('normal', 0)",
+          "expected": "('normal', 0)"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    },
+    {
+      "case": "test_integration.StateTransitions.test_timeout_and_stale_id",
+      "reproduction": "python -m unittest test_integration.StateTransitions.test_timeout_and_stale_id",
+      "expected": "Expected: timeout -> unknown/count=0, old ID cannot consume the next pending request.",
+      "actual": "All assertions passed",
+      "status": "PASS",
+      "assertions": [
+        {
+          "assertion": "assertIsNone",
+          "actual": "None",
+          "expected": "None"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'new'",
+          "expected": "'new'"
+        },
+        {
+          "assertion": "assertIsNotNone",
+          "actual": "(0.0, 100, 67.0)",
+          "expected": "not None"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "('normal', 0)",
+          "expected": "('normal', 0)"
+        }
+      ],
+      "started_at_utc": "2026-10-28T18:49:04.317620+00:00",
+      "finished_at_utc": "2026-10-28T18:49:04.317620+00:00"
+    }
+  ],
+  "scope": "Independent JavaScript producer -> real loopback HTTP Python adapter -> SQLite transactions; synthetic clock state inputs",
+  "limitations": [
+    "Not the production .NET/FastAPI/PostgreSQL stack",
+    "No physical sleep/resume, deployment clock accuracy or synchronization verification",
+    "No human approvals; this report alone cannot mark S1-01 Done"
+  ]
+}
