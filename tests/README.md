@@ -48,3 +48,10 @@ Windows 11의 절전 검증 또는 서버 동기화/정확도 검증으로 취�
 CI: .github/workflows/contracts.yml에서 Windows/Ubuntu 각각 전체 검사를 실행하고
 보고서를 artifact로 보관한다. workflow 파일이 존재하는 것만으로 CI 통과는 아니다.
 최종 공동 검토 절차는 contracts/REVIEW.md를 따른다.
+
+## S1-03 FastAPI / PostgreSQL
+
+`pip install -r backend/requirements.txt` 후 전용 테스트 DB를 `TEST_DATABASE_URL`로
+지정하고 `python tests/run_backend.py`를 실행한다. DB가 없으면 통합 검사는 미실행으로 기록한다.
+[실행·설계·제한](../backend/README.md), [증거](results/s1-03-backend.json)를 참고한다.
+S1-01 회귀 증거는 [s1-03-contract-regression.json](results/s1-03-contract-regression.json)이다.
