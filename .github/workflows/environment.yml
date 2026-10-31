@@ -1,0 +1,50 @@
+name: S1-07 development environment
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r infra/requirements-ci.txt
+      - run: python -m compileall -q backend tests
+      - run: python -m ruff check --select E9,F63,F7,F82 backend tests
+      - run: node --check tests/agent_producer.mjs
+      - run: git show --format= --check HEAD
+  compose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure disposable synthetic database
+        run: cp infra/.env.example infra/.env
+      - run: docker compose --env-file infra/.env -f infra/compose.yaml config --quiet
+      - run: docker compose --env-file infra/.env -f infra/compose.yaml up --build --wait api
+      - name: Run partition maintenance worker
+        run: docker compose --env-file infra/.env -f infra/compose.yaml run --rm partitions
+      - name: Assert API database readiness
+        run: curl --fail --show-error http://127.0.0.1:8000/health/partitions
+      - name: Container status and synthetic-only logs
+        if: always()
+        run: |
+          mkdir -p tests/results/ci
+          docker compose --env-file infra/.env -f infra/compose.yaml ps --all > tests/results/ci/compose-status.txt
+          docker compose --env-file infra/.env -f infra/compose.yaml logs --no-color > tests/results/ci/compose.log 2>&1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-07-compose-evidence
+          path: tests/results/ci/compose*
+          retention-days: 7
+          if-no-files-found: error
+      - name: Remove disposable CI database
+        if: always()
+        run: docker compose --env-file infra/.env -f infra/compose.yaml down --volumes

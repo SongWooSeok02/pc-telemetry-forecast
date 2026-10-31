@@ -1,5 +1,8 @@
 # PC Telemetry & Forecast
 
+- [S1-07 개발 환경·CI 안내](infra/README.md)
+- [실제 PC 2대 센서 지원 검증 표 (관측 대기)](docs/sensor-support.md)
+
 - [S1-03 수집 API·PostgreSQL 실행 및 설계](backend/README.md)
 - [S1-03 로컬 통합 검증 결과](tests/results/s1-03-backend.json)
 
