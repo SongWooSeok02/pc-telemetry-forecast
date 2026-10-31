@@ -8,6 +8,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -18,7 +20,7 @@ jobs:
       - run: python -m compileall -q backend tests
       - run: python -m ruff check --select E9,F63,F7,F82 backend tests
       - run: node --check tests/agent_producer.mjs
-      - run: git show --format= --check HEAD
+      - run: git diff --check HEAD^ HEAD
   compose:
     runs-on: ubuntu-latest
     timeout-minutes: 15

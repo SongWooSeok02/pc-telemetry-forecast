@@ -42,4 +42,10 @@ UTC 실행 시각과 성공/실패를 담는다. 기반 커밋 위 미커밋 변
 현재 소스에서 추가 병합 차단 결함은 발견하지 못했으며, 실제 Docker 실행 결과는
 PR CI에서 확인해야 한다. 이 자체 리뷰는 다른 팀원의 승인을 대신하지 않는다.
 
+PR #4의 첫 push CI에서 Docker 이미지 빌드·마이그레이션·API readiness·파티션 작업자와
+PostgreSQL 통합 검사가 통과했다. 정적 검사 job의 공백 검사는 깊이 1 checkout에서
+부모 커밋이 없어 기존 파일까지 검사하는 문제가 드러났다. checkout 깊이를 2로 늘리고
+`git diff --check HEAD^ HEAD`로 검사 범위를 명시했다. 복구 CI 결과는 PR checks에서 확인한다.
+첫 실행: https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/41227173913
+
 기존 `docs/discord-project-overview*` 파일은 이번 작업 산출물에 포함하지 않는다.
