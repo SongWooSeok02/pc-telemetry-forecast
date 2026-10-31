@@ -1,0 +1,183 @@
+{
+  "executed_at_utc": "2026-10-31T17:58:51.628989+00:00",
+  "base_commit": "8eb2e9cd2ca69c36c1f65f359c3fb4a7c6f8246d",
+  "pc": "local-dev-anonymous (not sensor PC-A/PC-B)",
+  "os": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14",
+  "node": "v24.16.0",
+  "ruff": "0.11.13",
+  "yaml_parser": "PyYAML 6.0.2",
+  "source_sha256": {
+    ".dockerignore": "17ba8765afb22291e87e0bc989f56f4369959076387b4f0e820bdbe1b802b1ee",
+    ".gitignore": "405df98b17e75dd1c3f2aaea2ec80f5636d592c871ce8c7fc330b16c44e829d7",
+    "README.md": "3b8f87a80c62f83a8afdcc3b5d53baa147f46928335e3a54c44f921640a0d9cd",
+    "backend/partitions.py": "fadea933bbe2884077967d1e3209da12251da13dec4b1480d6fbe716ac3e3d8d",
+    "tests/test_partitions.py": "b0194f717f2da670edd2e58516a94c142443b0c26124622e5e6978bc0c535716",
+    ".github/workflows/backend.yml": "69f2d777a1dc5978a026c408c513f75c111160f5b6fbf398d17e7de47666349b",
+    ".github/workflows/environment.yml": "94303fe5af2cff30002f3eb3c71d9aaa8c843ae5e3231693885b02e6defe7957",
+    "infra/.env.example": "3975dd1427225933dee99b490b6f79e8a611b06c87bc55d511e4fc8a6cd620e4",
+    "infra/compose.yaml": "91f9f91064d3c3743dfc47568990f124f864f32dae56b8b21d037951d53e5861",
+    "infra/Dockerfile": "38ea5655c548eabce2730b68223309517a3e1fe32fe6a477faa8afe9491ad0e9",
+    "infra/README.md": "a3e480f605f3d573938deb294ad8448e4bb58dba6578777a83bf0001ef16df91",
+    "infra/requirements-ci.txt": "dbcfa018c06c4df9a71623356aaeb26700752474b3cff329ab231df210ec153c",
+    "docs/sensor-support.md": "eb911ae6c730fe5ac9f1fbcc65773b172c788746fa2d16dc580e923478109604"
+  },
+  "cases": [
+    {
+      "case": "Python compile",
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "backend",
+        "tests"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:44.059769+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": ""
+    },
+    {
+      "case": "Fatal static checks",
+      "command": [
+        "python",
+        "-m",
+        "ruff",
+        "check",
+        "--select",
+        "E9,F63,F7,F82",
+        "backend",
+        "tests"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:44.119930+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": "All checks passed!"
+    },
+    {
+      "case": "JavaScript syntax",
+      "command": [
+        "node",
+        "--check",
+        "tests/agent_producer.mjs"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:44.148953+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": ""
+    },
+    {
+      "case": "Evidence runner regression",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_backend_runner.py"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:44.296986+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK"
+    },
+    {
+      "case": "Partition worker logging and exit",
+      "command": [
+        "python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_partitions.py"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:44.616060+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": "..\n----------------------------------------------------------------------\nRan 2 tests in 0.003s\n\nOK"
+    },
+    {
+      "case": "YAML parse only (not Compose runtime validation)",
+      "expected": "all YAML parse",
+      "actual": "4 YAML files parsed",
+      "status": "pass",
+      "executed_at_utc": "2026-10-31T17:56:14.762844+00:00"
+    },
+    {
+      "case": "Local intentional build failure (not remote CI)",
+      "command": [
+        "-m",
+        "compileall",
+        "-q",
+        "local-evidence\\intentional_syntax_error.py"
+      ],
+      "executed_at_utc": "2026-10-31T17:56:14.763844+00:00",
+      "expected_exit": 1,
+      "actual_exit": 1,
+      "status": "pass",
+      "output": "*** Error compiling 'local-evidence\\\\intentional_syntax_error.py'...\n  File \"local-evidence\\intentional_syntax_error.py\", line 1\n    def broken(:\n               ^\nSyntaxError: invalid syntax"
+    },
+    {
+      "case": "Local build recovery",
+      "command": [
+        "-m",
+        "compileall",
+        "-q",
+        "local-evidence\\intentional_syntax_error.py"
+      ],
+      "executed_at_utc": "2026-10-31T17:56:14.839996+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": ""
+    },
+    {
+      "case": "Contract regression",
+      "command": [
+        "python",
+        "tests/run_contracts.py"
+      ],
+      "expected": "33 tests pass",
+      "actual": "33 tests passed (see local execution output)",
+      "status": "pass",
+      "executed_at_utc": "2026-10-31T17:58:51.592930+00:00",
+      "actual_exit": 0,
+      "output": "test_auth_hash_failure (verify_contract.Checks.test_auth_hash_failure) ... ok\ntest_bad_quality_value (verify_contract.Checks.test_bad_quality_value) ... ok\ntest_canonical_golden (verify_contract.Checks.test_canonical_golden) ... ok\ntest_clock_reverse_sleep (verify_contract.Checks.test_clock_reverse_sleep) ... ok\ntest_duplicate_sample (verify_contract.Checks.test_duplicate_sample) ... ok\ntest_invalid_json_numbers (verify_contract.Checks.test_invalid_json_numbers) ... ok\ntest_new_id_same_sample (verify_contract.Checks.test_new_id_same_sample) ... ok\ntest_no_partial_success (verify_contract.Checks.test_no_partial_success) ... ok\ntest_normal_unsupported_missing (verify_contract.Checks.test_normal_unsupported_missing) ... ok\ntest_replay_after_response_loss (verify_contract.Checks.test_replay_after_response_loss) ... ok\ntest_rollback_retry (verify_contract.Checks.test_rollback_retry) ... ok\ntest_rtt_boundary (verify_contract.Checks.test_rtt_boundary) ... ok\ntest_same_id_changed_content (verify_contract.Checks.test_same_id_changed_content) ... ok\ntest_time_id_server (verify_contract.Checks.test_time_id_server) ... ok\ntest_time_normal_and_sign (verify_contract.Checks.test_time_normal_and_sign) ... ok\ntest_unit_mismatch (verify_contract.Checks.test_unit_mismatch) ... ok\ntest_actual_transaction_rollback (test_integration.Integration.test_actual_transaction_rollback)\nExpected: injected failure after INSERTs rolls back all tables; identical retry -> 200. ... ok\ntest_auth_hash_and_unsupported_zero (test_integration.Integration.test_auth_hash_and_unsupported_zero)\nExpected: bad token 401, other machine 403, bad hash 422, unsupported zero 422; no writes. ... ok\ntest_changed_id_and_content (test_integration.Integration.test_changed_id_and_content)\nExpected: same ID changed value -> BATCH_CONFLICT; new ID same sample -> SAMPLE_CONFLICT. ... ok\ntest_concurrent_identical_requests (test_integration.Integration.test_concurrent_identical_requests)\nExpected: 4 concurrent HTTP posts return the same 200 body and one stored sample. ... ok\ntest_hash_collision_still_compares_body (test_integration.Integration.test_hash_collision_still_compares_body)\nExpected: artificially equal hashes cannot bypass canonical content comparison -> 409. ... ok\ntest_independent_producer_golden (test_integration.Integration.test_independent_producer_golden)\nExpected: independent JS/Python canonical bytes and pinned SHA match. ... ok\ntest_invalid_last_sample_no_partial_success (test_integration.Integration.test_invalid_last_sample_no_partial_success)\nExpected: last sample invalid -> 422; all four tables empty. ... ok\ntest_invalid_types_and_duplicate_json (test_integration.Integration.test_invalid_types_and_duplicate_json)\nExpected: malformed batch types -> 422; duplicate JSON keys -> 400; no writes. ... ok\ntest_normal_replay_response_and_quality (test_integration.Integration.test_normal_replay_response_and_quality)\nExpected: replay body incl. received_at identical, exactly 1/1/3/1 rows. ... ok\ntest_old_catalog_and_pending_registration (test_integration.Integration.test_old_catalog_and_pending_registration)\nExpected: old catalog still accepts; missing catalog retryable 409, same frozen body succeeds after registration. ... ok\ntest_time_http_and_error (test_integration.Integration.test_time_http_and_error)\nExpected: request ID echoed, ordered UTC, precision=1000; unsynced -> CLOCK_UNTRUSTED. ... ok\ntest_elapsed_timeout_even_if_callback_delayed (test_integration.StateTransitions.test_elapsed_timeout_even_if_callback_delayed)\nExpected: 2s total timeout rejects a response even when network RTT alone is acceptable. ... ok\ntest_large_rtt_breaks_streak (test_integration.StateTransitions.test_large_rtt_breaks_streak)\nExpected: excessive RTT invalidates streak; next high offset counts as first. ... ok\ntest_reverse_time_reset (test_integration.StateTransitions.test_reverse_time_reset)\nExpected: backward wall clock -> jump event, unknown, no stale baseline. ... ok\ntest_sleep_reset_and_late_response (test_integration.StateTransitions.test_sleep_reset_and_late_response)\nExpected: resume clears baseline/count/pending; late response ignored; no jump; fresh sample needed. ... ok\ntest_three_consecutive_threshold_and_recovery (test_integration.StateTransitions.test_three_consecutive_threshold_and_recovery)\nExpected: 3 high offsets -> suspected; normal sample -> normal/count=0. ... ok\ntest_timeout_and_stale_id (test_integration.StateTransitions.test_timeout_and_stale_id)\nExpected: timeout -> unknown/count=0, old ID cannot consume the next pending request. ... ok\n\n----------------------------------------------------------------------\nRan 33 tests in 6.665s\n\nOK"
+    },
+    {
+      "case": "Whitespace",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "executed_at_utc": "2026-10-31T17:58:51.619935+00:00",
+      "expected_exit": 0,
+      "actual_exit": 0,
+      "status": "pass",
+      "output": ""
+    }
+  ],
+  "not_executed": [
+    "Docker image build and Compose readiness: Docker not installed",
+    "Fresh second developer environment",
+    "Remote CI intentional failure and recovery",
+    "PostgreSQL integration rerun for S1-07",
+    "Actual PC-A/PC-B sensors and drivers",
+    "Agent/dashboard/prediction worker builds: sources absent",
+    "Team member review and branch protection settings"
+  ],
+  "scope_passed": true,
+  "s1_07_complete": false,
+  "review_updated_at_utc": "2026-10-31T18:01:09.759126+00:00"
+}
