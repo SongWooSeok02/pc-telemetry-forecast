@@ -12,12 +12,22 @@ PC/환경: 현재 개발 작업 공간, Windows/PowerShell, Node.js. 실제 배�
 | 로컬 문서 링크 | 변경 Markdown의 상대 파일 링크가 존재하는지 확인 | 대상 파일 존재 | 기계 판독 기록 참조 |
 | 기존 신청 의무 제거 | README 7/15.2절 및 S1/S2/S3 작업명 확인 | 신청·발급이 필수 조건으로 남지 않음 | 반영. 센서 드라이버 요구사항 유지 |
 | 실제 설치본 존재 | 추적 파일 중 Windows 프로젝트·설치 패키지 검색 | 검증할 설치본 식별 | 미확보, 실제 설치 검증 미실행 |
-| 원격 카드 조회 | GitHub 연결 검색 및 기존 Git 인증의 Project GraphQL 조회 | 원격 카드 식별 | 연결 도구 접근 오류, Git 인증은 저장소 접근 성공·Project는 read:project 권한 부족. IssueDraft ID 미확인 |
+| 원격 카드 반영 | GitHub API 및 기존 로그인 브라우저 확인 | S1-08 식별·내용/상태 반영 | API는 Project 권한 부족. 브라우저에서 itemId=286058992 확인, 제목·본문·PR 링크·검토 중 상태 반영 성공 |
 | 다른 팀원 검토 | 승인 증거 확인 | 다른 팀원 1명 승인 | 대기. 자체 점검으로 대체하지 않음 |
 
 문서 변경이므로 백엔드/DB 회귀 검사는 실행하지 않는다. 문서 점검 성공은
 제품의 설치·실행 성공을 의미하지 않는다. 원격 카드 반영안은
-[별도 문서](s1-08-card-revisions.md)에 준비했으며 게시·완료 처리는 하지 않았다.
+[별도 문서](s1-08-card-revisions.md)에 준비했다. S1-08만 원격 반영했으며 후속 카드 변경·완료 처리는 하지 않았다.
+
+## 원격 PR 검증
+
+[PR #5](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/5), 최초 head `e61c6b3`의
+contract(Ubuntu/Windows), static, compose, ingestion 검사가 모두 성공했다.
+[환경·Compose 검사](https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/41477486702),
+[계약 검사](https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/41477486792),
+[수집 통합 검사](https://github.com/SongWooSeok02/pc-telemetry-forecast/actions/runs/41477486553).
+이후 문서 상태 갱신 커밋의 결과는 PR checks에서 별도로 확인한다. 실제 설치 검증과 팀원 승인은 별개다.
+카드 반영 화면은 비추적 로컬 증거 `local-evidence/s1-08-project-updated.jpg`로 보관했다.
 
 ## A/B 실제 배포 검증 기록 양식
 
