@@ -1,0 +1,134 @@
+{
+  "executed_at_utc": "2026-11-02T16:00:56.524Z",
+  "executed_at_kst": "2026-11-03 01:00:56 KST",
+  "base_commit": "4e694495fe9c89d5b808df679866a78390da9347",
+  "environment": {
+    "os": "Windows_NT",
+    "release": "10.0.19045",
+    "arch": "x64",
+    "node": "v24.16.0",
+    "pc": "current-development-workspace"
+  },
+  "product_version": null,
+  "scope": "documentation only",
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "9dd6b59183e426031ad5d50b44ae53f4d86ce5d74d17ce1f6f7e75ba042530ac"
+    },
+    {
+      "file": "docs/signing-status.md",
+      "sha256": "0802a01bf43ace1a8a8c900f100376ef1234bffffbccb609bc9c277360ba976d"
+    },
+    {
+      "file": "docs/s1-08-card-revisions.md",
+      "sha256": "689969e96cdda7503aed26cc5ceb7535afbdd84837d8d33c7b3bc02f1f1d6557"
+    },
+    {
+      "file": "docs/s1-08-validation.md",
+      "sha256": "50f1faf1b42be6e8342ea8caacd0f47775b4676071b0dbae3f1cddcd813e66e7"
+    }
+  ],
+  "checks": [
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "infra/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "docs/sensor-support.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "backend/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "tests/results/s1-03-backend.json",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "contracts/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "tests/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "docs/signing-status.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/signing-status.md",
+      "target": "s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/signing-status.md",
+      "target": "s1-08-validation.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/signing-status.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/s1-08-validation.md",
+      "target": "s1-08-local-validation.json",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/s1-08-validation.md",
+      "target": "s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/s1-08-validation.md",
+      "success": true
+    },
+    {
+      "check": "obsolete-mandatory-signing-removed",
+      "success": true
+    },
+    {
+      "check": "git-diff-check",
+      "success": true,
+      "output": ""
+    }
+  ],
+  "documentation_success": true,
+  "tracked_windows_artifacts": [],
+  "actual_installation_validation": "not_run_no_installer",
+  "remote_card_update": "not_applied_project_read_scope_missing",
+  "peer_review": "pending"
+}
