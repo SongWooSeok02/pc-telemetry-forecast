@@ -1,0 +1,145 @@
+{
+  "executed_at_utc": "2026-11-02T16:04:37.662Z",
+  "executed_at_kst": "2026-11-03 01:04:37 KST",
+  "base_commit": "4e694495fe9c89d5b808df679866a78390da9347",
+  "environment": {
+    "os": "Windows_NT",
+    "release": "10.0.19045",
+    "arch": "x64",
+    "node": "v24.16.0",
+    "pc": "current-development-workspace"
+  },
+  "product_version": null,
+  "scope": "documentation only",
+  "files": [
+    {
+      "file": "README.md",
+      "sha256": "9dd6b59183e426031ad5d50b44ae53f4d86ce5d74d17ce1f6f7e75ba042530ac"
+    },
+    {
+      "file": "docs/signing-status.md",
+      "sha256": "4fbf62d0ee15160652177c55f8aea335ff4fb5ca5e91ad7c021a8c514708e980"
+    },
+    {
+      "file": "docs/s1-08-card-revisions.md",
+      "sha256": "e749192eb1d83ac858577667b3f02519b57aaabb6dfb812680e17be986f5751f"
+    },
+    {
+      "file": "docs/s1-08-validation.md",
+      "sha256": "5918fe1c4d6526e88599b771b8d3afd9aab7b9f1540e4783d584608bab01f2ca"
+    }
+  ],
+  "checks": [
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "infra/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "docs/sensor-support.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "backend/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "tests/results/s1-03-backend.json",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "contracts/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "tests/README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "README.md",
+      "target": "docs/signing-status.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "README.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/signing-status.md",
+      "target": "s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/signing-status.md",
+      "target": "s1-08-validation.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/signing-status.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/s1-08-validation.md",
+      "target": "s1-08-local-validation.json",
+      "success": true
+    },
+    {
+      "check": "local-link",
+      "file": "docs/s1-08-validation.md",
+      "target": "s1-08-card-revisions.md",
+      "success": true
+    },
+    {
+      "check": "trailing-space",
+      "file": "docs/s1-08-validation.md",
+      "success": true
+    },
+    {
+      "check": "obsolete-mandatory-signing-removed",
+      "success": true
+    },
+    {
+      "check": "git-diff-check",
+      "success": true,
+      "output": ""
+    }
+  ],
+  "documentation_success": true,
+  "tracked_windows_artifacts": [],
+  "actual_installation_validation": "not_run_no_installer",
+  "remote_card_update": {
+    "status": "S1-08 updated via existing authenticated browser",
+    "item_id": "286058992",
+    "project_status": "검토 중",
+    "followups": "pending agreement with A"
+  },
+  "peer_review": "pending",
+  "remote_pr": {
+    "number": 5,
+    "url": "https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/5",
+    "verified_head": "e61c6b3659ca3a6ea089595a95d4077282cf077f",
+    "ci": "all checks passed for verified_head"
+  }
+}
