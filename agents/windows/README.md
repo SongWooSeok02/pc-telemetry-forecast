@@ -37,3 +37,8 @@ PowerShell 7 / Windows 전용 서비스 호스트 모듈이다. S2-02의 설치 
 검증: `pwsh -NoProfile -File tests/run_windows_credentials.ps1`.
 테스트는 현재 프로세스 SID를 서비스 계정으로 모사하며 실제 커널 제한 토큰으로 파일/IPC 거부를
 확인한다. 별도 일반 사용자 로그인, 설치 서비스, 실제 HTTPS 등록 전체 경로 검증은 남아 있다.
+
+추가 HTTPS 검증은 `python tests/run_https_registration.py`로 실행한다(TEST_DATABASE_URL 필요).
+클라이언트 전용 테스트 CA로 실제 HTTPS API 전체 수명 주기를 확인하고 Windows UI/IPC의 기본
+HTTP 클라이언트가 미신뢰 인증서를 거부하는 것도 검사한다. OS 신뢰 저장소는 변경하지 않는다.
+이 검사는 설치 서비스의 실제 계정과 운영 TLS를 연결하는 검증을 대체하지 않는다.

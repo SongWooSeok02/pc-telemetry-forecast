@@ -49,12 +49,34 @@ Windows는 `pwsh -NoProfile -File tests/run_windows_credentials.ps1`로 재현�
 [Windows 보고서](../tests/results/s2-03-windows.json)에 제한 토큰 조건도 기록한다.
 실행 시각은 UTC 원본이며 KST는 +09:00이다. CI 파일 추가는 원격 CI 통과 증거가 아니다.
 
-로컬 결과: 등록 6개, [수집 회귀 13개](../tests/results/s2-03-ingestion-regression.json),
-기존 계약 33개, 보고서 실행기 회귀 2개와 Windows 보안 검사가 통과했다.
+로컬 결과: 등록 15개, [수집 회귀 13개](../tests/results/s2-03-ingestion-regression.json),
+기존 계약 33개, 보고서 실행기 회귀 2개, 파티션 작업자 2개와 확대 Windows 보안 검사가 통과했다.
 신규 발급 토큰으로 실제 배치를 저장한 뒤 삭제 후 동일 배치를 재전송하면 401임을 확인했다.
 기존 계약 상세 보고서는 `local-evidence/s203-contracts.json`에 보관한다.
 Windows 표준 API 근거: [DPAPI 범위](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.dataprotectionscope),
 [파이프 ACL 생성](https://learn.microsoft.com/en-us/dotnet/api/system.io.pipes.namedpipeserverstreamacl.create).
+
+추가 검증에서 **소유자 잠금을 기다리는 동안 만료된 코드를 소비할 수 있는 결함**을 재현했다.
+트랜잭션 시작 시각인 CURRENT_TIMESTAMP 대신 실제 검사 시각인 clock_timestamp()를 사용하고,
+사용자 세션도 잠금 획득 뒤 만료/회수 상태를 재확인하도록 수정했다. 해당 코드 만료 및 로그아웃
+경합 회귀 검사가 통과했다. 병렬 코드 발급 제한, 삭제/재발급 경합, 감사 INSERT 실패 시 전체 롤백과
+재시도, 본문 수신 도중 회수, 장비 토큰 만료, 잘못된 입력, 최소 DB 역할 권한 및 기존 001 DB에
+002를 적용해 수동 등록 토큰을 보존하는 업그레이드도 검증했다.
+
+[실제 HTTPS 보고서](../tests/results/s2-03-https.json)는 `python tests/run_https_registration.py`로
+재현한다. TEST_DATABASE_URL과 PowerShell 7이 필요하다. 테스트 클라이언트에만 고유 CA를 지정하고
+OS 인증서 저장소는 변경하지 않는다. 실제 TCP/TLS 서버에서 등록→수집→재발급→구 토큰 거부→
+새 토큰 재전송→회수→삭제→코드 재사용 거부와 로그 비밀 미노출을 확인했다. 기본 신뢰 설정은
+테스트 CA를 거부한다. Windows에서는 실제 UI/IPC 및 기본 HTTP 클라이언트도 미신뢰 인증서를
+거부하고 파일을 남기지 않으며 등록 코드를 소비하지 않는 것을 확인했다.
+OS 신뢰 저장소에 테스트 CA를 추가하려던 초기 시도는 확인 대기 중 종료했고 해당 CA는 등록되지
+않았으며 임시 파일을 제거했다. 인증서 검증을 끄는 옵션이나 보안 UI 자동 조작은 사용하지 않았다.
+
+확대 Windows 검증에는 별도 프로세스의 DPAPI 복원, 손상 ciphertext·재분석 지점 거부,
+암호화된 중단 임시 파일 삭제, 금지/잘못된 JSON/4KiB 초과/10초 무응답 IPC 거부와 이후 정상
+요청 복구도 포함한다. 모든 HTTP/IPC 실패 메시지와 서버 출력에서 비밀 노출을 검사한다.
+2026-11-04 KST에 PR #10의 최초 커밋 4e5677c 기준 원격 CI 4개 워크플로도 성공을 확인했다.
+후속 검증 커밋의 원격 CI는 PR checks에서 별도로 확인한다.
 
 자체 리뷰에서 수정한 사항:
 
@@ -67,7 +89,7 @@ Windows 표준 API 근거: [DPAPI 범위](https://learn.microsoft.com/en-us/dotn
   서비스 종료를 방해하던 무기한 연결 대기 제거, HTTP 리다이렉트 거부.
 
 남은 확인: A가 S2-02 실제 서비스 SID/설치 ACL을 연결한 뒤 별도 일반 사용자 로그인에서 파일과
-파이프 거부, 서비스 재시작·설치/삭제, HTTPS 등록→수집→회수→삭제 전체 흐름을 확인해야 한다.
+파이프 거부, 실제 서비스 재시작·설치/삭제 및 설치 서비스와 신뢰된 운영 TLS를 연결한 전체 흐름을 확인해야 한다.
 B가 S1-01/S3-07 담당과 위 추가 API/opaque 세션 계약을 공동 검토해야 한다.
 자동 검증은 제한 토큰/현재 SID 모사 환경이며 이 후속 확인을 대체하지 않는다.
 다음 확인은 S2-03 시작일 2026-11-05 KST에 선행 작업 산출물 연결 시 진행한다.

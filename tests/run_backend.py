@@ -86,6 +86,9 @@ def main(module_name='test_backend', report_env='BACKEND_REPORT', default_report
     if module_name == 'test_registration':
         files += [p for p in (ROOT/'agents/windows').glob('*') if p.is_file()]
         files += [ROOT/'tests/run_registration.py']
+    if module_name == 'test_https_registration':
+        files += [ROOT/'tests'/name for name in ('create_test_certificate.ps1',
+            'live_registration_server.py', 'run_https_registration.py', 'probe_untrusted_registration.ps1')]
     version, version_error = None, None
     if os.environ.get('TEST_DATABASE_URL'):
         try:

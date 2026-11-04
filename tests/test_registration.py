@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import unittest
 import uuid
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import psycopg
@@ -160,3 +161,201 @@ class Registration(unittest.TestCase):
         self.assertEqual(send().status_code, 200)
         self.assertEqual(self.manage(device['machine_id'], 'delete').status_code, 200)
         self.assertEqual(send().status_code, 401)
+
+    def test_registration_transaction_rollback(self):
+        """Audit write failure rolls back code consumption, token and machine; retry succeeds."""
+        code = self.issue()
+        with psycopg.connect(self.dsn) as db:
+            db.execute("CREATE FUNCTION reject_test_audit() RETURNS trigger LANGUAGE plpgsql AS $$ "
+                "BEGIN RAISE EXCEPTION 'synthetic audit failure' USING ERRCODE='P0001'; END $$")
+            db.execute(f"CREATE TRIGGER reject_test_audit BEFORE INSERT ON credential_audit "
+                f"FOR EACH ROW WHEN (NEW.actor_id='{self.user}'::uuid) EXECUTE FUNCTION reject_test_audit()")
+        try:
+            with self.assertLogs('backend.app', level='ERROR') as logs:
+                failed = self.consume(code)
+            self.assertEqual(failed.status_code, 503)
+            self.assertNotIn(code, failed.text + ''.join(logs.output))
+            with psycopg.connect(self.dsn) as db:
+                self.assertEqual(db.execute('SELECT count(*) FROM machines WHERE owner_id=%s',
+                    (self.user,)).fetchone()[0], 0)
+                self.assertEqual(db.execute('SELECT consumed FROM registration_codes WHERE code_sha256=%s',
+                    (hashlib.sha256(code.encode()).hexdigest(),)).fetchone()[0], False)
+        finally:
+            with psycopg.connect(self.dsn) as db:
+                db.execute('DROP TRIGGER reject_test_audit ON credential_audit')
+                db.execute('DROP FUNCTION reject_test_audit()')
+        self.assertEqual(self.consume(code).status_code, 200)
+
+    def test_concurrent_delete_and_replacement(self):
+        """Deletion racing replacement leaves no live credentials or reusable codes."""
+        for _ in range(3):
+            machine = self.consume(self.issue()).json()['machine_id']
+            code = self.manage(machine, 'reissue').json()['registration_code']
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                enrollment = pool.submit(self.consume, code)
+                deletion = pool.submit(self.manage, machine, 'delete')
+                response = enrollment.result(timeout=15)
+                self.assertEqual(deletion.result(timeout=15).status_code, 200)
+            self.assertIn(response.status_code, (200, 401))
+            if response.status_code == 200:
+                self.assertEqual(self.authorized(response.json()['device_token']), 401)
+            self.assertEqual(self.consume(code).status_code, 401)
+            with psycopg.connect(self.dsn) as db:
+                self.assertEqual(db.execute('SELECT count(*) FROM device_credentials WHERE machine_id=%s AND NOT revoked',
+                    (machine,)).fetchone()[0], 0)
+
+    def test_concurrent_rate_limit_and_reissue_limit(self):
+        """Concurrent code issuance cannot exceed the limit; failed rotation preserves prior code."""
+        device = self.consume(self.issue()).json()
+        machine = device['machine_id']
+        for _ in range(9):
+            pending = self.manage(machine, 'reissue').json()['registration_code']
+        self.assertEqual(self.manage(machine, 'reissue').status_code, 429)
+        self.assertEqual(self.consume(pending).status_code, 200)
+        def issue():
+            return self.client.post('/v1/registration-codes', headers={'Authorization':'Bearer '+self.other}).status_code
+        with ThreadPoolExecutor(max_workers=12) as pool:
+            statuses = list(pool.map(lambda _: issue(), range(12)))
+        self.assertEqual(sorted(statuses), [200]*10 + [429]*2)
+
+    def test_expiry_while_waiting_for_owner_lock(self):
+        """A code that expires while queued on a lock is rejected at actual consumption time."""
+        code = self.issue()
+        with psycopg.connect(self.dsn) as blocker:
+            blocker.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(self.user),))
+            with psycopg.connect(self.dsn) as db:
+                db.execute("UPDATE registration_codes SET expires_at=clock_timestamp()+interval '1 second' WHERE code_sha256=%s",
+                    (hashlib.sha256(code.encode()).hexdigest(),))
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending = pool.submit(self.consume, code)
+                try:
+                    deadline = time.monotonic() + 5
+                    waiting = False
+                    while time.monotonic() < deadline:
+                        with psycopg.connect(self.dsn) as db:
+                            waiting = db.execute("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event='advisory' "
+                                "AND query LIKE '%hashtextextended%')").fetchone()[0]
+                        if waiting:
+                            break
+                        time.sleep(.02)
+                    self.assertTrue(waiting)
+                    time.sleep(1.1)
+                finally:
+                    blocker.commit()
+                self.assertEqual(pending.result(timeout=10).status_code, 401)
+
+    def test_session_revoked_while_waiting_for_owner_lock(self):
+        """Logout while a management request waits on an owner lock prevents that mutation."""
+        machine = self.consume(self.issue()).json()['machine_id']
+        with psycopg.connect(self.dsn) as blocker:
+            blocker.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(self.user),))
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending = pool.submit(self.manage, machine, 'delete')
+                try:
+                    deadline = time.monotonic() + 5
+                    waiting = False
+                    while time.monotonic() < deadline:
+                        with psycopg.connect(self.dsn) as db:
+                            waiting = db.execute("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event='advisory' "
+                                "AND query LIKE '%hashtextextended%')").fetchone()[0]
+                        if waiting:
+                            break
+                        time.sleep(.02)
+                    self.assertTrue(waiting)
+                    with psycopg.connect(self.dsn) as db:
+                        db.execute('UPDATE user_sessions SET revoked=true WHERE user_id=%s', (self.user,))
+                finally:
+                    blocker.commit()
+                self.assertEqual(pending.result(timeout=10).status_code, 401)
+        with psycopg.connect(self.dsn) as db:
+            self.assertEqual(db.execute('SELECT deleted FROM machines WHERE machine_id=%s', (machine,)).fetchone()[0], False)
+
+    def test_device_expiry_and_bad_inputs(self):
+        """Expired device credentials and malformed enrollment requests fail without secret reflection."""
+        device = self.consume(self.issue()).json()
+        with psycopg.connect(self.dsn) as db:
+            db.execute("UPDATE device_credentials SET expires_at=CURRENT_TIMESTAMP-interval '1 second' WHERE machine_id=%s",
+                (device['machine_id'],))
+        self.assertEqual(self.authorized(device['device_token']), 401)
+        for value in (None, [], {}, {'registration_code':0}, {'registration_code':None},
+                      {'registration_code':''}, {'registration_code':'x'*513}):
+            response = self.client.post('/v1/device/registrations', json=value)
+            self.assertEqual(response.status_code, 422)
+            self.assertNotIn(device['device_token'], response.text)
+        self.assertEqual(self.client.post('/v1/device/registrations', content=b'\xff').status_code, 422)
+        self.assertEqual(self.manage('invalid-uuid', 'delete').status_code, 422)
+
+    def test_documented_database_role(self):
+        """Documented least-privilege API role can enroll/manage, but cannot edit sessions/audits."""
+        role = 's203_api_' + uuid.uuid4().hex
+        with psycopg.connect(self.base) as db:
+            db.execute(f'CREATE ROLE {role} NOLOGIN')
+            db.execute(f'GRANT USAGE ON SCHEMA {self.schema} TO {role}')
+            for table in ('machines', 'registration_codes', 'device_credentials'):
+                db.execute(f'GRANT SELECT,INSERT,UPDATE ON {self.schema}.{table} TO {role}')
+            db.execute(f'GRANT SELECT ON {self.schema}.user_sessions TO {role}')
+            db.execute(f'GRANT SELECT,INSERT ON {self.schema}.credential_audit TO {role}')
+            db.execute(f'GRANT USAGE ON SEQUENCE {self.schema}.credential_audit_event_id_seq TO {role}')
+        try:
+            limited_dsn = make_conninfo(self.base, options=f'-c search_path={self.schema} -c role={role}')
+            with TestClient(create_app(limited_dsn)) as client:
+                headers = {'Authorization':'Bearer '+self.session}
+                issued = client.post('/v1/registration-codes', headers=headers)
+                self.assertEqual(issued.status_code, 200)
+                enrollment = client.post('/v1/device/registrations', json={
+                    'registration_code':issued.json()['registration_code']})
+                self.assertEqual(enrollment.status_code, 200)
+                machine = enrollment.json()['machine_id']
+                self.assertEqual(client.post(f'/v1/machines/{machine}/revoke',headers=headers).status_code, 200)
+                self.assertEqual(client.post(f'/v1/machines/{machine}/delete',headers=headers).status_code, 200)
+            for table in ('user_sessions', 'credential_audit'):
+                with psycopg.connect(limited_dsn) as db:
+                    with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                        db.execute('DELETE FROM '+table)
+        finally:
+            with psycopg.connect(self.base) as db:
+                db.execute(f'DROP OWNED BY {role}')
+                # DROP OWNED runs in the current database, including this test schema.
+                db.execute(f'DROP ROLE {role}')
+
+    def test_revocation_during_body_read(self):
+        """Revocation after initial authentication but before body persistence prevents writes."""
+        device = self.consume(self.issue()).json()
+        batch = json.loads((ROOT/'tests/fixtures/s1-03-batch.json').read_text(encoding='utf-8'))
+        batch['machine_id'] = device['machine_id']
+        payload = canonical(batch).encode()
+        def chunks():
+            yield payload[:10]
+            with psycopg.connect(self.dsn) as db:
+                db.execute('UPDATE device_credentials SET revoked=true WHERE machine_id=%s', (device['machine_id'],))
+            yield payload[10:]
+        response = self.client.post('/v1/telemetry/batches', content=chunks(), headers={
+            'Authorization':'Bearer '+device['device_token'], 'Content-Type':'application/json',
+            'X-Content-SHA256':digest(batch)})
+        self.assertEqual(response.status_code, 401)
+        with psycopg.connect(self.dsn) as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM ingestion_batches WHERE machine_id=%s',
+                (device['machine_id'],)).fetchone()[0], 0)
+
+    def test_upgrade_preserves_legacy_device_credentials(self):
+        """Applying 002 to populated 001 preserves legacy authentication without inventing ownership."""
+        schema='test_upgrade_'+uuid.uuid4().hex
+        token='synthetic-legacy-only'
+        machine=uuid.uuid4()
+        dsn=make_conninfo(self.base,options=f'-c search_path={schema}')
+        with psycopg.connect(self.base) as db:
+            db.execute(f'CREATE SCHEMA {schema}')
+        try:
+            with psycopg.connect(dsn) as db:
+                db.execute((ROOT/'database/migrations/001_ingestion.sql').read_text(encoding='utf-8'))
+                db.execute("INSERT INTO device_credentials VALUES(%s,%s,CURRENT_TIMESTAMP+interval '1 day',false)",
+                    (hashlib.sha256(token.encode()).hexdigest(),machine))
+                db.execute((ROOT/'database/migrations/002_registration.sql').read_text(encoding='utf-8'))
+                self.assertEqual(db.execute('SELECT count(*) FROM device_credentials').fetchone()[0],1)
+                self.assertEqual(db.execute('SELECT count(*) FROM machines').fetchone()[0],0)
+            with TestClient(create_app(dsn)) as client:
+                self.assertEqual(client.post('/v1/telemetry/batches',json={},
+                    headers={'Authorization':'Bearer '+token}).status_code,422)
+        finally:
+            with psycopg.connect(self.base) as db:
+                db.execute(f'DROP SCHEMA {schema} CASCADE')

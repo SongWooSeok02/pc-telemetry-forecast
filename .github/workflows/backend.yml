@@ -29,6 +29,7 @@ jobs:
       - run: python -m unittest discover -s tests -p test_partitions.py
       - run: python tests/run_backend.py
       - run: python tests/run_registration.py
+      - run: python tests/run_https_registration.py
       - run: git diff --check
       - uses: actions/upload-artifact@v4
         if: always()
@@ -37,4 +38,5 @@ jobs:
           path: |
             tests/results/ci/s1-03-postgres.json
             tests/results/s2-03-registration.json
+            tests/results/s2-03-https.json
           if-no-files-found: error

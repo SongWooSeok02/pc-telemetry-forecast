@@ -18,11 +18,16 @@ def install(app, connect, rejected):
         row = None
         if header.startswith('Bearer ') and 0 < len(header[7:]) <= 512:
             row = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
-                'AND NOT revoked AND expires_at>CURRENT_TIMESTAMP', (sha(header[7:]),)).fetchone()
+                'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
         if row is None:
             raise rejected(401, 'USER_UNAUTHENTICATED')
         # Serialize owner operations: prevents issuing a replacement code racing deletion.
         db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(row[0]),))
+        # Lock waits must not extend a user's session lifetime or bypass logout.
+        active = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
+            'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
+        if active is None:
+            raise rejected(401, 'USER_UNAUTHENTICATED')
         return row[0]
 
     async def body(request, fields):
@@ -69,7 +74,7 @@ def install(app, connect, rejected):
             limit(db, user)
             code = secrets.token_urlsafe(24)
             expires = db.execute("INSERT INTO registration_codes VALUES(%s,%s,NULL,"
-                "CURRENT_TIMESTAMP+interval '10 minutes',false) RETURNING expires_at", (sha(code), user)).fetchone()[0]
+                "clock_timestamp()+interval '10 minutes',false) RETURNING expires_at", (sha(code), user)).fetchone()[0]
             audit(db, user, None, 'code_issued')
         return result({'registration_code': code, 'expires_at': expires.isoformat()})
 
@@ -85,7 +90,7 @@ def install(app, connect, rejected):
                     raise rejected(401, 'REGISTRATION_INVALID')
                 db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(owner[0]),))
                 row = db.execute('SELECT owner_id,machine_id FROM registration_codes WHERE code_sha256=%s '
-                    'AND NOT consumed AND expires_at>CURRENT_TIMESTAMP FOR UPDATE',
+                    'AND NOT consumed AND expires_at>clock_timestamp() FOR UPDATE',
                     (sha(value['registration_code']),)).fetchone()
                 if row is None:
                     raise rejected(401, 'REGISTRATION_INVALID')
@@ -100,7 +105,7 @@ def install(app, connect, rejected):
                     event = 'registered'
                 token = secrets.token_urlsafe(48)
                 expires = db.execute("INSERT INTO device_credentials VALUES(%s,%s,"
-                    "CURRENT_TIMESTAMP+interval '90 days',false) RETURNING expires_at", (sha(token), machine)).fetchone()[0]
+                    "clock_timestamp()+interval '90 days',false) RETURNING expires_at", (sha(token), machine)).fetchone()[0]
                 db.execute('UPDATE registration_codes SET consumed=true WHERE code_sha256=%s',
                            (sha(value['registration_code']),))
                 audit(db, user, machine, event)
@@ -120,7 +125,7 @@ def install(app, connect, rejected):
                 limit(db, user)
                 code = secrets.token_urlsafe(24)
                 expires = db.execute("INSERT INTO registration_codes VALUES(%s,%s,%s,"
-                    "CURRENT_TIMESTAMP+interval '10 minutes',false) RETURNING expires_at",
+                    "clock_timestamp()+interval '10 minutes',false) RETURNING expires_at",
                     (sha(code), user, machine_id)).fetchone()[0]
                 audit(db, user, machine_id, 'code_issued')
                 response = {'registration_code': code, 'expires_at': expires.isoformat()}

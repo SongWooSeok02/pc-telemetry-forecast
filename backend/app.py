@@ -104,7 +104,7 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
                 # Recheck inside the write transaction: a token may have been revoked
                 # while this request was validating its body.
                 credential = db.execute('SELECT machine_id FROM device_credentials WHERE token_sha256=%s '
-                    'AND NOT revoked AND expires_at>CURRENT_TIMESTAMP FOR SHARE',
+                    'AND NOT revoked AND expires_at>clock_timestamp() FOR SHARE',
                     (hashlib.sha256(authorization[7:].encode()).hexdigest(),)).fetchone()
                 if credential is None:
                     raise Rejected(401, 'DEVICE_UNAUTHENTICATED')

@@ -17,7 +17,9 @@ $record = @{
     reproduction = 'pwsh -NoProfile -File tests/run_windows_credentials.ps1'
     expected = @('DPAPI LocalMachine roundtrip', 'encrypted atomic replacement', 'no plaintext on disk',
         'restricted token file access denied', 'unsafe ACL rejected', 'deleted credential unreadable',
-        'authorized IPC clear succeeds', 'restricted token IPC access denied')
+        'authorized IPC clear succeeds', 'restricted token IPC access denied', 'cross-process DPAPI persistence',
+        'corrupt ciphertext rejected', 'reparse directory rejected', 'encrypted staging removed',
+        'unknown/malformed/oversized/slow IPC rejected without reflection', 'IPC recovers after bad clients')
     actual = $output.Trim(); status = $(if ($success) { 'pass' } else { 'fail' })
     limitations = @('Restricted BUILTIN\Users token, not a separate interactive local account',
         'Service identity simulated by current process SID; installed S2-02 service integration pending',
