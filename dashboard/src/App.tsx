@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
+import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
 import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
 
 type SensorReading = {
@@ -30,6 +31,15 @@ const sensorDefaults = [
   { sensorId: 'gpu_power', label: 'GPU 전력', unit: 'W', quality: 'missing' as const },
 ]
 const rangeMs: Record<string, number> = { '1h': 3600000, '6h': 21600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, '90d': 7776000000 }
+
+function useScheduledQuery(scheduler: QueryScheduler, key: string, identity: string, enabled: boolean, request: ScheduledRequest) {
+  const requestRef = useRef(request)
+  requestRef.current = request
+  useEffect(() => {
+    if (!enabled) return
+    return scheduler.register(key, (signal) => requestRef.current(signal))
+  }, [scheduler, key, identity, enabled])
+}
 
 function formatTime(value?: string) {
   if (!value) return '—'
@@ -74,7 +84,7 @@ export default function App() {
   const [state, setState] = useState<LoadState>('idle')
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
   const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
-  const [requestKey, setRequestKey] = useState(0)
+  const [scheduler] = useState(() => new QueryScheduler())
   const [historyRange, setHistoryRange] = useState('24h')
   const [selectedSensorId, setSelectedSensorId] = useState('cpu_temperature')
   const [history, setHistory] = useState<HistoryResponse | null>(null)
@@ -99,114 +109,95 @@ export default function App() {
   }, [sensors, selectedSensorId])
 
   useEffect(() => {
+    return bindDashboardVisibility(scheduler)
+  }, [scheduler])
+
+  useEffect(() => { scheduler.setPeriod(period) }, [scheduler, period])
+
+  useEffect(() => {
     if (!machineId.trim()) {
       setState('idle')
       setSnapshot(null)
-      return
     }
-    let active = true
-    let timer: number | undefined
-    let controller: AbortController | undefined
+  }, [machineId])
 
-    let schedule: () => void = () => {}
-    const load = async () => {
-      controller = new AbortController()
-      setState('loading')
-      try {
-        const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(machineId.trim())}/current`, { signal: controller.signal })
-        if (response.status === 404) {
-          if (active) { setSnapshot(null); setState('unavailable') }
-          return
-        }
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const data = await response.json() as CurrentSnapshot
-        if (active) {
-          setSnapshot(data)
-          setLastRefresh(new Date().toISOString())
-          setState('ready')
-        }
-      } catch (error) {
-        if (active && !(error instanceof DOMException && error.name === 'AbortError')) setState('error')
-      } finally {
-        schedule()
-      }
+  const currentIdentity = machineId.trim()
+  const loadCurrent: ScheduledRequest = async (signal) => {
+    if (!currentIdentity) return
+    setState('loading')
+    try {
+      const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(currentIdentity)}/current`, { signal })
+      if (signal.aborted) return
+      if (response.status === 404) { setSnapshot(null); setState('unavailable'); return }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const data = await response.json() as CurrentSnapshot
+      if (signal.aborted || data.machineId !== currentIdentity) return
+      setSnapshot(data)
+      setLastRefresh(new Date().toISOString())
+      setState('ready')
+    } catch (error) {
+      if (!signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setState('error')
     }
-    schedule = () => {
-      if (active && period !== 'manual') timer = window.setTimeout(() => { void load() }, period * 1000)
-    }
+  }
+  useScheduledQuery(scheduler, 'current', currentIdentity, Boolean(currentIdentity), loadCurrent)
 
-    void load()
-    return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
-  }, [machineId, period, requestKey])
+  const historyIdentity = `${currentIdentity}|${selectedSensor?.sensorId ?? ''}|${historyRange}`
+  const historyEnabled = Boolean(currentIdentity && selectedSensor && selectedSensor.quality !== 'unsupported')
+  useEffect(() => {
+    if (historyCache.current.scope === historyIdentity) return
+    historyCache.current = { scope: historyIdentity, cursor: null, points: [] }
+    setHistory(null)
+    setHistoryError(null)
+    setHistoryBusy(false)
+  }, [historyIdentity])
 
   useEffect(() => {
-    if (!machineId.trim() || !selectedSensor) {
-      setHistory(null)
-      setHistoryBusy(false)
-      setHistoryError(null)
-      return
-    }
-    if (selectedSensor.quality === 'unsupported') {
-      setHistory(null)
-      setHistoryBusy(false)
-      setHistoryError(null)
-      return
-    }
-    let active = true
-    let timer: number | undefined
-    let controller: AbortController | undefined
+    if (historyEnabled) return
+    setHistory(null)
+    setHistoryError(null)
+    setHistoryBusy(false)
+  }, [historyEnabled, historyIdentity])
+
+  const loadHistory: ScheduledRequest = async (signal) => {
+    if (!currentIdentity || !selectedSensor || selectedSensor.quality === 'unsupported') return
+    setHistoryBusy(true)
+    setHistoryError(null)
     const duration = rangeMs[historyRange] ?? rangeMs['24h']
     const resolution = duration <= rangeMs['6h'] ? 'raw' : duration <= rangeMs['24h'] ? '10s' : duration <= rangeMs['7d'] ? '1m' : duration <= rangeMs['30d'] ? '5m' : '1h'
-    const scope = `${machineId.trim()}|${selectedSensor.sensorId}|${historyRange}`
-    if (historyCache.current.scope !== scope) {
-      historyCache.current = { scope, cursor: null, points: [] }
-      setHistory(null)
+    const scope = historyIdentity
+    const cache = historyCache.current.scope === scope ? historyCache.current : { scope, cursor: null, points: [] }
+    const to = new Date().toISOString()
+    const from = new Date(Date.now() - duration).toISOString()
+    const query = cache.cursor ? new URLSearchParams({ cursor: cache.cursor }) : new URLSearchParams({ from, to, resolution })
+    try {
+      const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(currentIdentity)}/sensors/${encodeURIComponent(selectedSensor.sensorId)}/history?${query}`, { signal })
+      if (signal.aborted) return
+      if (response.status === 404) throw new Error('선택한 PC 또는 센서의 과거 조회를 지원하지 않습니다.')
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const data = await response.json() as HistoryResponse
+      const validPoints = Array.isArray(data.points) && data.points.every((point) =>
+        point && Number.isFinite(Date.parse(point.bucketStart)) && Number.isFinite(Date.parse(point.bucketEnd)) &&
+        (point.lastObservedAt === null || Number.isFinite(Date.parse(point.lastObservedAt))) &&
+        (point.receivedAt === null || Number.isFinite(Date.parse(point.receivedAt))) &&
+        ['ok', 'unsupported', 'missing', 'error'].includes(point.quality) &&
+        (point.value === null || (typeof point.value === 'number' && Number.isFinite(point.value))) &&
+        (point.quality === 'ok' ? typeof point.value === 'number' : point.value === null) &&
+        (point.max === null || (typeof point.max === 'number' && Number.isFinite(point.max))) &&
+        Number.isInteger(point.sampleCount) && point.sampleCount >= 0)
+      if (!validPoints || typeof data.aggregationPending !== 'boolean' || data.unit !== selectedSensor.unit || data.resolution !== resolution || typeof data.nextCursor !== 'string' || !data.nextCursor || data.machineId !== currentIdentity || data.sensorId !== selectedSensor.sensorId) throw new Error('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.')
+      if (signal.aborted || historyCache.current.scope !== scope) return
+      const merged = new Map(cache.points.map((point) => [point.bucketStart, point]))
+      for (const point of data.points) merged.set(point.bucketStart, point)
+      const points = [...merged.values()].filter((point) => new Date(point.bucketEnd).getTime() >= Date.now() - duration).sort((a, b) => a.bucketStart.localeCompare(b.bucketStart))
+      historyCache.current = { scope, cursor: data.nextCursor, points }
+      setHistory({ ...data, points })
+    } catch (error) {
+      if (!signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
+    } finally {
+      if (!signal.aborted) setHistoryBusy(false)
     }
-    let cursor = historyCache.current.cursor
-    let points = historyCache.current.points
-    const loadHistory = async () => {
-      controller = new AbortController()
-      setHistoryBusy(true)
-      setHistoryError(null)
-      const to = new Date().toISOString()
-      const from = new Date(Date.now() - duration).toISOString()
-      const query = cursor ? new URLSearchParams({ cursor }) : new URLSearchParams({ from, to, resolution })
-      try {
-        const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(machineId.trim())}/sensors/${encodeURIComponent(selectedSensor.sensorId)}/history?${query}`, { signal: controller.signal })
-        if (response.status === 404) throw new Error('선택한 PC 또는 센서의 과거 조회를 지원하지 않습니다.')
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const data = await response.json() as HistoryResponse
-        const validPoints = Array.isArray(data.points) && data.points.every((point) =>
-          point && Number.isFinite(Date.parse(point.bucketStart)) && Number.isFinite(Date.parse(point.bucketEnd)) &&
-          (point.lastObservedAt === null || Number.isFinite(Date.parse(point.lastObservedAt))) &&
-          (point.receivedAt === null || Number.isFinite(Date.parse(point.receivedAt))) &&
-          ['ok', 'unsupported', 'missing', 'error'].includes(point.quality) &&
-          (point.value === null || (typeof point.value === 'number' && Number.isFinite(point.value))) &&
-          (point.quality === 'ok' ? typeof point.value === 'number' : point.value === null) &&
-          (point.max === null || (typeof point.max === 'number' && Number.isFinite(point.max))) &&
-          Number.isInteger(point.sampleCount) && point.sampleCount >= 0)
-        if (!validPoints || typeof data.aggregationPending !== 'boolean' || data.unit !== selectedSensor.unit || data.resolution !== resolution || typeof data.nextCursor !== 'string' || !data.nextCursor || data.machineId !== machineId.trim() || data.sensorId !== selectedSensor.sensorId) throw new Error('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.')
-        if (active) {
-          const merged = new Map(points.map((point) => [point.bucketStart, point]))
-          for (const point of data.points) merged.set(point.bucketStart, point)
-          points = [...merged.values()].filter((point) => new Date(point.bucketEnd).getTime() >= Date.now() - duration).sort((a, b) => a.bucketStart.localeCompare(b.bucketStart))
-          cursor = data.nextCursor
-          historyCache.current = { scope, cursor, points }
-          setHistory({ ...data, points })
-          setHistoryBusy(false)
-        }
-      } catch (error) {
-        if (active && !(error instanceof DOMException && error.name === 'AbortError')) {
-          setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
-          setHistoryBusy(false)
-        }
-      } finally {
-        if (active && period !== 'manual') timer = window.setTimeout(() => { void loadHistory() }, period * 1000)
-      }
-    }
-    void loadHistory()
-    return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
-  }, [machineId, selectedSensor?.sensorId, selectedSensor?.quality, selectedSensor?.unit, historyRange, period, requestKey])
+  }
+  useScheduledQuery(scheduler, 'history', historyIdentity, historyEnabled, loadHistory)
 
   const choosePeriod = (value: RefreshPeriod) => {
     setPeriod(value)
@@ -236,7 +227,7 @@ export default function App() {
                 <option value="manual">수동</option>
               </select>
             </label>
-            <button className="refresh-button" onClick={() => setRequestKey((key) => key + 1)} aria-label="지금 갱신">↻ <span>지금 갱신</span></button>
+            <button className="refresh-button" onClick={() => scheduler.refreshNow()} aria-label="지금 갱신">↻ <span>지금 갱신</span></button>
           </div>
         </header>
 
