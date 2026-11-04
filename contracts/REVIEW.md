@@ -1,4 +1,5 @@
 # S1-01 공동 검토와 완료 판정
+수정수정수정
 
 검토 대상: v0.1.0-draft.2, [PR #1](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/1).
 기한: 2026-10-30 23:59:59 KST. 승인 대상 버전/커밋을 반드시 적는다.
