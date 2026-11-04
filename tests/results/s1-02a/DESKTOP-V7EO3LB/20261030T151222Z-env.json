@@ -1,0 +1,38 @@
+﻿{
+    "executed_at_utc":  "2026-10-30T15:12:21.0017334Z",
+    "computer":  "DESKTOP-V7EO3LB",
+    "os":  "Microsoft Windows 11 Pro 10.0.26200 build 26200",
+    "model":  "OMEN Transcend Gaming Laptop 14-fb0xxx",
+    "board":  "HP 8C58",
+    "cpu":  "Intel(R) Core(TM) Ultra 9 185H",
+    "gpu":  [
+                "NVIDIA GeForce RTX 4060 Laptop GPU / driver 32.0.15.9282",
+                "Intel(R) Arc(TM) Graphics / driver 32.0.101.6556"
+            ],
+    "secure_boot":  true,
+    "vbs_status":  2,
+    "hvci_running":  true,
+    "hvci_reg_enabled":  1,
+    "vulnerable_driver_list":  1,
+    "defender":  {
+                     "product_version":  "4.18.26100.4",
+                     "signature_version":  "1.463.36.0",
+                     "realtime":  true,
+                     "tamper_protection":  true,
+                     "error":  null
+                 },
+    "smart_app_control":  0,
+    "restore_point":  "failed: 다음 오류로 인해 이 명령을 실행할 수 없습니다. 서비스가 사용하지 않도록 설정되어 있거나, 사용하도록 설정된 장치가 연결되어 있지 않으므로 서비스를 시작할 수 없습니다.",
+    "pawnio":  {
+                   "uninstall_key":  false,
+                   "display_version":  null,
+                   "uninstall_cmd":  null,
+                   "driver_state":  null,
+                   "driver_start":  null,
+                   "driver_path":  null,
+                   "driver_sha256":  null,
+                   "driver_sig":  null,
+                   "driver_signer":  null,
+                   "winring0_any":  false
+               }
+}

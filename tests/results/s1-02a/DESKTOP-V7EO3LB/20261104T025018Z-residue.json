@@ -1,0 +1,26 @@
+﻿{
+    "pawnio":  {
+                   "uninstall_key":  false,
+                   "display_version":  null,
+                   "uninstall_cmd":  null,
+                   "driver_state":  "Stopped",
+                   "driver_start":  "Manual",
+                   "driver_path":  "C:\\WINDOWS\\system32\\DriverStore\\FileRepository\\pawnio.inf_amd64_a72a2f969b8b7496\\PawnIO.sys",
+                   "driver_sha256":  "FCA6E7D58B0CF38DBB913A2B9E532F48629145D395F454B16A9F58E97B8D3940",
+                   "driver_sig":  "Valid",
+                   "driver_signer":  "CN=Microsoft Windows Hardware Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+                   "winring0_any":  false
+               },
+    "sc_query":  "\nSERVICE_NAME: PawnIO \n        종류               : 1  KERNEL_DRIVER  \n        상태              : 1  STOPPED \n        WIN32_EXIT_CODE    : 31  (0x1f)\n        SERVICE_EXIT_CODE  : 0  (0x0)\n        검사점         : 0x0\n        WAIT_HINT          : 0x0",
+    "driver_store":  [
+                         "  \r\n  게시된 이름:     oem101.inf\r\n\u003e 원래 이름:      pawnio.inf\r\n  공급자 이름:      namazso\r\n  클래스 이름:      SoftwareDevice\r\n  클래스 GUID:         {62f9c741-b25a-46ce-b54c-9bccce08b6f2}\r\n  드라이버 버전:     03/11/2026 2.2.0.0"
+                     ],
+    "sys_files":  [
+
+                  ],
+    "program_files":  [
+
+                      ],
+    "probe_service":  false,
+    "probe_deploy_dir":  true
+}

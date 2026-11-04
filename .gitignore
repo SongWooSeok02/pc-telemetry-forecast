@@ -3,6 +3,10 @@ __pycache__/
 tests/results/ci/
 .venv/
 .tools/
+
+agents/windows/**/bin/
+agents/windows/**/obj/
+
 .env
 .env.*
 !.env.example
@@ -15,3 +19,4 @@ tests/results/ci/
 *.pkl
 *.onnx
 local-evidence/
+

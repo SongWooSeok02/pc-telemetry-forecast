@@ -1,0 +1,25 @@
+﻿{
+    "service_state":  "Running",
+    "start_mode":  "Auto",
+    "account":  "LocalSystem",
+    "last_boot_utc":  "2026-11-04T02:06:22.5000000Z",
+    "result_file":  "service-DESKTOP-V7EO3LB_-20261104T020641Z.json",
+    "cycles":  486,
+    "cycle_errors":  0,
+    "open_error":  null,
+    "sensors_total":  138,
+    "sensors_ok":  138,
+    "cpu_temp_ok":  35,
+    "pawnio":  {
+                   "uninstall_key":  true,
+                   "display_version":  "2.2.0.0",
+                   "uninstall_cmd":  "\"C:\\Program Files\\PawnIO\\uninstall.exe\" -uninstall",
+                   "driver_state":  "Running",
+                   "driver_start":  "Manual",
+                   "driver_path":  "C:\\WINDOWS\\system32\\DriverStore\\FileRepository\\pawnio.inf_amd64_a72a2f969b8b7496\\PawnIO.sys",
+                   "driver_sha256":  "FCA6E7D58B0CF38DBB913A2B9E532F48629145D395F454B16A9F58E97B8D3940",
+                   "driver_sig":  "Valid",
+                   "driver_signer":  "CN=Microsoft Windows Hardware Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+                   "winring0_any":  false
+               }
+}

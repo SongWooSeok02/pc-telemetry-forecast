@@ -1,0 +1,31 @@
+﻿{
+    "started_at_utc":  "2026-11-04T02:50:34.0105725Z",
+    "seconds":  2.1536786,
+    "mode":  "silent (-install -silent)",
+    "exit_code":  0,
+    "note":  "대화형이면 동의 화면·SmartScreen·Defender 반응을 스크린샷으로 따로 남긴다.",
+    "before":  {
+                   "uninstall_key":  false,
+                   "display_version":  null,
+                   "uninstall_cmd":  null,
+                   "driver_state":  "Stopped",
+                   "driver_start":  "Manual",
+                   "driver_path":  "C:\\WINDOWS\\system32\\DriverStore\\FileRepository\\pawnio.inf_amd64_a72a2f969b8b7496\\PawnIO.sys",
+                   "driver_sha256":  "FCA6E7D58B0CF38DBB913A2B9E532F48629145D395F454B16A9F58E97B8D3940",
+                   "driver_sig":  "Valid",
+                   "driver_signer":  "CN=Microsoft Windows Hardware Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+                   "winring0_any":  false
+               },
+    "after":  {
+                  "uninstall_key":  true,
+                  "display_version":  "2.2.0.0",
+                  "uninstall_cmd":  "\"C:\\Program Files\\PawnIO\\uninstall.exe\" -uninstall",
+                  "driver_state":  "Running",
+                  "driver_start":  "Manual",
+                  "driver_path":  "C:\\WINDOWS\\system32\\DriverStore\\FileRepository\\pawnio.inf_amd64_a72a2f969b8b7496\\PawnIO.sys",
+                  "driver_sha256":  "FCA6E7D58B0CF38DBB913A2B9E532F48629145D395F454B16A9F58E97B8D3940",
+                  "driver_sig":  "Valid",
+                  "driver_signer":  "CN=Microsoft Windows Hardware Compatibility Publisher, O=Microsoft Corporation, L=Redmond, S=Washington, C=US",
+                  "winring0_any":  false
+              }
+}
