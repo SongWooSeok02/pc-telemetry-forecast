@@ -1,0 +1,947 @@
+﻿[
+    {
+        "TimeCreated":  "\/Date(1793758635270)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x830DE2E3\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x5F864D98"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758634289)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.115.0\r\n\t이전 보안 인텔리전스 버전: 1.463.108.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758634289)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.115.0\r\n\t이전 보안 인텔리전스 버전: 1.463.108.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758048206)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\ServiceStartStates = 0x1\r\n \t새 값: Default\\ServiceStartStates = 0x0"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758017070)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = LoadingEngine\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = ServiceStartedSuccessfully"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758017068)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: Default\\ProductAppDataPath = C:\\ProgramData\\Microsoft\\Windows Defender\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\ProductAppDataPath = C:\\ProgramData\\Microsoft\\Windows Defender"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758016105)\/",
+        "Id":  1152,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 시작되었습니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t프로세스 ID: 6628\r\n \t부티 종료 후 시작: False\r\n \t초기화 기간(밀리초): 15202\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758008397)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = RegistringUxToastLibrary\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = LoadingEngine"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758007198)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = InitWcsLibrary\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = RegistringUxToastLibrary"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758007194)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: Default\\ServiceStartStates = 0x0\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\ServiceStartStates = 0x1"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758001349)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = InitializeMiscConfigLibrary\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Diagnostics\\InitializingComponentProgress = InitWcsLibrary"
+    },
+    {
+        "TimeCreated":  "\/Date(1793758001344)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: Default\\IsServiceRunning = 0x0\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\IsServiceRunning = 0x1"
+    },
+    {
+        "TimeCreated":  "\/Date(1793757573147)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  5\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793757573144)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793753973132)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  5\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793753973126)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793750489654)\/",
+        "Id":  1002,
+        "LevelDisplayName":  "경고",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "헭갵괕瀁Microsoft Defender 바이러스 백신 scan has been stopped before completion.\r\n \tScan ID: {9DD3E4F3-66DE-4F9E-8CB5-8440F5534B47}\r\n \tScan Type: 맬웨어 방지\r\n \tScan Parameters: 빠른 검사\r\n  \tUser: NT AUTHORITY\\SYSTEM\r\n \tStop Reason: 괕닼에리Scheduled scan was skipped because the last successful scan was within the last 7 days"
+    },
+    {
+        "TimeCreated":  "\/Date(1793750489653)\/",
+        "Id":  1000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 검사가 시작되었습니다. \r\n \t검색 ID: {9DD3E4F3-66DE-4F9E-8CB5-8440F5534B47}\r\n \t검색 유형: 맬웨어 방지\r\n \t검색 매개 변수: 빠른 검사\r\n \t검색 리소스: \r\n  \t사용자: NT AUTHORITY\\SYSTEM\r\n \t검색 트리거: 예약된 유지 관리\r\n \t검색은 Idle: 사용\r\n \tScans: 사용 안 함\r\n \t스레드 우선 순위: 7"
+    },
+    {
+        "TimeCreated":  "\/Date(1793750373113)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  5\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793750373109)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793746773106)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793746773102)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793743173100)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793743173095)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793739573073)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793739573070)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793735973063)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793735973058)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793732373061)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793732373057)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793728773045)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793728773040)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793725173039)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.108.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.108.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.108.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T08:14:28Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793725173035)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.108.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793723333250)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x2D608222\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x830DE2E3"
+    },
+    {
+        "TimeCreated":  "\/Date(1793723332273)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.108.0\r\n\t이전 보안 인텔리전스 버전: 1.463.104.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793723332272)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.108.0\r\n\t이전 보안 인텔리전스 버전: 1.463.104.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793721573016)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793721573012)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793717973000)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793717972996)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793714372994)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793714372979)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793710772964)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793710772959)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793707172951)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793707172949)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793703572935)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.104.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.104.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.104.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-03T03:26:39Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793703572931)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.104.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793700622167)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xCAA9A8C2\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x2D608222"
+    },
+    {
+        "TimeCreated":  "\/Date(1793700621197)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.104.0\r\n\t이전 보안 인텔리전스 버전: 1.463.101.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793700621197)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.104.0\r\n\t이전 보안 인텔리전스 버전: 1.463.101.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793699972924)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793699972919)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793696372909)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793696372904)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793692772898)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793692772894)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793689172889)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793689172885)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793685572874)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793685572869)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793681972859)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793681972855)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793678372846)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.101.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.101.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.101.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T22:38:40Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793678372841)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.101.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793677714455)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xA72BEA93\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xCAA9A8C2"
+    },
+    {
+        "TimeCreated":  "\/Date(1793677713478)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.101.0\r\n\t이전 보안 인텔리전스 버전: 1.463.93.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793677713478)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.101.0\r\n\t이전 보안 인텔리전스 버전: 1.463.93.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793674772829)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793674772825)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793671172812)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793671172808)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793667572800)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793667572795)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793663972783)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  4\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793663972778)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793663964804)\/",
+        "Id":  1002,
+        "LevelDisplayName":  "경고",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "헭갵괕瀁Microsoft Defender 바이러스 백신 scan has been stopped before completion.\r\n \tScan ID: {38F1C5B7-0008-4F19-B4CC-8BD94F4D89E2}\r\n \tScan Type: 맬웨어 방지\r\n \tScan Parameters: 빠른 검사\r\n  \tUser: NT AUTHORITY\\SYSTEM\r\n \tStop Reason: 괕닼에리Scheduled scan was skipped because the last successful scan was within the last 7 days"
+    },
+    {
+        "TimeCreated":  "\/Date(1793663964804)\/",
+        "Id":  1000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 검사가 시작되었습니다. \r\n \t검색 ID: {38F1C5B7-0008-4F19-B4CC-8BD94F4D89E2}\r\n \t검색 유형: 맬웨어 방지\r\n \t검색 매개 변수: 빠른 검사\r\n \t검색 리소스: \r\n  \t사용자: NT AUTHORITY\\SYSTEM\r\n \t검색 트리거: 예약된 유지 관리\r\n \t검색은 Idle: 사용\r\n \tScans: 사용 안 함\r\n \t스레드 우선 순위: 7"
+    },
+    {
+        "TimeCreated":  "\/Date(1793660372773)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793660372769)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793656772765)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793656772762)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793653172756)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793653172752)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793649572731)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793649572727)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793646479717)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: \r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Features\\Controls\\203 = 0x1"
+    },
+    {
+        "TimeCreated":  "\/Date(1793646479717)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: \r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Features\\Controls\\277 = 0x1"
+    },
+    {
+        "TimeCreated":  "\/Date(1793646479717)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: \r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Features\\Controls\\381 = 0x1"
+    },
+    {
+        "TimeCreated":  "\/Date(1793646479713)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xC24CD1D5\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xA72BEA93"
+    },
+    {
+        "TimeCreated":  "\/Date(1793646478669)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Features\\EcsConfigs\\ETag\\Tag = \"Gu3QTzN+pA4pLqdEUj8OA2tFM1lg4PKcFLK3JGwQyfU=\"\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\Features\\EcsConfigs\\ETag\\Tag = \"mDaT3ZWlW0b+h+G6R6onrACLH5KSBPn9k9yiRoTA2VM=\""
+    },
+    {
+        "TimeCreated":  "\/Date(1793645972727)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793645972724)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793642372713)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793642372710)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793638772699)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793638772695)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793635172683)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.93.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.93.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.93.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-02T09:42:19Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793635172678)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.93.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793633867356)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xA242D2F\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xC24CD1D5"
+    },
+    {
+        "TimeCreated":  "\/Date(1793633866381)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.93.0\r\n\t이전 보안 인텔리전스 버전: 1.463.84.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793633866381)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.93.0\r\n\t이전 보안 인텔리전스 버전: 1.463.84.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793631572677)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.84.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.84.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.84.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793631572671)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.84.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793627972667)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.84.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.84.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.84.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793627972662)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.84.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793624372657)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.84.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.84.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.84.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793624372654)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.84.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793620772642)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.84.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.84.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.84.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793620772637)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.84.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793617172622)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.84.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.84.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.84.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T22:25:03Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793617172618)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.84.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793614188840)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x8468E90F\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xA242D2F"
+    },
+    {
+        "TimeCreated":  "\/Date(1793614187859)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.84.0\r\n\t이전 보안 인텔리전스 버전: 1.463.83.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793614187859)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.84.0\r\n\t이전 보안 인텔리전스 버전: 1.463.83.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793613572594)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793613572590)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793609972582)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793609972577)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793606372566)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793606372564)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793602772553)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793602772549)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793599172539)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793599172536)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793595572522)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793595572518)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793591972509)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.83.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.83.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.83.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T20:59:29Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793591972505)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.83.0\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793590647720)\/",
+        "Id":  5007,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 구성이 변경되었습니다. 예기치 않은 이벤트인 경우에는 맬웨어의 결과일 수 있으므로 설정을 검토하십시오.\r\n \t이전 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0xD157895B\r\n \t새 값: HKLM\\SOFTWARE\\Microsoft\\Windows Defender\\CoreService\\WdConfigHash = 0x8468E90F"
+    },
+    {
+        "TimeCreated":  "\/Date(1793590646739)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.83.0\r\n\t이전 보안 인텔리전스 버전: 1.463.73.0\r\n\t보안 인텔리전스 형식: 스파이웨어 방지 프로그램\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793590646738)\/",
+        "Id":  2000,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Microsoft Defender 바이러스 백신 보안 인텔리전스 버전이 업데이트되었습니다.\r\n\t현재 보안 인텔리전스 버전: 1.463.83.0\r\n\t이전 보안 인텔리전스 버전: 1.463.73.0\r\n\t보안 인텔리전스 형식: 바이러스 백신\r\n \t업데이트 형식: 델타\r\n \t사용자: NT AUTHORITY\\SYSTEM\r\n\t현재 엔진 버전: 1.1.26100.4\r\n \t이전 엔진 버전: 1.1.26100.4"
+    },
+    {
+        "TimeCreated":  "\/Date(1793588372501)\/",
+        "Id":  1151,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트 상태 보고서(UTC 시간): \r\n \t플랫폼  버전:  4.18.26100.4\r\n \t엔진 버전:  1.1.26100.4\r\n \t네트워크 실시간 검사 엔진 버전:  1.1.26100.4\r\n \t바이러스 백신 보안 인텔리전스 버전:  1.463.73.0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 버전:  1.463.73.0\r\n \t네트워크 실시간 검사 보안 인텔리전스 버전:  1.463.73.0\r\n \tRTP 상태:  사용\r\n \tOA 상태:  사용\r\n \tIOAV 상태:  사용\r\n \tBM 상태:  사용\r\n \t바이러스 백신 보안 인텔리전스 사용 기간:  0\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 사용 기간:  0\r\n \t마지막 빠른 검사 사용 기간:  3\r\n \t마지막 전체 검사 나이:  4294967295\r\n \t바이러스 백신 보안 인텔리전스 작성 시간:  2026-11-01T05:59:43Z\r\n \t스파이웨어 방지 프로그램 보안 인텔리전스 작성 시간:  2026-11-01T05:59:43Z\r\n \t마지막 빠른 검사 시작 시간:  2026-10-29T23:59:20Z\r\n \t마지막 빠른 검사 종료 시간:  2026-10-29T23:59:58Z\r\n \t마지막 빠른 검사 소스:  2\r\n \t마지막 전체 검사 시작 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 종료 시간:  1601-01-01T00:00:00Z\r\n \t마지막 전체 검사 소스:  0\r\n \t제품 상태:  0x00080000\r\n"
+    },
+    {
+        "TimeCreated":  "\/Date(1793588372496)\/",
+        "Id":  1150,
+        "LevelDisplayName":  "정보",
+        "ProviderName":  "Microsoft-Windows-Windows Defender",
+        "Message":  "Endpoint Protection 클라이언트가 정상 상태에서 실행 중입니다.\r\n \t플랫폼 버전: 4.18.26100.4\r\n \t엔진 버전: 1.1.26100.4\r\n \t보안 인텔리전스 버전: 1.463.73.0\r\n"
+    }
+]

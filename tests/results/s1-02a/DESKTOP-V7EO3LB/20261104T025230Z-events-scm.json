@@ -1,0 +1,7 @@
+﻿{
+    "TimeCreated":  "\/Date(1793758676281)\/",
+    "Id":  7045,
+    "LevelDisplayName":  "정보",
+    "ProviderName":  "Service Control Manager",
+    "Message":  "시스템에 서비스가 설치되었습니다.\r\n\r\n서비스 이름:  S1-02a SensorProbe\r\n서비스 파일 이름:  \"C:\\ProgramData\\SensorProbeSpike\\bin\\SensorProbe.exe\" service --out-dir \"C:\\ProgramData\\SensorProbeSpike\\out\"\r\n서비스 유형:  사용자 모드 서비스\r\n서비스 시작 유형:  자동 시작\r\n서비스 계정:  NT AUTHORITY\\LocalService"
+}
