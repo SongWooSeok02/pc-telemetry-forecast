@@ -25,6 +25,10 @@ jobs:
           node-version: '22'
       - name: Independent producer, HTTP API, transactions and clock state
         run: python tests/run_contracts.py
+      - name: Baseline evaluation and temporal leakage checks
+        run: python -m unittest discover -s tests -p test_ml_baselines.py -v
+      - name: Compile baseline pipeline
+        run: python -m compileall -q ml tests/test_ml_baselines.py
       - name: Whitespace check
         run: git diff --check
       - uses: actions/upload-artifact@v4
