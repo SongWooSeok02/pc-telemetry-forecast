@@ -39,7 +39,8 @@ class Evidence(unittest.TextTestResult):
         # startTest callback or _testMethodName is available for those errors.
         now = time.monotonic()
         method = getattr(test, '_testMethodName', None)
-        reproduction = 'python -m unittest discover -s tests -p test_backend.py'
+        pattern = test.__class__.__module__ + '.py'
+        reproduction = 'python -m unittest discover -s tests -p ' + pattern
         if method:
             reproduction += ' -k ' + method
         self.records.append(dict(case=test.id(), reproduction=reproduction,
@@ -71,15 +72,20 @@ class Evidence(unittest.TextTestResult):
         super().addSubTest(test, subtest, err)
 
 
-def main():
+def main(module_name='test_backend', report_env='BACKEND_REPORT', default_report='tests/results/s1-03-backend.json'):
     import psycopg
-    import test_backend
+    import importlib
+    test_module = importlib.import_module(module_name)
     result = unittest.TextTestRunner(verbosity=2, resultclass=Evidence).run(
-        unittest.defaultTestLoader.loadTestsFromModule(test_backend))
+        unittest.defaultTestLoader.loadTestsFromModule(test_module))
     files = sorted(p for folder in ('backend', 'database', 'tests/fixtures')
         for p in (ROOT/folder).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
     files += [ROOT/p for p in ('tests/test_backend.py', 'tests/run_backend.py',
         'tests/test_backend_runner.py', '.github/workflows/backend.yml')]
+    files += [ROOT/(f'tests/{module_name}.py')]
+    if module_name == 'test_registration':
+        files += [p for p in (ROOT/'agents/windows').glob('*') if p.is_file()]
+        files += [ROOT/'tests/run_registration.py']
     version, version_error = None, None
     if os.environ.get('TEST_DATABASE_URL'):
         try:
@@ -96,7 +102,7 @@ def main():
                        for p in sorted(set(files))},
         postgres_executed=bool(version), success=result.wasSuccessful() and not result.skipped and bool(version),
         cases=result.records)
-    path = ROOT/os.environ.get('BACKEND_REPORT', 'tests/results/s1-03-backend.json')
+    path = ROOT/os.environ.get(report_env, default_report)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(f'Evidence: {path}; PostgreSQL executed: {bool(version)}')

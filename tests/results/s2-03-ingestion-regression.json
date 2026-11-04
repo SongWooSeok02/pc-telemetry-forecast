@@ -1,0 +1,438 @@
+{
+  "executed_at_utc": "2026-11-04T11:47:49.437575+00:00",
+  "base_commit": "263038349427890b5508271eb78e8d5a46c9e6f2",
+  "pc": "DESKTOP-CC6CD6C",
+  "os": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "packages": {
+    "fastapi": "0.115.12",
+    "psycopg": "3.2.9",
+    "starlette": "0.46.2",
+    "httpx": "0.28.1"
+  },
+  "postgres_version": "PostgreSQL 16.15, compiled by Visual C++ build 1944, 64-bit",
+  "postgres_version_error": null,
+  "source_sha256": {
+    ".github/workflows/backend.yml": "5507b19965d7dd62af1b3cff855022f7ca6f1c8d05691c62219b4fa4370e00bc",
+    "backend/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "backend/app.py": "cbe8ffd22f910eb923cdd9ed300f91b6c48350be0628b5bce9b097214abe1018",
+    "backend/contract.py": "466a0345e022fc03121a716d7ac0bcadc3047b5c698aec1406c8a19c1233bc31",
+    "backend/partitions.py": "fadea933bbe2884077967d1e3209da12251da13dec4b1480d6fbe716ac3e3d8d",
+    "backend/README.md": "4b3480483818171910433176675e76ebf16c002508def80fef354279400fe94b",
+    "backend/registration.py": "555ece6e55eceb1866431f0f533d653fa1f46cf46285d41c60081f6a2db0bb6d",
+    "backend/requirements.txt": "ead1fc2951f82a00d3e9421cf780f3ec7b763ed2b41c99d9f42056b01266495d",
+    "database/migrations/001_ingestion.sql": "e822417c3dbfb7e70891360da0e7da30e8069d24ab54fed14d61cd45f743762f",
+    "database/migrations/002_registration.sql": "174cbc721a831173757e0a9ed6239c81c3f98b8525cc67545415bb80216221f5",
+    "tests/fixtures/s1-03-batch.json": "817cb97e30e19e6609170c33495078e83d55251e75311eb14a5c6b058c56d0e6",
+    "tests/run_backend.py": "2d0b5157d47d04c6c8c11c48904ca0d6af4997dc38ac03adb2e924e485d7a4bf",
+    "tests/test_backend.py": "c3a33ce7b5650253723efdccc126db3daca2a15b47ddf94fb65a039e11bbecc1",
+    "tests/test_backend_runner.py": "6e28ae7b2aa40ea30c62c62da5bb6b75afb753c44378e30f00ba8d258fb9e088"
+  },
+  "postgres_executed": true,
+  "success": true,
+  "cases": [
+    {
+      "case": "test_backend.ContractParity.test_fixture_and_numbers",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_fixture_and_numbers",
+      "expected": "Backend accepts the S1-01 synthetic fixture and canonical numeric vectors.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"a\":[1,10,\"x\"],\"z\":0}'",
+          "expected": "'{\"a\":[1,10,\"x\"],\"z\":0}'"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:46.675237+00:00",
+      "duration_seconds": 0.0
+    },
+    {
+      "case": "test_backend.ContractParity.test_golden_vectors",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_golden_vectors",
+      "expected": "Backend canonical bytes and hashes match every independently pinned S1-01 vector.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'",
+          "expected": "'{\"batch_id\":\"33333333-3333-4333-8333-333333333333\",\"boot_session_id\":\"22222222-2222-4222-8222-222222222222\",\"machine_id\":\"11111111-1111-4111-8111-111111111111\",\"samples\":[{\"monotonic_ms\":1000,\"observed_at\":\"2026-10-29T00:00:00.000000Z\",\"readings\":[{\"quality\":\"ok\",\"sensor_id\":\"cpu/package/temp\",\"unit\":\"Cel\",\"value\":52.5},{\"quality\":\"unsupported\",\"sensor_id\":\"gpu/board/power\",\"unit\":\"W\",\"value\":null},{\"quality\":\"missing\",\"reason\":\"not_ready\",\"sensor_id\":\"cpu/fan\",\"unit\":\"rpm\",\"value\":null}],\"sample_seq\":0}],\"schema_version\":\"0.1.0\",\"sensor_config_id\":\"66666666-6666-4666-8666-666666666666\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'11d4f9c82ba52f358678cd492a1ca954148ffadecd94484dbb615fecee0568a6'",
+          "expected": "'11d4f9c82ba52f358678cd492a1ca954148ffadecd94484dbb615fecee0568a6'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"a\":[1,10,\"x\"],\"z\":0}'",
+          "expected": "'{\"a\":[1,10,\"x\"],\"z\":0}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'",
+          "expected": "'9a4631ecc57e8ca3f9e46b6d423891207ec705d313d4fdcd0ae4fb72b1b56ec9'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'",
+          "expected": "'{\"s\":\"/<>&\\'\\\\\"\\\\\\\\\"}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'897c020e49165ab87da44086b51bdbbf21e166e98a09c9dc288d112ed0efa978'",
+          "expected": "'897c020e49165ab87da44086b51bdbbf21e166e98a09c9dc288d112ed0efa978'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"f\":0.000001,\"v\":9007199254740991}'",
+          "expected": "'{\"f\":0.000001,\"v\":9007199254740991}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'44f8554fd6ec6d82d63f79a3537d31bae948df58f8c0ce2899592ca5bed179b0'",
+          "expected": "'44f8554fd6ec6d82d63f79a3537d31bae948df58f8c0ce2899592ca5bed179b0'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'{\"v\":1000000000000.000001}'",
+          "expected": "'{\"v\":1000000000000.000001}'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'17544568830670c239a58ecf53e07c91ce669315b852e22674954fc5b980e52d'",
+          "expected": "'17544568830670c239a58ecf53e07c91ce669315b852e22674954fc5b980e52d'"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:46.678239+00:00",
+      "duration_seconds": 0.0
+    },
+    {
+      "case": "test_backend.ContractParity.test_unauthenticated",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_unauthenticated",
+      "expected": "Missing credentials return 401 with contract envelope before database access.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'Bearer'",
+          "expected": "'Bearer'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'DEVICE_UNAUTHENTICATED'",
+          "expected": "'DEVICE_UNAUTHENTICATED'"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:46.678239+00:00",
+      "duration_seconds": 0.016
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_auth_config_hash_and_limits",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_auth_config_hash_and_limits",
+      "expected": "Foreign machine, missing config, bad hash, malformed JSON, oversized input and revoked tokens reject without writes.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "403",
+          "expected": "403"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'SENSOR_CONFIG_PENDING'",
+          "expected": "'SENSOR_CONFIG_PENDING'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'HASH_MISMATCH'",
+          "expected": "'HASH_MISMATCH'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "400",
+          "expected": "400"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "413",
+          "expected": "413"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(0, 0, 0, 0)",
+          "expected": "(0, 0, 0, 0)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:46.802033+00:00",
+      "duration_seconds": 0.282
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_concurrent_overlapping_batches",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_concurrent_overlapping_batches",
+      "expected": "Two concurrent different batch IDs sharing a sample yield one 200, one 409, and one ledger entry.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "[200, 409]",
+          "expected": "[200, 409]"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(1, 1)",
+          "expected": "(1, 1)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:47.071336+00:00",
+      "duration_seconds": 0.172
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_concurrent_replay",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_concurrent_replay",
+      "expected": "Eight concurrent identical requests return one committed batch and identical 200 responses.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "[200, 200, 200, 200, 200, 200, 200, 200]",
+          "expected": "[200, 200, 200, 200, 200, 200, 200, 200]"
+        },
+        {
+          "assertion": "assertTrue",
+          "actual": "True",
+          "expected": "True"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(1, 1, 3)",
+          "expected": "(1, 1, 3)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:47.242376+00:00",
+      "duration_seconds": 0.312
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_conflicts_and_atomic_overlap",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_conflicts_and_atomic_overlap",
+      "expected": "Changed batch returns BATCH_CONFLICT; another batch with overlapping sample rolls back all writes.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'BATCH_CONFLICT'",
+          "expected": "'BATCH_CONFLICT'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'SAMPLE_CONFLICT'",
+          "expected": "'SAMPLE_CONFLICT'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(1, 1, 3, 6)",
+          "expected": "(1, 1, 3, 6)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:47.555171+00:00",
+      "duration_seconds": 0.266
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_database_error_and_retry",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_database_error_and_retry",
+      "expected": "SQL failure before commit leaves all four tables empty; retry commits once.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(0, 0, 0, 0)",
+          "expected": "(0, 0, 0, 0)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:47.822123+00:00",
+      "duration_seconds": 0.297
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_last_sample_invalid",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_last_sample_invalid",
+      "expected": "Invalid final sample returns 422 without ledger or measurement writes.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(0, 0, 0, 0)",
+          "expected": "(0, 0, 0, 0)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:48.128747+00:00",
+      "duration_seconds": 0.156
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_observed_anomaly_received_partition",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_observed_anomaly_received_partition",
+      "expected": "Old and future observed times are preserved; UTC received date chooses physical partition.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[('measurements_20261104',)]",
+          "expected": "[('measurements_20261104',)]"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[2000, 2099]",
+          "expected": "[2000, 2099]"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "2",
+          "expected": "2"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:48.281784+00:00",
+      "duration_seconds": 0.234
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_partitions_failure_monitor_and_rollback",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_partitions_failure_monitor_and_rollback",
+      "expected": "Health checks today+3; missing target partition alerts and insertion rolls back; repair is idempotent.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(0, 0, 0, 0)",
+          "expected": "(0, 0, 0, 0)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:48.507729+00:00",
+      "duration_seconds": 0.281
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_replay_response_loss_and_midnight",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_replay_response_loss_and_midnight",
+      "expected": "Discard first response; replay next UTC day returns identical response and unchanged rows.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'batch_id': '33333333-3333-4333-8333-333333333333', 'received_at': '2026-11-04T12:00:00.000000Z', 'schema_version': '0.1.0', 'accepted_samples': 1}",
+          "expected": "{'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-11-04T12:00:00.000000Z'}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(1, 1, 3, 6)",
+          "expected": "(1, 1, 3, 6)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:48.800799+00:00",
+      "duration_seconds": 0.219
+    },
+    {
+      "case": "test_backend.PostgreSQLIngestion.test_retention_separate_from_measurements",
+      "reproduction": "python -m unittest discover -s tests -p test_backend.py -k test_retention_separate_from_measurements",
+      "expected": "Raw deletion preserves batch replay and cross-batch sample uniqueness for device lifetime.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'batch_id': '33333333-3333-4333-8333-333333333333', 'received_at': '2026-11-04T12:00:00.000000Z', 'schema_version': '0.1.0', 'accepted_samples': 1}",
+          "expected": "{'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-11-04T12:00:00.000000Z'}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'SAMPLE_CONFLICT'",
+          "expected": "'SAMPLE_CONFLICT'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "(1, 1, 0)",
+          "expected": "(1, 1, 0)"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-04T11:47:49.017924+00:00",
+      "duration_seconds": 0.36
+    }
+  ]
+}

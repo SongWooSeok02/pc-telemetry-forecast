@@ -1,0 +1,35 @@
+{
+  "runtime": ".NET 10.0.11",
+  "expected": [
+    "DPAPI LocalMachine roundtrip",
+    "encrypted atomic replacement",
+    "no plaintext on disk",
+    "restricted token file access denied",
+    "unsafe ACL rejected",
+    "deleted credential unreadable",
+    "authorized IPC clear succeeds",
+    "restricted token IPC access denied"
+  ],
+  "executed_at_utc": "2026-11-04T11:42:16.8415270+00:00",
+  "status": "pass",
+  "success": true,
+  "limitations": [
+    "Restricted BUILTIN\\Users token, not a separate interactive local account",
+    "Service identity simulated by current process SID; installed S2-02 service integration pending",
+    "No live TLS registration server/UI test; authenticated IPC clear exercised"
+  ],
+  "pc": "DESKTOP-CC6CD6C",
+  "reproduction": "pwsh -NoProfile -File tests/run_windows_credentials.ps1",
+  "base_commit": "f8800167e3eae9662da65a5bdf2297b000fd7be1",
+  "powershell": "7.6.5",
+  "source_sha256": {
+    "Credentials.psm1": "cb37bef8b9f4db41d147a993eeb061bb7a5b1265cf2bf4c48e437dc2f16bb9ae",
+    "RestrictedCredentialProbe.cs": "74a3f95fb63a215984d64bfc3e3bc0418890dc4e29e715821fe90da59bdf6878",
+    "run_windows_credentials.ps1": "3cad1fc2713a50aae085ebd287adcffb6c3086d8da2c38b2f04c7b4d33c9d907",
+    "README.md": "b4e453aac86e1237dfa4e728bc1f9342c5157ea80a757852d66dbb5831800dae",
+    "Register-Device.ps1": "7d6781be9a1d6f113ab4cbcfbe7a24c3933b931c2e53f45fb19d538906f9dfe6",
+    "test_windows_credentials.ps1": "7ea12a210a6e9997398a1f527b74fe2060e95ef9ffb66a7a23f26db258d17aaf"
+  },
+  "actual": "Device operation completed\r\nPASS: DPAPI, atomic replacement, plaintext absence, ACL fail-closed, deletion",
+  "os": "Microsoft Windows NT 10.0.19045.0"
+}

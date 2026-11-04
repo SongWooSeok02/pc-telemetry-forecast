@@ -28,6 +28,9 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
     def connect():
         return psycopg.connect(dsn or os.environ['DATABASE_URL'], connect_timeout=5)
 
+    from .registration import install
+    install(app, connect, Rejected)
+
     @app.exception_handler(Rejected)
     async def rejected(request, exc):
         headers = {'WWW-Authenticate': 'Bearer'} if exc.status == 401 else {}
@@ -98,6 +101,13 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
                 # A transaction-scoped device lock orders concurrent requests, including
                 # overlapping batches. Constraints remain authoritative across partitions.
                 db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,0))', (machine,))
+                # Recheck inside the write transaction: a token may have been revoked
+                # while this request was validating its body.
+                credential = db.execute('SELECT machine_id FROM device_credentials WHERE token_sha256=%s '
+                    'AND NOT revoked AND expires_at>CURRENT_TIMESTAMP FOR SHARE',
+                    (hashlib.sha256(authorization[7:].encode()).hexdigest(),)).fetchone()
+                if credential is None:
+                    raise Rejected(401, 'DEVICE_UNAUTHENTICATED')
                 prior = db.execute('SELECT canonical_body,response FROM ingestion_batches '
                     'WHERE machine_id=%s AND batch_id=%s', (machine, body['batch_id'])).fetchone()
                 if prior:
