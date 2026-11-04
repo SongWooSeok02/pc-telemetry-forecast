@@ -12,8 +12,10 @@ def main():
             db.execute("SET LOCAL statement_timeout = '30s'")
             db.execute('SELECT ensure_measurement_partitions()')
         logging.info('partition_maintenance_success horizon_days=3')
-    except Exception:
-        logging.exception('partition_maintenance_failed')
+    except Exception as exc:
+        # Connection errors can include hosts/users/DSNs; keep diagnostics bounded.
+        logging.error('partition_maintenance_failed type=%s sqlstate=%s',
+                      type(exc).__name__, getattr(exc, 'sqlstate', None))
         raise SystemExit(1)
 
 
