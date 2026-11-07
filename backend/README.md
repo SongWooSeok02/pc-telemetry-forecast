@@ -1,5 +1,10 @@
 # S1-03 수집 API / PostgreSQL
 
+S2-03 등록·회수 API와 역할 권한 변경은 [구현/검증 기록](../docs/s2-03-validation.md),
+Windows DPAPI/IPC는 [서비스 연동 안내](../agents/windows/README.md)를 따른다.
+신규 DB는 마이그레이션 001 다음 002를 적용한다. 아래 S1-03의 수동 토큰 발급/SELECT 전용
+설명은 기존 수집 전용 역할에 대한 기록이며 새 관리 API 역할의 권한과 구분한다.
+
 상태: 구현 및 로컬 PostgreSQL 통합 검증 완료, **S1-01 계약 승인·다른 팀원 리뷰 전**.
 원격 자동 검증 결과는 PR checks에서 확인한다.
 현재 S1-01 `0.1.0-draft.2`를 변경 없이 적용한다. 작업을 Done으로 변경하지 않았다.
