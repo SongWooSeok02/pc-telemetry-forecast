@@ -1,4 +1,4 @@
-# Dashboard (S1-04)
+# 공통 대시보드 (S1-04 / S1-05)
 
 React/TypeScript shared dashboard shell for the browser and the future WebView2 host.
 It presents the current sensor readings and their observation times, and distinguishes
@@ -32,6 +32,10 @@ session/access-control model. Until those are agreed and implemented, this scree
 empty sensor states and does not invent or expose telemetry. The read path is a proposed
 frontend interface, not an approved API contract.
 
-The refresh selector is available in the header, defaults to five seconds, persists per
-browser/WebView client, and supports manual refresh. The API request is aborted when its
-machine selection or refresh mode changes.
+## 갱신 제어 (S1-05)
+
+상단 제어는 기본 5초를 사용하며 3·5·10·30초와 수동 모드를 제공합니다. 최초 설정 팝업이나 저장 버튼은 없습니다. 선택값은 현재 브라우저/WebView의 `localStorage`에 저장되어 같은 클라이언트에서 다시 열 때 복원됩니다. 저장소에 접근할 수 없거나 값이 잘못됐으면 기본 5초로 시작합니다. 이전 구현의 `0` 저장값도 수동 모드로 읽습니다.
+
+주기를 선택하면 이전 예약과 진행 중 요청을 정리하고 새 설정으로 즉시 조회합니다. 자동 모드에서는 요청이 끝난 뒤 선택한 간격을 예약하며, 수동 모드에서는 예약하지 않습니다. `지금 갱신`은 모드와 관계없이 조회를 즉시 요청합니다. 주기 변경은 페이지를 다시 불러오지 않으며 선택 PC와 화면 위치 등 대시보드 상태를 유지합니다. 화면 주기는 센서 수집·전송·예측 주기와 분리되어 있습니다.
+
+공통 스케줄러의 가시성 감지, 호스트 상태 연동, 요청 경합의 통합 관리는 S2-06 범위입니다.

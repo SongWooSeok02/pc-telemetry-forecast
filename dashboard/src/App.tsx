@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
 
 type SensorReading = {
   label: string
@@ -17,7 +18,6 @@ type CurrentSnapshot = {
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'unavailable' | 'error'
 
-const refreshOptions = [5, 10, 30] as const
 const apiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? ''
 
 function formatTime(value?: string) {
@@ -48,13 +48,8 @@ export default function App() {
   const [snapshot, setSnapshot] = useState<CurrentSnapshot | null>(null)
   const [state, setState] = useState<LoadState>('idle')
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
-  const [period, setPeriod] = useState<number | 'manual'>(5)
+  const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
   const [requestKey, setRequestKey] = useState(0)
-
-  useEffect(() => {
-    const stored = Number(localStorage.getItem('telemetry.refresh-seconds'))
-    if ([...refreshOptions, 0].includes(stored as 0 | 5 | 10 | 30)) setPeriod(stored === 0 ? 'manual' : stored)
-  }, [])
 
   useEffect(() => {
     if (!machineId.trim()) {
@@ -97,9 +92,9 @@ export default function App() {
     return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
   }, [machineId, period, requestKey])
 
-  const choosePeriod = (value: number | 'manual') => {
+  const choosePeriod = (value: RefreshPeriod) => {
     setPeriod(value)
-    localStorage.setItem('telemetry.refresh-seconds', value === 'manual' ? '0' : String(value))
+    saveRefreshPeriod(value)
   }
   const statusText = state === 'ready' ? '연결됨' : state === 'loading' ? '조회 중' : state === 'error' ? '연결 오류' : state === 'unavailable' ? '데이터 없음' : 'PC 선택 필요'
   const statusClass = state === 'ready' ? 'is-connected' : state === 'error' ? 'is-error' : ''
@@ -119,8 +114,8 @@ export default function App() {
           <div className="breadcrumb"><span>모니터링</span><b>/</b><strong>대시보드</strong></div>
           <div className="topbar-actions">
             <label className="refresh-control">갱신
-              <select value={period} onChange={(event) => choosePeriod(event.target.value === 'manual' ? 'manual' : Number(event.target.value))} aria-label="갱신 주기">
-                {refreshOptions.map((seconds) => <option key={seconds} value={seconds}>{seconds}초</option>)}
+              <select value={period} onChange={(event) => choosePeriod(event.target.value === 'manual' ? 'manual' : Number(event.target.value) as RefreshPeriod)} aria-label="갱신 주기">
+                {REFRESH_SECONDS.map((seconds) => <option key={seconds} value={seconds}>{seconds}초</option>)}
                 <option value="manual">수동</option>
               </select>
             </label>
