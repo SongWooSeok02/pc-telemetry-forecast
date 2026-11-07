@@ -283,6 +283,8 @@ class Registration(unittest.TestCase):
             self.assertEqual(response.status_code, 422)
             self.assertNotIn(device['device_token'], response.text)
         self.assertEqual(self.client.post('/v1/device/registrations', content=b'\xff').status_code, 422)
+        for invalid_code in (b'{"registration_code":"\\ud800"}', b'{"registration_code":"short"}'):
+            self.assertEqual(self.client.post('/v1/device/registrations', content=invalid_code).status_code, 422)
         self.assertEqual(self.manage('invalid-uuid', 'delete').status_code, 422)
 
     def test_documented_database_role(self):

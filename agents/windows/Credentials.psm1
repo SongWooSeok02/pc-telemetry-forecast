@@ -40,9 +40,16 @@ function Assert-CredentialAcl($Store, [string]$Path) {
     }
 }
 
-function Set-DeviceCredential($Store, [string]$Token) {
+function Set-DeviceCredential($Store, [string]$Token, [guid]$MachineId) {
     Assert-CredentialAcl $Store $Store.Path
-    $plain = [Text.Encoding]::UTF8.GetBytes($Token)
+    $payload = $Token
+    if ($PSBoundParameters.ContainsKey('MachineId')) {
+        if ($MachineId -eq [guid]::Empty -or [string]::IsNullOrWhiteSpace($Token)) {
+            throw 'Invalid device registration'
+        }
+        $payload = @{ machine_id = $MachineId.ToString(); device_token = $Token } | ConvertTo-Json -Compress
+    }
+    $plain = [Text.Encoding]::UTF8.GetBytes($payload)
     $temp = Join-Path $Store.Path ([Guid]::NewGuid().ToString() + '.tmp')
     try {
         $cipher = [Security.Cryptography.ProtectedData]::Protect($plain, $null,
@@ -56,13 +63,22 @@ function Set-DeviceCredential($Store, [string]$Token) {
     }
 }
 
-function Get-DeviceCredential($Store) {
+function Get-DeviceCredential($Store, [switch]$IncludeMachineId) {
     Assert-CredentialAcl $Store $Store.Path
     $path = Join-Path $Store.Path 'device.dpapi'
     Assert-CredentialAcl $Store $path
     $plain = [Security.Cryptography.ProtectedData]::Unprotect([IO.File]::ReadAllBytes($path), $null,
         [Security.Cryptography.DataProtectionScope]::LocalMachine)
-    try { return [Text.Encoding]::UTF8.GetString($plain) }
+    try {
+        $payload = [Text.Encoding]::UTF8.GetString($plain)
+        if ($payload.StartsWith('{')) {
+            $registration = $payload | ConvertFrom-Json
+            if ($IncludeMachineId) { return $registration }
+            return $registration.device_token
+        }
+        if ($IncludeMachineId) { throw 'Stored credential has no machine ID; reissue required' }
+        return $payload
+    }
     finally { [Array]::Clear($plain, 0, $plain.Length) }
 }
 
@@ -117,7 +133,7 @@ function Start-RegistrationPipe {
                         $response = Invoke-RestMethod -Method Post -Uri ([uri]::new($Server, '/v1/device/registrations')) `
                             -ContentType 'application/json' -Body (@{registration_code=$command.code} | ConvertTo-Json -Compress) `
                             -TimeoutSec 15 -MaximumRedirection 0
-                        Set-DeviceCredential $Store $response.device_token
+                        Set-DeviceCredential $Store $response.device_token -MachineId $response.machine_id
                         $response = $null
                     }
                     'clear' { Remove-DeviceCredential $Store }

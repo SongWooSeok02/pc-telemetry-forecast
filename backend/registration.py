@@ -1,5 +1,6 @@
 """Device lifecycle. Opaque user sessions are supplied by the trusted login adapter."""
 import hashlib
+import re
 import secrets
 import uuid
 
@@ -81,17 +82,20 @@ def install(app, connect, rejected):
     @app.post('/v1/device/registrations')
     async def consume(request: Request):
         value = await body(request, ['registration_code'])
+        if not re.fullmatch(r'[A-Za-z0-9_-]{32}', value['registration_code']):
+            raise rejected(422, 'VALIDATION_ERROR')
+        code_hash = sha(value['registration_code'])
         def work():
             with connect() as db:
                 # Capability possession authorizes enrollment; owner comes only from the DB.
                 owner = db.execute('SELECT owner_id FROM registration_codes WHERE code_sha256=%s',
-                    (sha(value['registration_code']),)).fetchone()
+                    (code_hash,)).fetchone()
                 if owner is None:
                     raise rejected(401, 'REGISTRATION_INVALID')
                 db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(owner[0]),))
                 row = db.execute('SELECT owner_id,machine_id FROM registration_codes WHERE code_sha256=%s '
                     'AND NOT consumed AND expires_at>clock_timestamp() FOR UPDATE',
-                    (sha(value['registration_code']),)).fetchone()
+                    (code_hash,)).fetchone()
                 if row is None:
                     raise rejected(401, 'REGISTRATION_INVALID')
                 user, machine = row
@@ -107,7 +111,7 @@ def install(app, connect, rejected):
                 expires = db.execute("INSERT INTO device_credentials VALUES(%s,%s,"
                     "clock_timestamp()+interval '90 days',false) RETURNING expires_at", (sha(token), machine)).fetchone()[0]
                 db.execute('UPDATE registration_codes SET consumed=true WHERE code_sha256=%s',
-                           (sha(value['registration_code']),))
+                           (code_hash,))
                 audit(db, user, machine, event)
             return result({'machine_id': str(machine), 'device_token': token, 'expires_at': expires.isoformat()})
         return await run_in_threadpool(work)

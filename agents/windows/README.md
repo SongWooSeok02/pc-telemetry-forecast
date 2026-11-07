@@ -20,9 +20,11 @@ PowerShell 7 / Windows 전용 서비스 호스트 모듈이다. S2-02의 설치 
 서비스 응답은 성공 여부뿐이며 원문 토큰 조회 IPC는 없다. HTTP redirect는 거부한다.
 관리자 및 서비스 계정은 신뢰 경계 안에 있으며 악의적인 관리자에 대한 보호를 주장하지 않는다.
 
-토큰은 LocalMachine DPAPI ciphertext로만 파일/임시 파일에 기록한다. 교체는 같은 디렉터리에서
+장비 ID와 토큰은 하나의 LocalMachine DPAPI ciphertext로 파일/임시 파일에 기록한다. 교체는 같은 디렉터리에서
 원자적으로 수행하고 매 읽기/쓰기 전에 소유자/Allow ACE/재분석 지점을 검사한다.
-서비스 내부 업로더만 `Get-DeviceCredential`을 호출하고 Authorization 헤더에 사용한다.
+서비스 내부 업로더는 `Get-DeviceCredential $store -IncludeMachineId`로 `machine_id`와
+`device_token`을 함께 읽고 각각 배치 본문과 Authorization 헤더에 사용한다.
+기존 토큰 전용 파일은 기본 조회로 계속 읽을 수 있으며 장비 ID가 필요한 경우 재발급한다.
 그 반환값과 HTTP 응답/예외/본문을 로그·transcript·설정·백업에 쓰지 않는다.
 자격 증명 디렉터리는 백업 대상에서 제외한다. 평문 버퍼는 지우지만 런타임의 불변 문자열/메모리 덤프
 완전 제거는 보장하지 않는다. 파일 삭제는 SSD의 물리적 지우기를 보장하지 않는다.

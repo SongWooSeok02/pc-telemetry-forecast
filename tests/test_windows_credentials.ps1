@@ -19,13 +19,15 @@ try {
     if ((Get-DeviceCredential $store) -ne $synthetic) { throw 'DPAPI roundtrip failed' }
     $bytes = [IO.File]::ReadAllBytes((Join-Path $store.Path 'device.dpapi'))
     if ([Text.Encoding]::UTF8.GetString($bytes).Contains($synthetic)) { throw 'Plaintext persisted' }
-    Set-DeviceCredential $store 'synthetic-replacement'
+    $machineId = [guid]::NewGuid().ToString()
+    Set-DeviceCredential $store 'synthetic-replacement' -MachineId $machineId
     if ((Get-DeviceCredential $store) -ne 'synthetic-replacement') { throw 'Replacement failed' }
     $restart = Start-Job -ScriptBlock {
-        param($module,$state)
+        param($module,$state,$expectedMachineId)
         Import-Module $module -Force
-        (Get-DeviceCredential $state) -eq 'synthetic-replacement'
-    } -ArgumentList "$PSScriptRoot/../agents/windows/Credentials.psm1",$store
+        $registration = Get-DeviceCredential $state -IncludeMachineId
+        $registration.device_token -eq 'synthetic-replacement' -and $registration.machine_id -eq $expectedMachineId
+    } -ArgumentList "$PSScriptRoot/../agents/windows/Credentials.psm1",$store,$machineId
     try {
         $null = Wait-Job $restart -Timeout 10
         if ($restart.State -ne 'Completed' -or (Receive-Job $restart) -ne $true) { throw 'Cross-process DPAPI persistence failed' }
