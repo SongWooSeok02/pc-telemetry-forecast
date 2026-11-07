@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from ml.evaluate_baselines import Observation, build_examples, evaluate
+from ml.evaluate_baselines import Observation, build_examples, chronological_boundaries, evaluate
 
 
 class BaselinePipelineTests(unittest.TestCase):
@@ -32,6 +32,37 @@ class BaselinePipelineTests(unittest.TestCase):
         examples, possible = build_examples(timeline, self.start, self.start + timedelta(seconds=500))
         self.assertEqual(possible, 141)
         self.assertEqual(examples, [])
+
+    def test_fractional_split_boundary_aligns_anchor_to_second_grid(self):
+        timeline = self.timeline(1_000)
+        split_start = self.start + timedelta(seconds=300, microseconds=500_000)
+        split_end = self.start + timedelta(seconds=900, microseconds=500_000)
+
+        examples, possible = build_examples(timeline, split_start, split_end)
+
+        self.assertTrue(examples)
+        self.assertGreater(possible, 0)
+        self.assertEqual(examples[0].anchor, self.start + timedelta(seconds=600))
+        self.assertTrue(all(example.anchor.microsecond == 0 for example in examples))
+        self.assertEqual(examples[-1].target_time, self.start + timedelta(seconds=900))
+        self.assertGreaterEqual(examples[0].anchor - timedelta(seconds=299), split_start)
+        self.assertLess(examples[-1].target_time, split_end)
+
+    def test_fractional_day_splits_are_supported_and_invalid_durations_rejected(self):
+        boundaries = chronological_boundaries(
+            self.start + timedelta(seconds=2_000),
+            train_days=0.005005,
+            validation_days=0.005005,
+            test_days=0.005005,
+        )
+        self.assertTrue(any(start.microsecond or end.microsecond for start, end in boundaries.values()))
+        for invalid in (0, -1, float("nan"), float("inf")):
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                chronological_boundaries(self.start, train_days=invalid)
+
+    def test_invalid_split_bounds_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "earlier"):
+            build_examples(self.timeline(400), self.start + timedelta(seconds=100), self.start)
 
     def test_validation_selects_baseline_and_report_records_test_metrics(self):
         timeline = {}

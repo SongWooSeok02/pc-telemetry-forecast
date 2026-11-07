@@ -97,8 +97,11 @@ def read_input(
 def chronological_boundaries(
     latest: datetime, train_days: float = 5, validation_days: float = 1, test_days: float = 2
 ) -> dict[str, tuple[datetime, datetime]]:
-    if min(train_days, validation_days, test_days) <= 0:
-        raise ValueError("split durations must be positive")
+    durations = (train_days, validation_days, test_days)
+    if any(not math.isfinite(days) or days <= 0 for days in durations):
+        raise ValueError("split durations must be finite and positive")
+    if latest.tzinfo is None or latest.utcoffset() != timedelta(0):
+        raise ValueError("latest timestamp must be UTC")
     test_start = latest - timedelta(days=test_days)
     validation_start = test_start - timedelta(days=validation_days)
     train_start = validation_start - timedelta(days=train_days)
@@ -113,11 +116,30 @@ def build_examples(
     observations: dict[datetime, Observation], split_start: datetime, split_end: datetime
 ) -> tuple[list[Example], int]:
     """Build 300-second inputs and +60s targets wholly contained in a split."""
+    for name, boundary in (("split_start", split_start), ("split_end", split_end)):
+        if boundary.tzinfo is None or boundary.utcoffset() != timedelta(0):
+            raise ValueError(f"{name} must be UTC")
+    if split_start >= split_end:
+        raise ValueError("split_start must be earlier than split_end")
     if not observations:
         return [], 0
     first, last = min(observations), max(observations)
-    first_anchor = max(first + timedelta(seconds=INPUT_SECONDS - 1), split_start + timedelta(seconds=INPUT_SECONDS - 1))
-    last_anchor = min(last - timedelta(seconds=HORIZON_SECONDS), split_end - timedelta(seconds=HORIZON_SECONDS + 1))
+    earliest_anchor = max(
+        first + timedelta(seconds=INPUT_SECONDS - 1),
+        split_start + timedelta(seconds=INPUT_SECONDS - 1),
+    )
+    # Telemetry is sampled on whole-second UTC ticks. Ceiling a fractional
+    # split boundary keeps candidate anchors on that same grid.
+    first_anchor = earliest_anchor.replace(microsecond=0)
+    if earliest_anchor.microsecond:
+        first_anchor += timedelta(seconds=1)
+    latest_anchor = min(
+        last - timedelta(seconds=HORIZON_SECONDS),
+        split_end - timedelta(seconds=HORIZON_SECONDS),
+    )
+    last_anchor = latest_anchor.replace(microsecond=0)
+    if last_anchor + timedelta(seconds=HORIZON_SECONDS) >= split_end:
+        last_anchor -= timedelta(seconds=1)
     if first_anchor > last_anchor:
         return [], 0
     examples: list[Example] = []
