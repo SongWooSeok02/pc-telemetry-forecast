@@ -1,0 +1,41 @@
+name: S1-06 Windows desktop shell
+on:
+  pull_request:
+  push:
+    paths: ['desktop/windows/**', '.github/workflows/desktop.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  shell:
+    # 셸 판단 로직(주소 검증·런타임 판정·이동 정책·상태 표시)을 검증하고 WebView2 셸을 빌드한다.
+    # 실제 WebView2 표시·서비스 상태·오프라인 안내는 실제 PC 증거(docs/desktop)로 따로 남긴다.
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Unit tests (shell core)
+        run: dotnet test desktop/windows/tests/PcTelemetry.Shell.Tests --logger "trx;LogFileName=shell.trx" --results-directory tests/results/ci
+      - name: Build shell (WebView2 SDK pinned)
+        run: dotnet build desktop/windows/src/PcTelemetry.Shell -c Release
+      - name: Runtime check on runner (no window)
+        shell: pwsh
+        run: |
+          $exe = 'desktop/windows/src/PcTelemetry.Shell/bin/Release/net10.0-windows/win-x64/PcTelemetry.Shell.exe'
+          $p = Start-Process $exe -ArgumentList '--check','--out','tests/results/ci/shell-check.json','--dashboard-url','https://dashboard.invalid/' -Wait -PassThru
+          Get-Content tests/results/ci/shell-check.json
+          # 0: 런타임 있음, 2: 런타임 없음(러너 이미지에 따라 다름). 3(설정 오류)·그 외는 실패.
+          if ($p.ExitCode -notin 0, 2) { exit 1 }
+      - name: Whitespace check
+        run: git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-06-shell
+          path: |
+            tests/results/ci/shell.trx
+            tests/results/ci/shell-check.json
+          if-no-files-found: error

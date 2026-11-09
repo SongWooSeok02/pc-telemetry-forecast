@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.Wpf;
 using PcTelemetry.Shell.Core;
@@ -10,18 +11,27 @@ using PcTelemetry.Shell.Core;
 namespace PcTelemetry.Shell;
 
 /// <summary>
-/// 셸 창. 대시보드(WebView2) 또는 안내 화면(런타임 없음·설정 오류·초기화 실패)을 본문에 둔다.
-/// 창을 닫아도 수집 서비스에는 아무 동작도 하지 않는다(서비스 제어 권한·코드 없음).
+/// 셸 창: 위쪽 호스트 상태 줄 + 본문(대시보드 WebView2 또는 안내 화면).
+/// 창을 닫아도 수집 서비스에는 아무 동작도 하지 않는다(서비스 제어 코드·권한 없음).
 /// </summary>
 internal sealed class MainWindow : Window
 {
+    private static readonly TimeSpan StatusInterval = TimeSpan.FromSeconds(5);
+
     private readonly ConfigResult config;
     private readonly IRuntimeProbe probe;
     private readonly ShellPaths paths;
     private readonly ShellLog log;
     private readonly Border body = new();
+    private readonly TextBlock statusText = new() { VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis };
+    private readonly TextBlock statusDetail = new() { VerticalAlignment = VerticalAlignment.Center, Foreground = Brushes.DimGray, Margin = new Thickness(16, 0, 0, 0) };
+    private readonly DispatcherTimer statusTimer;
     private LaunchPlan plan;
     private WebView2? webView;
+    private Border? offlineOverlay;
+    private ServerState server = ServerState.Connecting;
+    private string? serverDetail;
+    private HostSnapshot? lastSnapshot;
 
     public MainWindow(LaunchPlan plan, ConfigResult config, IRuntimeProbe probe, ShellPaths paths, ShellLog log)
     {
@@ -36,9 +46,86 @@ internal sealed class MainWindow : Window
         MinWidth = 720;
         MinHeight = 480;
         Background = Brushes.White;
-        Content = body;
-        Loaded += async (_, _) => await ShowPlanAsync();
+
+        var strip = new DockPanel { LastChildFill = true };
+        strip.Children.Add(statusDetail);
+        DockPanel.SetDock(statusDetail, Dock.Right);
+        strip.Children.Add(statusText);
+        var root = new DockPanel();
+        var top = new Border
+        {
+            Child = strip,
+            Padding = new Thickness(14, 6, 14, 6),
+            Background = new SolidColorBrush(Color.FromRgb(0xF3, 0xF5, 0xF8)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xDD, 0xE1, 0xE6)),
+            BorderThickness = new Thickness(0, 0, 0, 1),
+        };
+        DockPanel.SetDock(top, Dock.Top);
+        root.Children.Add(top);
+        root.Children.Add(body);
+        Content = root;
+
+        statusTimer = new DispatcherTimer(StatusInterval, DispatcherPriority.Background, (_, _) => RefreshHostStatus(), Dispatcher);
+        Loaded += async (_, _) =>
+        {
+            RefreshHostStatus();
+            statusTimer.Start();
+            await ShowPlanAsync();
+        };
+        StateChanged += (_, _) => OnWindowStateChanged();
+        Closed += (_, _) =>
+        {
+            statusTimer.Stop();
+            log.Write("shell closed (collection service untouched)");
+        };
     }
+
+    // ---- 호스트 상태 ----
+
+    private void RefreshHostStatus()
+    {
+        var service = plan.Config.Config?.AgentServiceName ?? ShellConfigLoader.DefaultServiceName;
+        var snapshot = new HostSnapshot(ServiceProbe.Query(service), AgentStatusReader.Read(AgentStatusReader.DefaultPath, DateTime.UtcNow),
+            plan.Screen == ShellScreen.Dashboard ? server : ServerState.Unreachable,
+            plan.Screen == ShellScreen.Dashboard ? serverDetail : "대시보드 미표시");
+        if (lastSnapshot is null || lastSnapshot.Service != snapshot.Service || lastSnapshot.Server != snapshot.Server
+            || lastSnapshot.Agent.Freshness != snapshot.Agent.Freshness)
+            log.Write($"host service={snapshot.Service} server={snapshot.Server} agent_status={snapshot.Agent.Freshness} pending={snapshot.Agent.PendingBatches?.ToString() ?? "-"}");
+        lastSnapshot = snapshot;
+        statusText.Text = HostStatusText.Summary(snapshot);
+        statusDetail.Text = $"전송: {HostStatusText.Upload(snapshot.Agent)} · 마지막 전송 {HostStatusText.Time(snapshot.Agent.LastSuccessUtc)}";
+        if (offlineOverlay is not null) offlineOverlay.Child = OfflineContent(snapshot);
+    }
+
+    /// <summary>
+    /// README 15.6: 최소화 시 WebView2 컨트롤러를 숨기고(IsVisible=false → 웹 visibilitychange), 복원 시 다시 보인다.
+    /// 복원은 표시만 바꾸며 셸이 조회를 일으키지 않는다. 최소화 중에는 로컬 상태 확인도 멈춘다.
+    /// </summary>
+    private void OnWindowStateChanged()
+    {
+        var minimized = WindowState == WindowState.Minimized;
+        UpdateWebViewVisibility();
+        if (minimized) statusTimer.Stop();
+        else
+        {
+            RefreshHostStatus();
+            statusTimer.Start();
+        }
+        log.Write($"window {(minimized ? "minimized: webview hidden" : "restored: webview visible")}");
+    }
+
+    /// <summary>
+    /// WebView2(WPF)는 별도 HWND로 그려져 WPF 요소를 위에 겹칠 수 없다(airspace). 그래서 오프라인 안내를 보일 때도
+    /// 컨트롤을 숨긴다. 최소화가 아니고 오프라인 안내가 없을 때만 보인다.
+    /// </summary>
+    private void UpdateWebViewVisibility()
+    {
+        if (webView is null) return;
+        var show = WindowState != WindowState.Minimized && offlineOverlay is null;
+        webView.Visibility = show ? Visibility.Visible : Visibility.Hidden;
+    }
+
+    // ---- 화면 전환 ----
 
     private async Task ShowPlanAsync()
     {
@@ -54,6 +141,7 @@ internal sealed class MainWindow : Window
                 body.Child = ConfigErrorView();
                 break;
         }
+        RefreshHostStatus();
     }
 
     private async Task RecheckAsync()
@@ -68,12 +156,14 @@ internal sealed class MainWindow : Window
     private async Task ShowDashboardAsync(ShellConfig shell)
     {
         var view = new WebView2();
+        var host = new Grid();
+        host.Children.Add(view);
         webView = view;
-        body.Child = view;
+        body.Child = host;
         try
         {
             Directory.CreateDirectory(paths.UserDataFolder);
-            var env = await CoreWebView2Environment.CreateAsync(browserExecutableFolder: WebView2RuntimeProbe.FixedRuntimeFolder,userDataFolder: paths.UserDataFolder);
+            var env = await CoreWebView2Environment.CreateAsync(browserExecutableFolder: WebView2RuntimeProbe.FixedRuntimeFolder, userDataFolder: paths.UserDataFolder);
             await view.EnsureCoreWebView2Async(env);
         }
         catch (Exception e)
@@ -109,12 +199,82 @@ internal sealed class MainWindow : Window
         };
         core.NavigationCompleted += (_, e) =>
         {
-            if (!e.IsSuccess) log.Write($"navigation failed: {e.WebErrorStatus} http={e.HttpStatusCode}");
+            if (e.IsSuccess)
+            {
+                SetServer(ServerState.Connected, null);
+                HideOffline(host);
+                return;
+            }
+            // 정책으로 취소한 이동은 연결 실패가 아니다.
+            if (e.WebErrorStatus == CoreWebView2WebErrorStatus.OperationCanceled) return;
+            var detail = HostStatusText.WebError(e.WebErrorStatus.ToString(), e.HttpStatusCode);
+            log.Write($"navigation failed: {e.WebErrorStatus} http={e.HttpStatusCode}");
+            SetServer(ServerState.Unreachable, detail);
+            ShowOffline(host, shell);
         };
-        core.ProcessFailed += (_, e) => log.Write($"webview2 process failed: {e.ProcessFailedKind} {e.Reason}");
+        core.ProcessFailed += (_, e) =>
+        {
+            log.Write($"webview2 process failed: {e.ProcessFailedKind} {e.Reason}");
+            SetServer(ServerState.Unreachable, "화면 프로세스 오류");
+            ShowOffline(host, shell);
+        };
 
+        Navigate(core, shell);
+    }
+
+    private void Navigate(CoreWebView2 core, ShellConfig shell)
+    {
+        SetServer(ServerState.Connecting, null);
         log.Write($"navigate {ShellConfigLoader.Redact(shell.DashboardUrl)}");
         core.Navigate(shell.DashboardUrl.AbsoluteUri);
+    }
+
+    private void SetServer(ServerState state, string? detail)
+    {
+        server = state;
+        serverDetail = detail;
+        RefreshHostStatus();
+    }
+
+    /// <summary>
+    /// 서버에 닿지 못하면 브라우저 오류 페이지 대신 연결 상태와 로컬 대기 데이터 수를 보여 준다(README 3절).
+    /// 자동 재시도는 하지 않는다(수동 갱신 모드와 충돌하지 않도록 사용자가 [다시 연결]을 누른다).
+    /// </summary>
+    private void ShowOffline(Grid host, ShellConfig shell)
+    {
+        if (offlineOverlay is null)
+        {
+            offlineOverlay = new Border { Background = Brushes.White };
+            offlineOverlay.Tag = shell;
+            host.Children.Add(offlineOverlay);
+        }
+        offlineOverlay.Child = OfflineContent(lastSnapshot);
+        UpdateWebViewVisibility();
+    }
+
+    private void HideOffline(Grid host)
+    {
+        if (offlineOverlay is null) return;
+        host.Children.Remove(offlineOverlay);
+        offlineOverlay = null;
+        UpdateWebViewVisibility();
+    }
+
+    private UIElement OfflineContent(HostSnapshot? snapshot)
+    {
+        var lines = snapshot is null ? "" :
+            $"수집 서비스: {HostStatusText.Service(snapshot.Service)}\n" +
+            $"전송 대기: {HostStatusText.Pending(snapshot.Agent)}\n" +
+            $"전송 상태: {HostStatusText.Upload(snapshot.Agent)} · 마지막 전송 {HostStatusText.Time(snapshot.Agent.LastSuccessUtc)}";
+        return Guidance(
+            "대시보드 서버에 연결할 수 없습니다",
+            $"서버 연결: {HostStatusText.Server(server, serverDetail)}. 네트워크나 서버 상태를 확인한 뒤 [다시 연결]을 누르세요. " +
+            "수집 서비스는 서버와 관계없이 이 PC에서 계속 수집하고, 보내지 못한 데이터는 로컬에 보관했다가 연결되면 전송합니다.\n\n" + lines,
+            [Button("다시 연결", () =>
+            {
+                if (webView?.CoreWebView2 is { } core && offlineOverlay?.Tag is ShellConfig shell) Navigate(core, shell);
+                return Task.CompletedTask;
+            })]);
     }
 
     private void Guard(ShellConfig shell, string uri, Action cancel)

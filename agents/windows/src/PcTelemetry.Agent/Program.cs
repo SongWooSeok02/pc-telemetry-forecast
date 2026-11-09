@@ -3,7 +3,7 @@
 //   PcTelemetry.Agent discover [--out file.json]
 //       센서를 탐색해 계약 매핑(정의·원천 연결)을 출력한다. 임시 상태 디렉터리를 쓴다.
 //   PcTelemetry.Agent run [--state-dir DIR] [--seconds N]
-//                         [--server URL --machine-id UUID --token-file FILE]
+//                         [--server URL --machine-id UUID --token-file FILE] [--status-file PATH|none]
 //       콘솔에서 1초 수집. --machine-id가 있으면 3초 배치를 동결해 스풀에 쌓고, --server가 있으면 전송한다.
 //   PcTelemetry.Agent service [위와 같은 옵션]
 //       Windows 서비스로 실행(LocalSystem 필요, S1-02a 5.5).
@@ -21,7 +21,8 @@ internal sealed record AgentOptions(
     Uri? Server,
     Guid? MachineId,
     string? TokenFile,
-    int IntervalMs);
+    int IntervalMs,
+    string? StatusFile);
 
 internal static class Program
 {
@@ -46,7 +47,11 @@ internal static class Program
                 o.TryGetValue("server", out var url) ? new Uri(url) : null,
                 o.TryGetValue("machine-id", out var m) ? Guid.Parse(m) : null,
                 o.GetValueOrDefault("token-file"),
-                o.TryGetValue("interval-ms", out var i) ? int.Parse(i) : 1000);
+                o.TryGetValue("interval-ms", out var i) ? int.Parse(i) : 1000,
+                o.GetValueOrDefault("status-file") is { } sf
+                    ? (sf == "none" ? null : sf)
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                        "PcTelemetry", "status", "agent-status.json"));
             if (options.Server is not null && (options.MachineId is null || options.TokenFile is null))
                 throw new ArgumentException("--server requires --machine-id and --token-file");
         }
@@ -121,16 +126,21 @@ internal static class Program
         var collect = Task.Run(() => collector.RunAsync(stop.Token), CancellationToken.None);
         var upload = uploader is null ? Task.CompletedTask : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
         var statsPath = store.PathOf("stats.json");
+        var tick = 0;
+        WriteStatus(options.StatusFile, collecting: true, uploader, spool);
         while (!collect.IsCompleted)
         {
-            await Task.WhenAny(collect, Task.Delay(TimeSpan.FromSeconds(60), CancellationToken.None));
-            WriteStats(statsPath, options, started, source, collector, uploader, spool);
+            await Task.WhenAny(collect, Task.Delay(TimeSpan.FromSeconds(10), CancellationToken.None));
+            WriteStatus(options.StatusFile, collecting: !collect.IsCompleted, uploader, spool);
+            if (++tick % 6 == 0 || collect.IsCompleted)
+                WriteStats(statsPath, options, started, source, collector, uploader, spool);
         }
         await collect;
         await uploadStop.CancelAsync();
         await upload;
         if (uploader is not null) await uploader.DrainAsync(TimeSpan.FromSeconds(20));
         WriteStats(statsPath, options, started, source, collector, uploader, spool);
+        WriteStatus(options.StatusFile, collecting: false, uploader, spool);
         if (console) Console.WriteLine($"stats: {statsPath}");
         return 0;
     }
@@ -173,6 +183,36 @@ internal static class Program
             },
         };
         StateStore.WriteAtomic(path, JsonSerializer.Serialize(report, Pretty));
+    }
+
+    /// <summary>
+    /// 일반 사용자 셸(S1-06)이 읽는 공개 상태. 토큰·machine_id·센서값·호스트 정보를 넣지 않는다.
+    /// 상태 디렉터리(서비스 전용 ACL)와 분리해 %ProgramData%\PcTelemetry\status에 둔다. 실패해도 수집은 계속한다.
+    /// </summary>
+    internal static void WriteStatus(string? path, bool collecting, Uploader? uploader, Spool? spool)
+    {
+        if (path is null) return;
+        var status = new Dictionary<string, object?>
+        {
+            ["schema"] = "pc-telemetry/agent-status/1",
+            ["updated_at_utc"] = Utc.Format(DateTime.UtcNow),
+            ["agent_version"] = typeof(Program).Assembly.GetName().Version?.ToString(3),
+            ["collecting"] = collecting,
+            ["upload"] = new Dictionary<string, object?>
+            {
+                ["configured"] = uploader is not null,
+                ["state"] = uploader?.State ?? (spool is null ? "not_configured" : "idle"),
+                ["pending_batches"] = spool?.Pending().Count,
+                ["last_success_at_utc"] = uploader?.LastSuccessUtc is { } t ? Utc.Format(t) : null,
+            },
+        };
+        try
+        {
+            StateStore.WriteAtomic(path, JsonSerializer.Serialize(status, Pretty));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+        }
     }
 
     private static int Discover(string? outPath)

@@ -19,6 +19,8 @@
   <ItemGroup>
     <!-- 변경 시 desktop/windows/README.md의 SDK 버전과 런타임 검증을 함께 갱신한다. -->
     <PackageReference Include="Microsoft.Web.WebView2" Version="[1.0.4314.35]" />
+    <!-- 수집 서비스 상태 조회(제어 없음). -->
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

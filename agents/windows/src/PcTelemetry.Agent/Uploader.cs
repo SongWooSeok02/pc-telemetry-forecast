@@ -19,6 +19,10 @@ internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEvent
     public long Retries { get; private set; }
     public long Quarantined { get; private set; }
 
+    /// <summary>공개 상태 파일(S1-06)용: idle, ok, retrying, paused_auth.</summary>
+    public string State { get; private set; } = "idle";
+    public DateTime? LastSuccessUtc { get; private set; }
+
     public async Task RunAsync(CancellationToken token)
     {
         var lastPrune = DateTime.MinValue;
@@ -69,13 +73,17 @@ internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEvent
                     spool.Complete(path);
                     Sent++;
                     _attempt = 0;
+                    State = "ok";
+                    LastSuccessUtc = DateTime.UtcNow;
                     continue;
                 case UploadAction.Retry:
                     Retries++;
+                    State = "retrying";
                     if (code == "SENSOR_CONFIG_PENDING") ReportPendingConfig(body);
                     // 순서를 지키기 위해 같은 배치부터 다시 시도한다.
                     return UploadPolicy.Backoff(_attempt++);
                 case UploadAction.PauseAuth:
+                    State = "paused_auth";
                     Emit("upload_paused_auth", new() { ["status"] = status, ["code"] = code });
                     return TimeSpan.FromSeconds(60);
                 case UploadAction.Quarantine:

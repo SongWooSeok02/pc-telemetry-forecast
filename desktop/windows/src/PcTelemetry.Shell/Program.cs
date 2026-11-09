@@ -60,6 +60,22 @@ internal static class Program
         return app.Run(new MainWindow(plan, config, probe, paths, log));
     }
 
+    private static object HostReport(LaunchPlan plan)
+    {
+        var service = plan.Config.Config?.AgentServiceName ?? ShellConfigLoader.DefaultServiceName;
+        var agent = AgentStatusReader.Read(AgentStatusReader.DefaultPath, DateTime.UtcNow);
+        return new
+        {
+            ServiceName = service,
+            ServiceState = ServiceProbe.Query(service),
+            AgentStatus = agent.Freshness,
+            AgentCollecting = agent.Collecting,
+            PendingBatches = agent.PendingBatches,
+            UploadState = agent.UploadState,
+            PendingText = HostStatusText.Pending(agent),
+        };
+    }
+
     internal static object CheckReport(LaunchPlan plan, ShellPaths paths) => new
     {
         Task = "S1-06",
@@ -84,6 +100,7 @@ internal static class Program
             DashboardOrigin = plan.Config.Config is { } c ? ShellConfigLoader.Redact(c.DashboardUrl) : null,
             ServiceName = plan.Config.Config?.AgentServiceName,
         },
+        Host = HostReport(plan),
         Install = new
         {
             BootstrapperPresent = plan.Install.BootstrapperPath is not null,
