@@ -49,7 +49,7 @@
 | 보안 | Secure Boot·HVCI·취약 드라이버 차단 목록·Defender 실시간/변조 방지 켜짐 |
 | 권한·드라이버 | 관리자 PowerShell(LocalSystem 아님), PawnIO 2.2.0 |
 | 빌드 | .NET SDK 10.0.300, PcTelemetry.Agent 0.1.0 Release win-x64 self-contained, LibreHardwareMonitorLib 0.9.6 |
-| 기반 커밋 | `2630383`(main, PR #8) + 미커밋 S1-02b 변경 |
+| 기반 커밋 | 11-04~11-08 실행: `2630383`(main, PR #8) + 미커밋 S1-02b 변경. 11-09 재검증: `d7842cf`(main, PR #14, S2-03 포함) 위로 rebase한 S1-02b |
 | API ① | `tests/reference_api.py`(S1-01 HTTP 참조 API, SQLite, loopback, 합성 토큰·machine_id) |
 | API ② | S1-03 `backend/` FastAPI + PostgreSQL 16, `infra/compose.yaml`(별도 프로젝트 `pctf-s1-02b`, 임시 비밀번호), Docker Engine 29.9.2, API 이미지 `sha256:bcbd9f90482a…`. 장비 토큰 SHA-256·구성은 db 컨테이너 psql로 관리자 등록(backend/README). 11-04~11-08 실행은 S2-03 병합 전 main `2630383` 기준 |
 
@@ -91,6 +91,7 @@
 | 2026-11-06 00:46 | ② 재전송·충돌 | 같은 본문 200·최초 응답 동일, 같은 ID 값 변경 409 BATCH_CONFLICT, 새 ID 같은 샘플 409 SAMPLE_CONFLICT | 200(응답 동일) / 409 BATCH_CONFLICT / 409 SAMPLE_CONFLICT | 성공 |
 | 2026-11-06 00:46:16~00:56:18 | ② FastAPI/PostgreSQL 10분 | ①과 같음 | 599/599 수락(배치 200, 측정 8,985행), 중복 0·누락 0, 간격 984~1015ms(598/598 정시), 지원 센서 ok 100%, 0 대신 null 위반 0, 격리·잔여 0 | 성공 |
 | 2026-11-08 23:58:10~11-09 00:17:55 | ② 실제 절전/재개(300초, `--expect-resume`). 수집 약 70초 후 시작 메뉴 절전(Modern Standby, S0 저전력 유휴) → 약 14.7분 후 재개 | `suspend_resume` ≥1, 절전 가로지르는 배치 0, `clock_jump` 0, 순번 연속, 단조 시간 절전 제외, 나머지 ①과 같음 | `suspend_resume` 1(절전 881,752ms, 직전 순번 68, 벽시계 경과 882,757ms·단조 경과 1,005ms), 가로지르는 배치 0, `clock_jump` 0, 298/298 수락(배치 100, 측정 4,470행), 순번 0~297 중복·누락 0, 간격 986~1015ms(297/297 정시), ok 100%, 업로드 재시도 1(PENDING), 격리·잔여 0 | 성공 |
+| 2026-11-09 01:17:10~01:18:13 | ② rebase 후 회귀(최신 main, S2-03 마이그레이션 포함) 60초 | ①과 같음 | 59/59 수락(배치 20, 측정 885행), 중복 0·누락 0, 간격 988~1009ms(58/58 정시), ok 100%, 409 PENDING 1회 후 수락, 격리·잔여 0, API 컨테이너 healthy | 성공 |
 
 증거: [tests/results/s1-02b/](../../tests/results/s1-02b/).
 
