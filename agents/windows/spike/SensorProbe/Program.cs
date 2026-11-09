@@ -211,6 +211,14 @@ internal static class Program
         }
     }
 
+    // 계정명·호스트명은 결과 파일에 남기지 않는다(README 13절). 권한 판정에 필요한 종류만 기록한다.
+    internal static string AccountKind(WindowsIdentity identity) =>
+        identity.User is not { } sid ? "unknown"
+        : sid.IsWellKnown(WellKnownSidType.LocalSystemSid) ? "system"
+        : sid.IsWellKnown(WellKnownSidType.LocalServiceSid) ? "local_service"
+        : sid.IsWellKnown(WellKnownSidType.NetworkServiceSid) ? "network_service"
+        : "interactive_user";
+
     private static Dictionary<string, object?> NewReport(string mode)
     {
         using var identity = WindowsIdentity.GetCurrent();
@@ -223,7 +231,7 @@ internal static class Program
             ["lhm_version"] = typeof(Computer).Assembly.GetName().Version?.ToString(),
             ["executed_at_utc"] = Utc(DateTime.UtcNow),
             ["os_version"] = Environment.OSVersion.VersionString,
-            ["account"] = identity.Name,
+            ["account"] = AccountKind(identity),
             ["is_elevated"] = principal.IsInRole(WindowsBuiltInRole.Administrator),
             ["is_system"] = identity.IsSystem,
             ["pawnio"] = PawnIoState(),

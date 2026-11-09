@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- S1-02b: LHM 센서 어댑터·Windows 시계·스풀 전송을 묶은 수집 에이전트 실행 파일. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SelfContained>true</SelfContained>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- S1-02a 보고서에 기록한 버전으로 고정한다. 변경 시 docs/sensor-support.md와 재검증이 필요하다. -->
+    <PackageReference Include="LibreHardwareMonitorLib" Version="[0.9.6]" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PcTelemetry.Collector\PcTelemetry.Collector.csproj" />
+  </ItemGroup>
+
+</Project>

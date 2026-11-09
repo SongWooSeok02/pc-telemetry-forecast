@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PcTelemetry.Collector\PcTelemetry.Collector.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 계약 공유 벡터를 복사하지 않고 그대로 읽는다. -->
+    <None Include="..\..\..\..\contracts\fixtures\hash-vectors.json" Link="fixtures\hash-vectors.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\..\contracts\fixtures\batch.json" Link="fixtures\batch.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

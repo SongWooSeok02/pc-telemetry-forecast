@@ -1,0 +1,228 @@
+{
+  "task": "S1-02b",
+  "kind": "agent -> reference HTTP API integration (real sensors, loopback)",
+  "executed_at_utc": {
+    "started": "2026-11-04T07:34:48.181249Z",
+    "finished": "2026-11-04T07:35:50.808831Z"
+  },
+  "build": {
+    "base_commit": "263038349427890b5508271eb78e8d5a46c9e6f2",
+    "dirty": true,
+    "agent_version": "0.1.0.0",
+    "lhm_version": "0.9.6.0",
+    "python": "3.13.9"
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os_version": "Microsoft Windows NT 10.0.26200.0",
+    "is_elevated": true,
+    "is_system": false,
+    "pawnio_installed": true,
+    "pawnio_version": "2.2.0.0",
+    "sensor_sources": [
+      "lhm-0.9.6:Cpu:Clock:max(16xclock)",
+      "lhm-0.9.6:Cpu:Load:CPU Core Max",
+      "lhm-0.9.6:Cpu:Load:CPU Total",
+      "lhm-0.9.6:Cpu:Power:CPU Cores",
+      "lhm-0.9.6:Cpu:Power:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:Core Max",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Memory",
+      "lhm-0.9.6:GpuNvidia:Load:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Power:GPU Package",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Hot Spot",
+      "lhm-0.9.6:none"
+    ]
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_agent_integration.py --exe <PcTelemetry.Agent.exe> --seconds 60 --register-delay 5.0 --pc-label pc-a"
+  ],
+  "duration_s": 60,
+  "checks": [
+    {
+      "name": "agent exit code",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "samples accepted by API == samples collected",
+      "expected": 58,
+      "actual": 58,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "sample_seq gaps within run",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "non-ok readings carrying a value (0 instead of null)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "spool pending after drain",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "SENSOR_CONFIG_PENDING retried then accepted",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "interval on-time ratio (|dt-1000|<=100ms) >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "supported sensor ok ratio >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    }
+  ],
+  "result": {
+    "server_counts": {
+      "batches": 20,
+      "samples": 58,
+      "measurements": 870
+    },
+    "boot_sessions": 1,
+    "sensor_configs_used": [
+      "a01da0b0-76b5-4ab9-bc7c-da406a7bae51"
+    ],
+    "samples": 58,
+    "seq_first": 0,
+    "seq_last": 57,
+    "seq_duplicates": 0,
+    "seq_gaps": 0,
+    "interval_ms": {
+      "count": 57,
+      "min": 987,
+      "max": 1013,
+      "on_time_pm10pct": 57,
+      "on_time_ratio": 1.0
+    },
+    "supported_ok_ratio": 1.0,
+    "non_ok_with_value": 0,
+    "quality_counts": {
+      "cpu0/core-max/clock": {
+        "ok": 58
+      },
+      "cpu0/core-max/load": {
+        "ok": 58
+      },
+      "cpu0/core-max/temp": {
+        "ok": 58
+      },
+      "cpu0/cores/power": {
+        "ok": 58
+      },
+      "cpu0/fan": {
+        "unsupported:sensor_not_exposed": 58
+      },
+      "cpu0/package/power": {
+        "ok": 58
+      },
+      "cpu0/package/temp": {
+        "ok": 58
+      },
+      "cpu0/total/load": {
+        "ok": 58
+      },
+      "gpu0/board/power": {
+        "ok": 58
+      },
+      "gpu0/core/clock": {
+        "ok": 58
+      },
+      "gpu0/core/load": {
+        "ok": 58
+      },
+      "gpu0/core/temp": {
+        "ok": 58
+      },
+      "gpu0/fan": {
+        "unsupported:sensor_not_exposed": 58
+      },
+      "gpu0/hotspot/temp": {
+        "ok": 58
+      },
+      "gpu0/memory/clock": {
+        "ok": 58
+      }
+    },
+    "support": {
+      "cpu0/core-max/clock": "supported",
+      "cpu0/core-max/load": "supported",
+      "cpu0/core-max/temp": "supported",
+      "cpu0/cores/power": "supported",
+      "cpu0/fan": "unsupported",
+      "cpu0/package/power": "supported",
+      "cpu0/package/temp": "supported",
+      "cpu0/total/load": "supported",
+      "gpu0/board/power": "supported",
+      "gpu0/core/clock": "supported",
+      "gpu0/core/load": "supported",
+      "gpu0/core/temp": "supported",
+      "gpu0/fan": "unsupported",
+      "gpu0/hotspot/temp": "supported",
+      "gpu0/memory/clock": "supported"
+    }
+  },
+  "agent_stats": {
+    "cycles": 60,
+    "samples": 58,
+    "source_errors": 0,
+    "cycle_failures": 0,
+    "resumes": 0,
+    "clock_jumps": 0,
+    "intervals": {
+      "total": 57,
+      "on_time_pm10pct": 57,
+      "min_ms": 987,
+      "max_ms": 1013
+    },
+    "upload": {
+      "sent": 20,
+      "retries": 1,
+      "quarantined": 0,
+      "pending": 0
+    },
+    "lhm_open_ms": 937
+  },
+  "events": {
+    "agent_started": 1,
+    "agent_stopped": 1,
+    "boot_session_started": 1,
+    "sensor_config_pending": 1,
+    "sensor_config_selected": 1
+  },
+  "config_registration_utc": {
+    "a01da0b0-76b5-4ab9-bc7c-da406a7bae51": "2026-11-04T07:34:57.370632Z"
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}
