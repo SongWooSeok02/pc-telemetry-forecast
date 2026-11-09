@@ -1,4 +1,47 @@
-# S2-03 자격 증명 및 등록 IPC
+# Windows 에이전트
+
+이 디렉터리에는 수집 에이전트(S1-02b, A)와 자격 증명·등록 모듈(S2-03, B)이 함께 있다.
+
+상태(S1-02b): 1초 수집·센서 매핑·이벤트·불변 배치 구현. **PC 1대 실측, 다른 팀원 리뷰 전.**
+설계·검증 결과: [S1-02b 보고서](../../docs/collector/s1-02b-report.md), 센서 표: [sensor-support.md](../../docs/sensor-support.md).
+
+| 경로 | 내용 |
+|---|---|
+| `src/PcTelemetry.Collector/` | LHM 비의존 핵심: 센서 매핑, 1초 루프, 부팅 세션·순번, 절전/시계 이벤트, 불변 배치·`ascii-json-v1` 해시, 파일 스풀 |
+| `src/PcTelemetry.Agent/` | LHM 0.9.6 어댑터, `QueryUnbiasedInterruptTime` 시계, BootId, 업로더, 콘솔/서비스 진입점 |
+| `tests/PcTelemetry.Collector.Tests/` | 가상 센서·가짜 시계 기반 단위 테스트, 계약 공유 해시 벡터 |
+| `Credentials.psm1`, `Register-Device.ps1` | S2-03 자격 증명 저장(DPAPI·ACL)·등록 IPC. 아래 [S2-03 절](#s2-03-자격-증명-및-등록-ipc) |
+| `spike/` | S1-02a 스파이크 도구(운영 코드 아님) |
+
+## 빌드·테스트
+
+```powershell
+dotnet test agents/windows/tests/PcTelemetry.Collector.Tests
+dotnet build agents/windows/src/PcTelemetry.Agent -c Release
+```
+
+## 실행
+
+CPU 온도·전력·클럭은 PawnIO 2.2.0과 관리자/LocalSystem 권한이 필요하다(S1-02a). 권한이 없으면 해당 센서를
+`unsupported`로 등록하고 나머지를 수집한다.
+
+```powershell
+$exe = "agents/windows/src/PcTelemetry.Agent/bin/Release/net10.0-windows/win-x64/PcTelemetry.Agent.exe"
+& $exe discover --out discover.json                 # 매핑 확인(임시 상태)
+& $exe run --state-dir .\state --seconds 60          # 수집만(배치 없음)
+& $exe run --state-dir .\state --server https://<host> --machine-id <uuid> --token-file <path>
+python tests/run_agent_integration.py --exe $exe --seconds 600 --pc-label pc-a   # 참조 API 통합
+```
+
+상태 디렉터리(기본 `%ProgramData%\PcTelemetry\state`): `boot-session.json`(부팅 세션·순번 예약),
+`components.json`(하드웨어→component_id), `sensor-configs.json`·`sensor-configs/<id>.json`(불변 구성·등록 본문),
+`spool/`(동결 배치), `quarantine/`, `events.jsonl`, `stats.json`. 실제 PC 상태 디렉터리는 커밋하지 않는다.
+
+토큰은 현재 `--token-file`에서 읽어 헤더에만 쓴다. S2-03 자격 증명 저장소(`Get-DeviceCredential`) 연동은
+설치 서비스(S2-02)와 함께 후속으로 한다. SQLite 버퍼·재전송 정책은 S2-01,
+서비스 자동 시작·설치는 S2-02/S1-06 범위다.
+
+## S2-03 자격 증명 및 등록 IPC
 
 PowerShell 7 / Windows 전용 서비스 호스트 모듈이다. S2-02의 설치 서비스가 아직 저장소에
 없으므로 서비스 등록·계정 생성·센서 전송 루프를 만들지는 않는다. 설치된 서비스에서 아래

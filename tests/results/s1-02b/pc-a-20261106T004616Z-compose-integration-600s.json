@@ -1,0 +1,245 @@
+{
+  "task": "S1-02b",
+  "kind": "agent -> S1-03 FastAPI/PostgreSQL (infra/compose.yaml, real sensors, loopback)",
+  "executed_at_utc": {
+    "started": "2026-11-06T00:46:16.293256Z",
+    "finished": "2026-11-06T00:56:18.808813Z"
+  },
+  "build": {
+    "base_commit": "263038349427890b5508271eb78e8d5a46c9e6f2",
+    "dirty": true,
+    "agent_version": "0.1.0.0",
+    "lhm_version": "0.9.6.0",
+    "python": "3.13.9"
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os_version": "Microsoft Windows NT 10.0.26200.0",
+    "is_elevated": true,
+    "is_system": false,
+    "pawnio_installed": true,
+    "pawnio_version": "2.2.0.0",
+    "sensor_sources": [
+      "lhm-0.9.6:Cpu:Clock:max(16xclock)",
+      "lhm-0.9.6:Cpu:Load:CPU Core Max",
+      "lhm-0.9.6:Cpu:Load:CPU Total",
+      "lhm-0.9.6:Cpu:Power:CPU Cores",
+      "lhm-0.9.6:Cpu:Power:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:Core Max",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Memory",
+      "lhm-0.9.6:GpuNvidia:Load:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Power:GPU Package",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Hot Spot",
+      "lhm-0.9.6:none"
+    ]
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_agent_integration.py --exe <PcTelemetry.Agent.exe> --seconds 600 --register-delay 5.0 --pc-label pc-a --restarts 0 --backend compose --compose-project pctf-s1-02b --compose-env <env file>"
+  ],
+  "duration_s_per_run": 600,
+  "runs": [
+    {
+      "exit_code": 0,
+      "samples": 599,
+      "boot_session_id": "7a1269b7-f8e1-409e-b245-7c30e8bd40a3"
+    }
+  ],
+  "checks": [
+    {
+      "name": "agent exit codes",
+      "expected": [
+        0
+      ],
+      "actual": [
+        0
+      ],
+      "pass": true
+    },
+    {
+      "name": "samples accepted by API == samples collected",
+      "expected": 599,
+      "actual": 599,
+      "pass": true
+    },
+    {
+      "name": "boot sessions (restarts keep the session)",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "sample_seq gaps (only reservation skips at restarts)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "non-ok readings carrying a value (0 instead of null)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "spool pending after drain",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "SENSOR_CONFIG_PENDING retried then accepted",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "interval on-time ratio (|dt-1000|<=100ms) >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "supported sensor ok ratio >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    }
+  ],
+  "result": {
+    "server_counts": {
+      "ingestion_batches": 200,
+      "ingestion_samples": 599,
+      "measurements": 8985
+    },
+    "boot_sessions": 1,
+    "sensor_configs_used": [
+      "d56a0fb4-1aff-41f5-80ce-04967fae4710"
+    ],
+    "samples": 599,
+    "seq_first": 0,
+    "seq_last": 598,
+    "seq_duplicates": 0,
+    "seq_gaps": 0,
+    "interval_ms": {
+      "count": 598,
+      "min": 984,
+      "max": 1015,
+      "on_time_pm10pct": 598,
+      "on_time_ratio": 1.0
+    },
+    "supported_ok_ratio": 1.0,
+    "non_ok_with_value": 0,
+    "quality_counts": {
+      "cpu0/core-max/clock": {
+        "ok": 599
+      },
+      "cpu0/core-max/load": {
+        "ok": 599
+      },
+      "cpu0/core-max/temp": {
+        "ok": 599
+      },
+      "cpu0/cores/power": {
+        "ok": 599
+      },
+      "cpu0/fan": {
+        "unsupported:sensor_not_exposed": 599
+      },
+      "cpu0/package/power": {
+        "ok": 599
+      },
+      "cpu0/package/temp": {
+        "ok": 599
+      },
+      "cpu0/total/load": {
+        "ok": 599
+      },
+      "gpu0/board/power": {
+        "ok": 599
+      },
+      "gpu0/core/clock": {
+        "ok": 599
+      },
+      "gpu0/core/load": {
+        "ok": 599
+      },
+      "gpu0/core/temp": {
+        "ok": 599
+      },
+      "gpu0/fan": {
+        "unsupported:sensor_not_exposed": 599
+      },
+      "gpu0/hotspot/temp": {
+        "ok": 599
+      },
+      "gpu0/memory/clock": {
+        "ok": 599
+      }
+    },
+    "support": {
+      "cpu0/core-max/clock": "supported",
+      "cpu0/core-max/load": "supported",
+      "cpu0/core-max/temp": "supported",
+      "cpu0/cores/power": "supported",
+      "cpu0/fan": "unsupported",
+      "cpu0/package/power": "supported",
+      "cpu0/package/temp": "supported",
+      "cpu0/total/load": "supported",
+      "gpu0/board/power": "supported",
+      "gpu0/core/clock": "supported",
+      "gpu0/core/load": "supported",
+      "gpu0/core/temp": "supported",
+      "gpu0/fan": "unsupported",
+      "gpu0/hotspot/temp": "supported",
+      "gpu0/memory/clock": "supported"
+    }
+  },
+  "agent_stats": {
+    "cycles": 601,
+    "samples": 599,
+    "source_errors": 0,
+    "cycle_failures": 0,
+    "resumes": 0,
+    "clock_jumps": 0,
+    "intervals": {
+      "total": 598,
+      "on_time_pm10pct": 598,
+      "min_ms": 984,
+      "max_ms": 1015
+    },
+    "upload": {
+      "sent": 200,
+      "retries": 1,
+      "quarantined": 0,
+      "pending": 0
+    },
+    "lhm_open_ms": 890
+  },
+  "events": {
+    "agent_started": 1,
+    "agent_stopped": 1,
+    "boot_session_started": 1,
+    "sensor_config_pending": 1,
+    "sensor_config_selected": 1
+  },
+  "config_registration_utc": {
+    "d56a0fb4-1aff-41f5-80ce-04967fae4710": "2026-11-06T00:46:25.221304Z"
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}

@@ -3,20 +3,20 @@
   "mode": "run",
   "probe_version": "0.1.0.0",
   "lhm_version": "0.9.6.0",
-  "executed_at_utc": "2026-11-04T02:51:18.811371Z",
+  "executed_at_utc": "2026-10-30T15:13:04.180187Z",
   "os_version": "Microsoft Windows NT 10.0.26200.0",
-  "account": "DESKTOP-V7EO3LB\\U301-09",
+  "account": "interactive_user",
   "is_elevated": true,
   "is_system": false,
   "pawnio": {
-    "installed": true,
-    "display_version": "2.2.0.0"
+    "installed": false,
+    "display_version": null
   },
   "interval_ms": 1000,
   "open_error": null,
-  "open_ms": 797.4132,
-  "started_at_utc": "2026-11-04T02:51:19.621527Z",
-  "finished_at_utc": "2026-11-04T02:52:19.646323Z",
+  "open_ms": 437.9345,
+  "started_at_utc": "2026-10-30T15:13:04.625912Z",
+  "finished_at_utc": "2026-10-30T15:14:04.652635Z",
   "cycles": 60,
   "cycle_errors": 0,
   "cycle_overruns": 0,
@@ -28,9 +28,9 @@
       "contract_unit": "MHz",
       "ok": 60,
       "null": 0,
-      "min": 100,
-      "max": 800,
-      "last": 100
+      "min": 650,
+      "max": 650,
+      "last": 650
     },
     "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/load/0": {
       "hardware": "Intel(R) Arc(TM) Graphics",
@@ -95,7 +95,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 10.437,
+      "max": 0.555,
       "last": 0
     },
     "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/load/5": {
@@ -161,8 +161,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 0.074,
-      "last": 0.001
+      "max": 0,
+      "last": 0
     },
     "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/smalldata/0": {
       "hardware": "Intel(R) Arc(TM) Graphics",
@@ -171,9 +171,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 389.262,
-      "max": 427.844,
-      "last": 389.262
+      "min": 495.25,
+      "max": 521.855,
+      "last": 495.25
     },
     "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/smalldata/1": {
       "hardware": "Intel(R) Arc(TM) Graphics",
@@ -182,9 +182,9 @@
       "contract_unit": null,
       "ok": 59,
       "null": 1,
-      "min": 17898.67,
-      "max": 17937.252,
-      "last": 17937.252
+      "min": 17804.658,
+      "max": 17831.264,
+      "last": 17831.264
     },
     "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/smalldata/2": {
       "hardware": "Intel(R) Arc(TM) Graphics",
@@ -204,9 +204,9 @@
       "contract_unit": "MHz",
       "ok": 60,
       "null": 0,
-      "min": 285,
+      "min": 210,
       "max": 1470,
-      "last": 345
+      "last": 210
     },
     "/gpu-nvidia/0/clock/4": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -217,7 +217,7 @@
       "null": 0,
       "min": 405,
       "max": 7000.978,
-      "last": 810
+      "last": 405
     },
     "/gpu-nvidia/0/load/0": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -226,9 +226,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 6,
-      "max": 64,
-      "last": 21
+      "min": 0,
+      "max": 63,
+      "last": 0
     },
     "/gpu-nvidia/0/load/1": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -237,9 +237,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 2,
-      "max": 40,
-      "last": 13
+      "min": 1,
+      "max": 45,
+      "last": 35
     },
     "/gpu-nvidia/0/load/10": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -303,9 +303,9 @@
       "contract_unit": "%",
       "ok": 120,
       "null": 0,
-      "min": 5,
-      "max": 34,
-      "last": 18.647
+      "min": 0,
+      "max": 33.439,
+      "last": 32.81
     },
     "/gpu-nvidia/0/load/5": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -314,9 +314,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 6.691,
-      "max": 44.846,
-      "last": 17.649
+      "min": 0,
+      "max": 18.614,
+      "last": 0
     },
     "/gpu-nvidia/0/load/6": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -326,7 +326,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 2.322,
+      "max": 4.252,
       "last": 0
     },
     "/gpu-nvidia/0/load/7": {
@@ -337,7 +337,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 0.27,
+      "max": 0.341,
       "last": 0
     },
     "/gpu-nvidia/0/load/8": {
@@ -369,9 +369,9 @@
       "contract_unit": "W",
       "ok": 60,
       "null": 0,
-      "min": 5.824,
-      "max": 12.395,
-      "last": 9.986
+      "min": 3.307,
+      "max": 12.486,
+      "last": 3.307
     },
     "/gpu-nvidia/0/smalldata/0": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -380,9 +380,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 6644,
-      "max": 6662,
-      "last": 6661
+      "min": 5449,
+      "max": 5516,
+      "last": 5501
     },
     "/gpu-nvidia/0/smalldata/1": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -391,9 +391,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 1525,
-      "max": 1543,
-      "last": 1526
+      "min": 2671,
+      "max": 2738,
+      "last": 2686
     },
     "/gpu-nvidia/0/smalldata/2": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -413,9 +413,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 1300.156,
-      "max": 1318.609,
-      "last": 1301.918
+      "min": 2448.594,
+      "max": 2514.859,
+      "last": 2463.27
     },
     "/gpu-nvidia/0/smalldata/4": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -424,9 +424,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 145.719,
-      "max": 148.387,
-      "last": 146.688
+      "min": 106.637,
+      "max": 109.051,
+      "last": 106.883
     },
     "/gpu-nvidia/0/temperature/0": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -435,7 +435,7 @@
       "contract_unit": "Cel",
       "ok": 60,
       "null": 0,
-      "min": 48,
+      "min": 46,
       "max": 49,
       "last": 49
     },
@@ -446,9 +446,9 @@
       "contract_unit": "Cel",
       "ok": 60,
       "null": 0,
-      "min": 55.344,
-      "max": 55.875,
-      "last": 55.719
+      "min": 53.281,
+      "max": 56,
+      "last": 56
     },
     "/gpu-nvidia/0/temperature/3": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -457,9 +457,9 @@
       "contract_unit": "Cel",
       "ok": 60,
       "null": 0,
-      "min": 58,
-      "max": 62,
-      "last": 60
+      "min": 56,
+      "max": 60,
+      "last": 58
     },
     "/gpu-nvidia/0/throughput/0": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -468,9 +468,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 149504,
-      "max": 24799232,
-      "last": 3149824
+      "min": 49152,
+      "max": 8299520,
+      "last": 49152
     },
     "/gpu-nvidia/0/throughput/1": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -479,9 +479,9 @@
       "contract_unit": null,
       "ok": 60,
       "null": 0,
-      "min": 199680,
-      "max": 2849699840,
-      "last": 1823499264
+      "min": 49152,
+      "max": 1824049152,
+      "last": 99328
     },
     "/gpu-nvidia/0/voltage/0": {
       "hardware": "NVIDIA GeForce RTX 4060 Laptop GPU",
@@ -494,192 +494,181 @@
       "max": 0.675,
       "last": 0.625
     },
-    "/intelcpu/0/clock/0": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "Bus Speed",
-      "type": "Clock",
-      "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 99.096,
-      "max": 99.097,
-      "last": 99.097
-    },
     "/intelcpu/0/clock/1": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #1",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.965,
-      "max": 1981.944,
-      "last": 1981.936
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/10": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #2",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1387.356,
-      "max": 5053.957,
-      "last": 4954.841
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/11": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #3",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1387.356,
-      "max": 4261.163,
-      "last": 1981.936
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/12": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #4",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1387.355,
-      "max": 4459.357,
-      "last": 2972.905
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/13": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #5",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1486.453,
-      "max": 4756.647,
-      "last": 1981.936
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/14": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #6",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1684.646,
-      "max": 3666.579,
-      "last": 1981.936
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/15": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #9",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 495.484,
-      "max": 1090.065,
-      "last": 1090.065
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/16": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #10",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 594.581,
-      "max": 1090.069,
-      "last": 891.871
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/2": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #2",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.968,
-      "max": 1981.937,
-      "last": 1684.646
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/3": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #3",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.964,
-      "max": 1981.937,
-      "last": 990.968
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/4": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #4",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.964,
-      "max": 1981.937,
-      "last": 990.968
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/5": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #5",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.967,
-      "max": 2873.807,
-      "last": 1783.743
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/6": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #6",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.964,
-      "max": 2279.227,
-      "last": 1387.355
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/7": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #7",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.965,
-      "max": 1981.937,
-      "last": 990.968
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/8": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #8",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 990.964,
-      "max": 1981.937,
-      "last": 1684.646
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/clock/9": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #1",
       "type": "Clock",
       "contract_unit": "MHz",
-      "ok": 60,
-      "null": 0,
-      "min": 1387.356,
-      "max": 5053.94,
-      "last": 4756.647
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/load/0": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -688,9 +677,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 5.12,
-      "max": 12.91,
-      "last": 6.62
+      "min": 1.07,
+      "max": 11.53,
+      "last": 2.38
     },
     "/intelcpu/0/load/1": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -699,9 +688,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 54.69,
-      "max": 84.21,
-      "last": 62.99
+      "min": 10.94,
+      "max": 68.75,
+      "last": 20.63
     },
     "/intelcpu/0/load/10": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -711,7 +700,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 6.15,
+      "max": 12.2,
       "last": 0
     },
     "/intelcpu/0/load/11": {
@@ -722,7 +711,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 2.34,
+      "max": 3.12,
       "last": 0
     },
     "/intelcpu/0/load/12": {
@@ -733,8 +722,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 73.44,
-      "last": 42.52
+      "max": 43.75,
+      "last": 0
     },
     "/intelcpu/0/load/13": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -744,8 +733,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 69.23,
-      "last": 0
+      "max": 20.31,
+      "last": 4.76
     },
     "/intelcpu/0/load/14": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -754,9 +743,9 @@
       "contract_unit": "%",
       "ok": 60,
       "null": 0,
-      "min": 0,
-      "max": 84.21,
-      "last": 0.78
+      "min": 4.69,
+      "max": 68.75,
+      "last": 17.46
     },
     "/intelcpu/0/load/15": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -766,8 +755,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 72.66,
-      "last": 62.99
+      "max": 0,
+      "last": 0
     },
     "/intelcpu/0/load/16": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -777,7 +766,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 29.23,
+      "max": 15.62,
       "last": 0
     },
     "/intelcpu/0/load/17": {
@@ -788,8 +777,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 26.56,
-      "last": 22.05
+      "max": 0,
+      "last": 0
     },
     "/intelcpu/0/load/18": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -799,8 +788,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 37.5,
-      "last": 5.51
+      "max": 46.67,
+      "last": 0
     },
     "/intelcpu/0/load/19": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -810,8 +799,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 0,
-      "last": 0
+      "max": 50,
+      "last": 20.63
     },
     "/intelcpu/0/load/2": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -821,7 +810,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 10.16,
+      "max": 25,
       "last": 0
     },
     "/intelcpu/0/load/20": {
@@ -832,7 +821,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 21.54,
+      "max": 43.75,
       "last": 0
     },
     "/intelcpu/0/load/21": {
@@ -865,8 +854,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 8.2,
-      "last": 6.25
+      "max": 7.81,
+      "last": 3.17
     },
     "/intelcpu/0/load/3": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -876,7 +865,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 26.32,
+      "max": 0,
       "last": 0
     },
     "/intelcpu/0/load/4": {
@@ -887,8 +876,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 7.89,
-      "last": 0
+      "max": 28.12,
+      "last": 6.35
     },
     "/intelcpu/0/load/5": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -898,7 +887,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 18.18,
+      "max": 10.61,
       "last": 0
     },
     "/intelcpu/0/load/6": {
@@ -909,7 +898,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 10.61,
+      "max": 7.69,
       "last": 0
     },
     "/intelcpu/0/load/7": {
@@ -920,7 +909,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 9.52,
+      "max": 4.69,
       "last": 0
     },
     "/intelcpu/0/load/8": {
@@ -931,8 +920,8 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 18.46,
-      "last": 5.6
+      "max": 27.27,
+      "last": 0
     },
     "/intelcpu/0/load/9": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -942,7 +931,7 @@
       "ok": 60,
       "null": 0,
       "min": 0,
-      "max": 8.33,
+      "max": 12.12,
       "last": 0
     },
     "/intelcpu/0/power/0": {
@@ -952,9 +941,9 @@
       "contract_unit": "W",
       "ok": 60,
       "null": 0,
-      "min": 22.497,
-      "max": 33.947,
-      "last": 26.418
+      "min": 0,
+      "max": 0,
+      "last": 0
     },
     "/intelcpu/0/power/1": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -963,9 +952,9 @@
       "contract_unit": "W",
       "ok": 60,
       "null": 0,
-      "min": 15.362,
-      "max": 26.301,
-      "last": 18.916
+      "min": 0,
+      "max": 0,
+      "last": 0
     },
     "/intelcpu/0/power/3": {
       "hardware": "Intel Core Ultra 9 185H",
@@ -994,550 +983,385 @@
       "name": "Core Max",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 63,
-      "max": 93,
-      "last": 84
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/1": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "Core Average",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 57.688,
-      "max": 62.625,
-      "last": 62.625
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/10": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #1",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 56,
-      "max": 93,
-      "last": 84
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/11": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #2",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 56,
-      "max": 84,
-      "last": 84
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/12": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #3",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 55,
-      "max": 75,
-      "last": 67
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/13": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #4",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 68,
-      "last": 68
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/14": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #5",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 52,
-      "max": 59,
-      "last": 54
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/15": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #6",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 53,
-      "max": 58,
-      "last": 55
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/16": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #9",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 56,
-      "max": 58,
-      "last": 56
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/17": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #10",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 56,
-      "max": 58,
-      "last": 56
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/18": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "CPU Package",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 65,
-      "max": 93,
-      "last": 80
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/19": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #1 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 44,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/2": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #1",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 66,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/20": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #2 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 44,
-      "max": 55,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/21": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #3 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 44,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/22": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #4 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 44,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/23": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #5 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 46,
-      "max": 56,
-      "last": 52
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/24": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #6 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 46,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/25": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #7 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 46,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/26": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #8 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 45,
-      "max": 56,
-      "last": 50
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/27": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #1 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 17,
-      "max": 54,
-      "last": 26
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/28": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #2 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 26,
-      "max": 54,
-      "last": 26
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/29": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #3 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 35,
-      "max": 55,
-      "last": 43
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/3": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #2",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 55,
-      "max": 66,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/30": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #4 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 42,
-      "max": 56,
-      "last": 42
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/31": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #5 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 51,
-      "max": 58,
-      "last": 56
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/32": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "P-Core #6 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 52,
-      "max": 57,
-      "last": 55
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/33": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #9 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 52,
-      "max": 54,
-      "last": 54
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/34": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #10 Distance to TjMax",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 52,
-      "max": 54,
-      "last": 54
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/4": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #3",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 66,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/5": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #4",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 66,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/6": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #5",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 64,
-      "last": 58
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/7": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #6",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 64,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/8": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #7",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 64,
-      "last": 60
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     },
     "/intelcpu/0/temperature/9": {
       "hardware": "Intel Core Ultra 9 185H",
       "name": "E-Core #8",
       "type": "Temperature",
       "contract_unit": "Cel",
-      "ok": 60,
-      "null": 0,
-      "min": 54,
-      "max": 65,
-      "last": 60
-    },
-    "/intelcpu/0/voltage/0": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "CPU Core",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0,
-      "max": 0,
-      "last": 0
-    },
-    "/intelcpu/0/voltage/1": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #1",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.585,
-      "max": 0.708,
-      "last": 0.645
-    },
-    "/intelcpu/0/voltage/10": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #2",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.67,
-      "max": 1.248,
-      "last": 1.21
-    },
-    "/intelcpu/0/voltage/11": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #3",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.667,
-      "max": 0.873,
-      "last": 0.685
-    },
-    "/intelcpu/0/voltage/12": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #4",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.65,
-      "max": 1.137,
-      "last": 0.677
-    },
-    "/intelcpu/0/voltage/13": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #5",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.662,
-      "max": 0.968,
-      "last": 0.7
-    },
-    "/intelcpu/0/voltage/14": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #6",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.68,
-      "max": 0.907,
-      "last": 0.698
-    },
-    "/intelcpu/0/voltage/2": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #2",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.585,
-      "max": 0.875,
-      "last": 0.645
-    },
-    "/intelcpu/0/voltage/3": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #3",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.585,
-      "max": 0.708,
-      "last": 0.645
-    },
-    "/intelcpu/0/voltage/4": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #4",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.585,
-      "max": 0.72,
-      "last": 0.645
-    },
-    "/intelcpu/0/voltage/5": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #5",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.59,
-      "max": 0.935,
-      "last": 0.655
-    },
-    "/intelcpu/0/voltage/6": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #6",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.588,
-      "max": 0.723,
-      "last": 0.655
-    },
-    "/intelcpu/0/voltage/7": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #7",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.59,
-      "max": 0.887,
-      "last": 0.655
-    },
-    "/intelcpu/0/voltage/8": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "E-Core #8",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.59,
-      "max": 0.935,
-      "last": 0.655
-    },
-    "/intelcpu/0/voltage/9": {
-      "hardware": "Intel Core Ultra 9 185H",
-      "name": "P-Core #1",
-      "type": "Voltage",
-      "contract_unit": null,
-      "ok": 60,
-      "null": 0,
-      "min": 0.665,
-      "max": 1.29,
-      "last": 1.272
+      "ok": 0,
+      "null": 60,
+      "min": null,
+      "max": null,
+      "last": null
     }
   }
 }

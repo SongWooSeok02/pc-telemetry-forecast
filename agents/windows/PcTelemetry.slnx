@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/spike/">
+    <Project Path="spike/SensorProbe/SensorProbe.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PcTelemetry.Agent/PcTelemetry.Agent.csproj" />
+    <Project Path="src/PcTelemetry.Collector/PcTelemetry.Collector.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PcTelemetry.Collector.Tests/PcTelemetry.Collector.Tests.csproj" />
+  </Folder>
+</Solution>

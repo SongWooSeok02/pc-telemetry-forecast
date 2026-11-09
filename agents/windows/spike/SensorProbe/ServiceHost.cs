@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace SensorProbe;
 
-// 서비스 계정에서 센서를 읽을 수 있는지만 확인한다. 결과는 out-dir/service-<계정>.json에 60초마다 갱신한다.
+// 서비스 계정에서 센서를 읽을 수 있는지만 확인한다. 결과는 out-dir/service-<계정 종류>-<시작 시각>.json에 60초마다 갱신한다.
 internal static class ServiceHost
 {
     public static int Run(string outDir, int intervalMs)
@@ -19,7 +19,8 @@ internal static class ServiceHost
     {
         protected override Task ExecuteAsync(CancellationToken stoppingToken) => Task.Run(() =>
         {
-            var account = Environment.UserName.Replace('$', '_');
+            using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var account = Program.AccountKind(identity);
             var started = DateTime.UtcNow.ToString("yyyyMMddTHHmmssZ");
             var outPath = Path.Combine(outDir, $"service-{account}-{started}.json");
             Program.RunLoop(outPath, TimeSpan.MaxValue, intervalMs, stoppingToken, TimeSpan.FromSeconds(60));

@@ -59,7 +59,7 @@ DLL 문자열에서 아래 두 값을 확인했다. 이를 근거로 **라이브
 
 | PC | 용도 | OS | CPU / GPU / 보드 | 보안 설정 | PawnIO / WinRing0 사전 상태 |
 |---|---|---|---|---|---|
-| DESKTOP-V7EO3LB (HP OMEN Transcend 14-fb0xxx 노트북) | 실측 1번 | Windows 11 Pro 10.0.26200 | Intel Core Ultra 9 185H / NVIDIA RTX 4060 Laptop + Intel Arc 내장 / HP 8C58 | HVCI 실행 중, VBS 2(실행). Secure Boot·Defender는 `Env` 단계에서 기록 | 둘 다 없음 (2026-10-30) |
+| pc-a (HP OMEN Transcend 14-fb0xxx 노트북) | 실측 1번 | Windows 11 Pro 10.0.26200 | Intel Core Ultra 9 185H / NVIDIA RTX 4060 Laptop + Intel Arc 내장 / HP 8C58 | HVCI 실행 중, VBS 2(실행). Secure Boot·Defender는 `Env` 단계에서 기록 | 둘 다 없음 (2026-10-30) |
 | 실측 2번 | 미확보 | | 팀원 PC 대여 시도(AMD 장비 우선) | | |
 
 | 요구사항 | 단일 PC 대응 | 남는 제한 |
@@ -74,7 +74,7 @@ DLL 문자열에서 아래 두 값을 확인했다. 이를 근거로 **라이브
 
 ### 5.1 대조군: PawnIO 없음, 일반 사용자 (2026-10-30, 10초·1초 주기)
 
-결과 파일: `tests/results/s1-02a/DESKTOP-V7EO3LB/20261030-control-nopawnio-user-*.json`. Computer.Open 오류 없음, 10회 측정 중 오류 0회, 주기 초과 0회.
+결과 파일: `tests/results/s1-02a/pc-a/20261030-control-nopawnio-user-*.json`. Computer.Open 오류 없음, 10회 측정 중 오류 0회, 주기 초과 0회.
 
 | 장치 | 센서 | 결과 |
 |---|---|---|
@@ -142,8 +142,8 @@ S1-02b에 반영할 관찰(5.1에 추가):
 
 | 계정 | 기간 (UTC) | 측정 횟수 | 오류 / 주기 초과 | CPU 온도 | 대표값 | 결과 파일 |
 |---|---|---|---|---|---|---|
-| LocalSystem (`NT AUTHORITY\SYSTEM`), 자동 시작 | 2026-10-30 15:46:34 ~ 15:59:43 (13분 9초) | 789 | 0 / 0 | 35/35 ok, null 0회 | CPU Package 48~86°C·7.5~22.1W, GPU Core 41~51°C·3.0~12.5W | `C:\ProgramData\SensorProbeSpike\out\service-DESKTOP-V7EO3LB_-20261030T154634Z.json` (`ServiceStatus`로 저장소에 복사) |
-| LocalService (`NT AUTHORITY\LOCAL SERVICE`, 비관리자) | 2026-11-04 02:17:57 ~ 02:47:15 (29분) | 1,759 | 0 / 0 | **35/35 null** | CPU 클럭 16개 null, CPU 전력 4개 0, CPU 부하·NVIDIA GPU 전체는 ok | `service-LOCAL SERVICE-20261104T021756Z.json` |
+| LocalSystem (`NT AUTHORITY\SYSTEM`), 자동 시작 | 2026-10-30 15:46:34 ~ 15:59:43 (13분 9초) | 789 | 0 / 0 | 35/35 ok, null 0회 | CPU Package 48~86°C·7.5~22.1W, GPU Core 41~51°C·3.0~12.5W | `C:\ProgramData\SensorProbeSpike\out\service-system-20261030T154634Z.json` (`ServiceStatus`로 저장소에 복사) |
+| LocalService (`NT AUTHORITY\LOCAL SERVICE`, 비관리자) | 2026-11-04 02:17:57 ~ 02:47:15 (29분) | 1,759 | 0 / 0 | **35/35 null** | CPU 클럭 16개 null, CPU 전력 4개 0, CPU 부하·NVIDIA GPU 전체는 ok | `service-local_service-20261104T021756Z.json` |
 
 LocalSystem:
 
@@ -170,7 +170,7 @@ LocalService:
 | `Computer.Open` | 1,334ms (재부팅 전 746ms), 오류 없음 |
 | 재부팅 후 측정 | 486회(약 8분), 오류 0, 주기 초과 0, CPU 온도 35/35 ok·null 0회, 센서 138/138 ok |
 
-결과 파일: `tests/results/s1-02a/DESKTOP-V7EO3LB/20261104T021514Z-service-status.json`, `20261104T021506Z-service-DESKTOP-V7EO3LB_-20261104T020641Z.json`.
+결과 파일: `tests/results/s1-02a/pc-a/20261104T021514Z-service-status.json`, `20261104T021506Z-service-system-20261104T020641Z.json`.
 
 ### 5.7 제거·잔여 항목·무인 재설치 (2026-11-04 KST 11:49~11:52)
 
@@ -219,7 +219,7 @@ LocalService:
 
 **결론: 범위 축소 조건부 채택.** LibreHardwareMonitorLib 0.9.6 + PawnIO 2.2.0을 S1-02b·S1-06의 기본 구성으로 쓴다.
 
-근거 (DESKTOP-V7EO3LB, Intel Core Ultra 9 185H + RTX 4060 Laptop 1대):
+근거 (pc-a, Intel Core Ultra 9 185H + RTX 4060 Laptop 1대):
 - Secure Boot·HVCI·취약 드라이버 차단 목록·Defender를 모두 켠 상태에서, 보안 예외 없이 설치·로드됨. 드라이버는 Microsoft WHCP 서명 (5.2·5.3)
 - LocalSystem 서비스로 CPU·GPU 센서를 읽음. 4일 10시간 동안 38만 회 측정, 오류 0 (5.5)
 - 재부팅 후 자동 시작과 읽기 정상 (5.6), 무인 설치 동작 (5.7)

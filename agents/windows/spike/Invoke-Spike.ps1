@@ -1,6 +1,7 @@
 ﻿<#
 S1-02a 스파이크 단계 실행 스크립트. 관리자 PowerShell에서 한 단계씩 실행한다.
 
+  모든 단계에 -PcLabel pc-a 처럼 익명 PC 라벨을 함께 준다.
   .\Invoke-Spike.ps1 -Step Env            # 보안 설정·하드웨어·사전 상태 기록 (+ 복원 지점)
   .\Invoke-Spike.ps1 -Step Publish        # SensorProbe를 ProgramData로 배포
   .\Invoke-Spike.ps1 -Step ProbeAdmin     # 관리자 콘솔에서 once + 60초 run
@@ -12,7 +13,7 @@ S1-02a 스파이크 단계 실행 스크립트. 관리자 PowerShell에서 한 �
   .\Invoke-Spike.ps1 -Step Residue        # 제거 후 남은 항목
   .\Invoke-Spike.ps1 -Step Events         # CodeIntegrity·Defender·SCM 이벤트 로그 저장
 
-모든 출력은 tests/results/s1-02a/<PC이름>/ 에 남는다. 보안 기능을 끄거나 예외를 추가하는 단계는 없다.
+모든 출력은 tests/results/s1-02a/<PcLabel>/ 에 남는다. 호스트명·계정명은 기록하지 않는다. 보안 기능을 끄거나 예외를 추가하는 단계는 없다.
 #>
 [CmdletBinding()]
 param(
@@ -20,6 +21,9 @@ param(
     [ValidateSet('Env', 'Publish', 'ProbeAdmin', 'InstallPawnIO', 'ServiceInstall', 'ServiceStatus',
         'ServiceRemove', 'UninstallPawnIO', 'Residue', 'Events')]
     [string]$Step,
+    [Parameter(Mandatory)]
+    [ValidatePattern('^pc-[a-z0-9]{1,16}$')]
+    [string]$PcLabel,
     [ValidateSet('LocalSystem', 'LocalService')]
     [string]$Account = 'LocalSystem',
     [switch]$Silent,
@@ -31,7 +35,7 @@ $PawnIOSha256 = '1F519A22E47187F70A1379A48CA604981C4FCF694F4E65B734AAA74A9FBA303
 $ServiceName = 'SensorProbe'
 $DeployDir = 'C:\ProgramData\SensorProbeSpike'
 $RepoRoot = (Resolve-Path "$PSScriptRoot\..\..\..").Path
-$OutDir = Join-Path $RepoRoot "tests\results\s1-02a\$env:COMPUTERNAME"
+$OutDir = Join-Path $RepoRoot "tests\results\s1-02a\$PcLabel"
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
@@ -80,7 +84,7 @@ switch ($Step) {
         $os = Get-CimInstance Win32_OperatingSystem
         Save-Json 'env' ([ordered]@{
             executed_at_utc        = (Get-Date).ToUniversalTime().ToString('o')
-            computer               = $env:COMPUTERNAME
+            computer               = $PcLabel
             os                     = "$($os.Caption) $($os.Version) build $($os.BuildNumber)"
             model                  = (Get-CimInstance Win32_ComputerSystem).Model
             board                  = (Get-CimInstance Win32_BaseBoard | ForEach-Object { "$($_.Manufacturer) $($_.Product)" })

@@ -1,0 +1,30 @@
+name: S1-02b Windows agent
+on:
+  pull_request:
+  push:
+    paths: ['agents/windows/**', 'contracts/fixtures/**', '.github/workflows/agent.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  collector:
+    # 가상 센서 원천으로 수집 루프·계약 해시를 검증한다. 실제 센서·드라이버·절전 검증은 실제 PC 증거로 따로 남긴다.
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Unit tests (synthetic sensors, shared hash vectors)
+        run: dotnet test agents/windows/tests/PcTelemetry.Collector.Tests --logger "trx;LogFileName=collector.trx" --results-directory tests/results/ci
+      - name: Build agent (LHM 0.9.6 pinned)
+        run: dotnet build agents/windows/src/PcTelemetry.Agent -c Release
+      - name: Whitespace check
+        run: git diff --check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: s1-02b-collector-tests
+          path: tests/results/ci/collector.trx
+          if-no-files-found: error

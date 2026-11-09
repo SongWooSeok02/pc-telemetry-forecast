@@ -3,17 +3,17 @@
   "mode": "once",
   "probe_version": "0.1.0.0",
   "lhm_version": "0.9.6.0",
-  "executed_at_utc": "2026-10-30T14:40:05.647932Z",
+  "executed_at_utc": "2026-11-04T02:51:17.443053Z",
   "os_version": "Microsoft Windows NT 10.0.26200.0",
-  "account": "DESKTOP-V7EO3LB\\U301-09",
-  "is_elevated": false,
+  "account": "interactive_user",
+  "is_elevated": true,
   "is_system": false,
   "pawnio": {
-    "installed": false,
-    "display_version": null
+    "installed": true,
+    "display_version": "2.2.0.0"
   },
   "open_error": null,
-  "open_ms": 612.706,
+  "open_ms": 853.0729,
   "hardware": [
     {
       "identifier": "/motherboard",
@@ -32,7 +32,7 @@
           "name": "CPU Core #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 21.74
+          "value": 2.86
         },
         {
           "identifier": "/intelcpu/0/load/5",
@@ -40,7 +40,7 @@
           "name": "CPU Core #2",
           "type": "Load",
           "contract_unit": "%",
-          "value": 30.43
+          "value": 11.43
         },
         {
           "identifier": "/intelcpu/0/load/6",
@@ -48,7 +48,7 @@
           "name": "CPU Core #3",
           "type": "Load",
           "contract_unit": "%",
-          "value": 43.48
+          "value": 5.56
         },
         {
           "identifier": "/intelcpu/0/load/7",
@@ -56,7 +56,7 @@
           "name": "CPU Core #4",
           "type": "Load",
           "contract_unit": "%",
-          "value": 26.09
+          "value": 3.23
         },
         {
           "identifier": "/intelcpu/0/load/8",
@@ -64,7 +64,7 @@
           "name": "CPU Core #5",
           "type": "Load",
           "contract_unit": "%",
-          "value": 69.57
+          "value": 17.65
         },
         {
           "identifier": "/intelcpu/0/load/9",
@@ -72,7 +72,7 @@
           "name": "CPU Core #6",
           "type": "Load",
           "contract_unit": "%",
-          "value": 34.78
+          "value": 10
         },
         {
           "identifier": "/intelcpu/0/load/10",
@@ -80,7 +80,7 @@
           "name": "CPU Core #7",
           "type": "Load",
           "contract_unit": "%",
-          "value": 43.48
+          "value": 0
         },
         {
           "identifier": "/intelcpu/0/load/11",
@@ -88,7 +88,7 @@
           "name": "CPU Core #8",
           "type": "Load",
           "contract_unit": "%",
-          "value": 34.78
+          "value": 0
         },
         {
           "identifier": "/intelcpu/0/load/12",
@@ -96,7 +96,7 @@
           "name": "CPU Core #9 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 86.96
+          "value": 0
         },
         {
           "identifier": "/intelcpu/0/load/13",
@@ -104,7 +104,7 @@
           "name": "CPU Core #9 Thread #2",
           "type": "Load",
           "contract_unit": "%",
-          "value": 8
+          "value": 62.86
         },
         {
           "identifier": "/intelcpu/0/load/14",
@@ -112,7 +112,7 @@
           "name": "CPU Core #10 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 86.96
+          "value": 71.43
         },
         {
           "identifier": "/intelcpu/0/load/15",
@@ -128,7 +128,7 @@
           "name": "CPU Core #11 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 34.78
+          "value": 0
         },
         {
           "identifier": "/intelcpu/0/load/3",
@@ -136,7 +136,7 @@
           "name": "CPU Core #11 Thread #2",
           "type": "Load",
           "contract_unit": "%",
-          "value": 0
+          "value": 42.86
         },
         {
           "identifier": "/intelcpu/0/load/16",
@@ -144,7 +144,7 @@
           "name": "CPU Core #12 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 17.39
+          "value": 22.86
         },
         {
           "identifier": "/intelcpu/0/load/17",
@@ -160,7 +160,7 @@
           "name": "CPU Core #13 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 21.74
+          "value": 22.86
         },
         {
           "identifier": "/intelcpu/0/load/19",
@@ -176,7 +176,7 @@
           "name": "CPU Core #14 Thread #1",
           "type": "Load",
           "contract_unit": "%",
-          "value": 26.09
+          "value": 14.71
         },
         {
           "identifier": "/intelcpu/0/load/21",
@@ -200,7 +200,7 @@
           "name": "CPU Core #16",
           "type": "Load",
           "contract_unit": "%",
-          "value": 9.09
+          "value": 5.88
         },
         {
           "identifier": "/intelcpu/0/load/0",
@@ -208,7 +208,7 @@
           "name": "CPU Total",
           "type": "Load",
           "contract_unit": "%",
-          "value": 27.06
+          "value": 13.37
         },
         {
           "identifier": "/intelcpu/0/load/1",
@@ -216,7 +216,7 @@
           "name": "CPU Core Max",
           "type": "Load",
           "contract_unit": "%",
-          "value": 86.96
+          "value": 71.43
         },
         {
           "identifier": "/intelcpu/0/temperature/0",
@@ -224,7 +224,7 @@
           "name": "Core Max",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 78
         },
         {
           "identifier": "/intelcpu/0/temperature/1",
@@ -232,7 +232,7 @@
           "name": "Core Average",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 63.5
         },
         {
           "identifier": "/intelcpu/0/temperature/2",
@@ -240,7 +240,7 @@
           "name": "E-Core #1",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 62
         },
         {
           "identifier": "/intelcpu/0/temperature/3",
@@ -248,7 +248,7 @@
           "name": "E-Core #2",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 64
         },
         {
           "identifier": "/intelcpu/0/temperature/4",
@@ -256,7 +256,7 @@
           "name": "E-Core #3",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 64
         },
         {
           "identifier": "/intelcpu/0/temperature/5",
@@ -264,7 +264,7 @@
           "name": "E-Core #4",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 64
         },
         {
           "identifier": "/intelcpu/0/temperature/6",
@@ -272,7 +272,7 @@
           "name": "E-Core #5",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 61
         },
         {
           "identifier": "/intelcpu/0/temperature/7",
@@ -280,7 +280,7 @@
           "name": "E-Core #6",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 61
         },
         {
           "identifier": "/intelcpu/0/temperature/8",
@@ -288,7 +288,7 @@
           "name": "E-Core #7",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 61
         },
         {
           "identifier": "/intelcpu/0/temperature/9",
@@ -296,7 +296,7 @@
           "name": "E-Core #8",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 61
         },
         {
           "identifier": "/intelcpu/0/temperature/10",
@@ -304,7 +304,7 @@
           "name": "P-Core #1",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 78
         },
         {
           "identifier": "/intelcpu/0/temperature/11",
@@ -312,7 +312,7 @@
           "name": "P-Core #2",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 77
         },
         {
           "identifier": "/intelcpu/0/temperature/12",
@@ -320,7 +320,7 @@
           "name": "P-Core #3",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 67
         },
         {
           "identifier": "/intelcpu/0/temperature/13",
@@ -328,7 +328,7 @@
           "name": "P-Core #4",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 66
         },
         {
           "identifier": "/intelcpu/0/temperature/14",
@@ -336,7 +336,7 @@
           "name": "P-Core #5",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 59
         },
         {
           "identifier": "/intelcpu/0/temperature/15",
@@ -344,7 +344,7 @@
           "name": "P-Core #6",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 57
         },
         {
           "identifier": "/intelcpu/0/temperature/16",
@@ -352,7 +352,7 @@
           "name": "E-Core #9",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 57
         },
         {
           "identifier": "/intelcpu/0/temperature/17",
@@ -360,7 +360,7 @@
           "name": "E-Core #10",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 57
         },
         {
           "identifier": "/intelcpu/0/temperature/18",
@@ -368,7 +368,7 @@
           "name": "CPU Package",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 71
         },
         {
           "identifier": "/intelcpu/0/temperature/19",
@@ -376,7 +376,7 @@
           "name": "E-Core #1 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 48
         },
         {
           "identifier": "/intelcpu/0/temperature/20",
@@ -384,7 +384,7 @@
           "name": "E-Core #2 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 46
         },
         {
           "identifier": "/intelcpu/0/temperature/21",
@@ -392,7 +392,7 @@
           "name": "E-Core #3 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 46
         },
         {
           "identifier": "/intelcpu/0/temperature/22",
@@ -400,7 +400,7 @@
           "name": "E-Core #4 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 46
         },
         {
           "identifier": "/intelcpu/0/temperature/23",
@@ -408,7 +408,7 @@
           "name": "E-Core #5 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 49
         },
         {
           "identifier": "/intelcpu/0/temperature/24",
@@ -416,7 +416,7 @@
           "name": "E-Core #6 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 49
         },
         {
           "identifier": "/intelcpu/0/temperature/25",
@@ -424,7 +424,7 @@
           "name": "E-Core #7 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 49
         },
         {
           "identifier": "/intelcpu/0/temperature/26",
@@ -432,7 +432,7 @@
           "name": "E-Core #8 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 49
         },
         {
           "identifier": "/intelcpu/0/temperature/27",
@@ -440,7 +440,7 @@
           "name": "P-Core #1 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 32
         },
         {
           "identifier": "/intelcpu/0/temperature/28",
@@ -448,7 +448,7 @@
           "name": "P-Core #2 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 33
         },
         {
           "identifier": "/intelcpu/0/temperature/29",
@@ -456,7 +456,7 @@
           "name": "P-Core #3 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 43
         },
         {
           "identifier": "/intelcpu/0/temperature/30",
@@ -464,7 +464,7 @@
           "name": "P-Core #4 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 44
         },
         {
           "identifier": "/intelcpu/0/temperature/31",
@@ -472,7 +472,7 @@
           "name": "P-Core #5 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 51
         },
         {
           "identifier": "/intelcpu/0/temperature/32",
@@ -480,7 +480,7 @@
           "name": "P-Core #6 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 53
         },
         {
           "identifier": "/intelcpu/0/temperature/33",
@@ -488,7 +488,7 @@
           "name": "E-Core #9 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 53
         },
         {
           "identifier": "/intelcpu/0/temperature/34",
@@ -496,7 +496,7 @@
           "name": "E-Core #10 Distance to TjMax",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": null
+          "value": 53
         },
         {
           "identifier": "/intelcpu/0/clock/1",
@@ -504,7 +504,7 @@
           "name": "E-Core #1",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/2",
@@ -512,7 +512,7 @@
           "name": "E-Core #2",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/3",
@@ -520,7 +520,7 @@
           "name": "E-Core #3",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/4",
@@ -528,7 +528,7 @@
           "name": "E-Core #4",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1684.646
         },
         {
           "identifier": "/intelcpu/0/clock/5",
@@ -536,7 +536,7 @@
           "name": "E-Core #5",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/6",
@@ -544,7 +544,7 @@
           "name": "E-Core #6",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/7",
@@ -552,7 +552,7 @@
           "name": "E-Core #7",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1486.452
         },
         {
           "identifier": "/intelcpu/0/clock/8",
@@ -560,7 +560,7 @@
           "name": "E-Core #8",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1585.549
         },
         {
           "identifier": "/intelcpu/0/clock/9",
@@ -568,7 +568,7 @@
           "name": "P-Core #1",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 4558.453
         },
         {
           "identifier": "/intelcpu/0/clock/10",
@@ -576,7 +576,7 @@
           "name": "P-Core #2",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 4459.356
         },
         {
           "identifier": "/intelcpu/0/clock/11",
@@ -584,7 +584,7 @@
           "name": "P-Core #3",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1981.936
         },
         {
           "identifier": "/intelcpu/0/clock/12",
@@ -592,7 +592,7 @@
           "name": "P-Core #4",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1981.936
         },
         {
           "identifier": "/intelcpu/0/clock/13",
@@ -600,7 +600,7 @@
           "name": "P-Core #5",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1981.936
         },
         {
           "identifier": "/intelcpu/0/clock/14",
@@ -608,7 +608,7 @@
           "name": "P-Core #6",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 1981.936
         },
         {
           "identifier": "/intelcpu/0/clock/15",
@@ -616,7 +616,7 @@
           "name": "E-Core #9",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/clock/16",
@@ -624,7 +624,7 @@
           "name": "E-Core #10",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": null
+          "value": 990.968
         },
         {
           "identifier": "/intelcpu/0/power/0",
@@ -632,7 +632,7 @@
           "name": "CPU Package",
           "type": "Power",
           "contract_unit": "W",
-          "value": 0
+          "value": 31.151
         },
         {
           "identifier": "/intelcpu/0/power/1",
@@ -640,7 +640,7 @@
           "name": "CPU Cores",
           "type": "Power",
           "contract_unit": "W",
-          "value": 0
+          "value": 23.665
         },
         {
           "identifier": "/intelcpu/0/power/3",
@@ -657,6 +657,134 @@
           "type": "Power",
           "contract_unit": "W",
           "value": 0
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/0",
+          "index": 0,
+          "name": "CPU Core",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/1",
+          "index": 1,
+          "name": "E-Core #1",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.632
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/2",
+          "index": 2,
+          "name": "E-Core #2",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.632
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/3",
+          "index": 3,
+          "name": "E-Core #3",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.632
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/4",
+          "index": 4,
+          "name": "E-Core #4",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.632
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/5",
+          "index": 5,
+          "name": "E-Core #5",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.642
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/6",
+          "index": 6,
+          "name": "E-Core #6",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.642
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/7",
+          "index": 7,
+          "name": "E-Core #7",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.642
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/8",
+          "index": 8,
+          "name": "E-Core #8",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.642
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/9",
+          "index": 9,
+          "name": "P-Core #1",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 1.238
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/10",
+          "index": 10,
+          "name": "P-Core #2",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 1.18
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/11",
+          "index": 11,
+          "name": "P-Core #3",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.682
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/12",
+          "index": 12,
+          "name": "P-Core #4",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.682
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/13",
+          "index": 13,
+          "name": "P-Core #5",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.7
+        },
+        {
+          "identifier": "/intelcpu/0/voltage/14",
+          "index": 14,
+          "name": "P-Core #6",
+          "type": "Voltage",
+          "contract_unit": null,
+          "value": 0.698
+        },
+        {
+          "identifier": "/intelcpu/0/clock/0",
+          "index": 0,
+          "name": "Bus Speed",
+          "type": "Clock",
+          "contract_unit": "MHz",
+          "value": 99.097
         }
       ]
     },
@@ -671,7 +799,7 @@
           "name": "GPU Core",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": 50
+          "value": 49
         },
         {
           "identifier": "/gpu-nvidia/0/clock/0",
@@ -679,7 +807,7 @@
           "name": "GPU Core",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": 735
+          "value": 645
         },
         {
           "identifier": "/gpu-nvidia/0/clock/4",
@@ -695,7 +823,7 @@
           "name": "GPU Core",
           "type": "Load",
           "contract_unit": "%",
-          "value": 26
+          "value": 27
         },
         {
           "identifier": "/gpu-nvidia/0/load/1",
@@ -703,7 +831,7 @@
           "name": "GPU Memory Controller",
           "type": "Load",
           "contract_unit": "%",
-          "value": 11
+          "value": 14
         },
         {
           "identifier": "/gpu-nvidia/0/load/2",
@@ -719,7 +847,7 @@
           "name": "GPU Bus",
           "type": "Load",
           "contract_unit": "%",
-          "value": 22
+          "value": 21
         },
         {
           "identifier": "/gpu-nvidia/0/voltage/0",
@@ -735,7 +863,7 @@
           "name": "D3D Dedicated Memory Used",
           "type": "SmallData",
           "contract_unit": null,
-          "value": 2162.922
+          "value": 1309.793
         },
         {
           "identifier": "/gpu-nvidia/0/smalldata/4",
@@ -743,7 +871,7 @@
           "name": "D3D Shared Memory Used",
           "type": "SmallData",
           "contract_unit": null,
-          "value": 135.422
+          "value": 146.969
         },
         {
           "identifier": "/gpu-nvidia/0/load/5",
@@ -751,7 +879,7 @@
           "name": "D3D 3D",
           "type": "Load",
           "contract_unit": "%",
-          "value": 14.227
+          "value": 20.71
         },
         {
           "identifier": "/gpu-nvidia/0/load/9",
@@ -783,7 +911,7 @@
           "name": "D3D Copy",
           "type": "Load",
           "contract_unit": "%",
-          "value": 0.1
+          "value": 0
         },
         {
           "identifier": "/gpu-nvidia/0/load/10",
@@ -823,7 +951,7 @@
           "name": "GPU Hot Spot",
           "type": "Temperature",
           "contract_unit": "Cel",
-          "value": 56.969
+          "value": 55.656
         },
         {
           "identifier": "/gpu-nvidia/0/temperature/3",
@@ -847,7 +975,7 @@
           "name": "GPU Memory Free",
           "type": "SmallData",
           "contract_unit": null,
-          "value": 5801
+          "value": 6653
         },
         {
           "identifier": "/gpu-nvidia/0/smalldata/1",
@@ -855,7 +983,7 @@
           "name": "GPU Memory Used",
           "type": "SmallData",
           "contract_unit": null,
-          "value": 2386
+          "value": 1534
         },
         {
           "identifier": "/gpu-nvidia/0/load/3",
@@ -863,7 +991,7 @@
           "name": "GPU Memory",
           "type": "Load",
           "contract_unit": "%",
-          "value": 29.144
+          "value": 18.743
         },
         {
           "identifier": "/gpu-nvidia/0/power/0",
@@ -871,7 +999,7 @@
           "name": "GPU Package",
           "type": "Power",
           "contract_unit": "W",
-          "value": 9.17
+          "value": 8.294
         },
         {
           "identifier": "/gpu-nvidia/0/throughput/0",
@@ -879,7 +1007,7 @@
           "name": "GPU PCIe Rx",
           "type": "Throughput",
           "contract_unit": null,
-          "value": 2649088
+          "value": 2849792
         },
         {
           "identifier": "/gpu-nvidia/0/throughput/1",
@@ -887,7 +1015,7 @@
           "name": "GPU PCIe Tx",
           "type": "Throughput",
           "contract_unit": null,
-          "value": 1832349696
+          "value": 1139549184
         }
       ]
     },
@@ -902,7 +1030,7 @@
           "name": "GPU Core",
           "type": "Clock",
           "contract_unit": "MHz",
-          "value": 650
+          "value": 800
         },
         {
           "identifier": "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/power/0",
@@ -910,7 +1038,7 @@
           "name": "GPU Power",
           "type": "Power",
           "contract_unit": "W",
-          "value": 0
+          "value": 0.002
         },
         {
           "identifier": "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/smalldata/2",
@@ -934,7 +1062,7 @@
           "name": "D3D Shared Memory Used",
           "type": "SmallData",
           "contract_unit": null,
-          "value": 556.949
+          "value": 408.051
         },
         {
           "identifier": "/gpu-intel-integrated/%5C%5C%3F%5CPCI%23VEN_8086%26DEV_7D55%26SUBSYS_8C58103C%26REV_08%233%2611583659%260%2610%23%7B1ca05180-a699-450a-9a0c-de4fbe3ddd89%7D/load/4",
@@ -1027,7 +1155,7 @@
       ]
     }
   ],
-  "sensor_count": 123,
+  "sensor_count": 139,
   "duplicate_identifiers": {
     "/gpu-nvidia/0/load/3": 2
   }
