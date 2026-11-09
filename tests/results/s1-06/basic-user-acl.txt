@@ -1,0 +1,6 @@
+﻿admin_role=False
+C:\ProgramData\PcTelemetry\status\agent-status.json : read OK
+C:\ProgramData\PcTelemetry\state : denied (UnauthorizedAccessException)
+C:\ProgramData\PcTelemetry\state\device.token : denied (UnauthorizedAccessException)
+C:\ProgramData\PcTelemetry : denied (UnauthorizedAccessException)
+check_exit=0

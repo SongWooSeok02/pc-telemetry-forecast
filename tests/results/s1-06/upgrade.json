@@ -1,0 +1,85 @@
+﻿{
+    "task":  "S1-06",
+    "action":  "install",
+    "started_at_utc":  "2026-11-09T03:53:12.9791615Z",
+    "steps":  {
+                  "preflight":  {
+                                    "os":  "Microsoft Windows 11 Pro 10.0.26200",
+                                    "build":  26200,
+                                    "upload_configured":  true
+                                },
+                  "pawnio":  {
+                                 "installed":  true,
+                                 "version":  "2.2.0.0",
+                                 "expected":  "2.2.0",
+                                 "note":  "ok"
+                             },
+                  "webview2":  {
+                                   "action":  "present",
+                                   "runtime":  {
+                                                   "version":  "157.0.4341.42",
+                                                   "scope":  "per_machine",
+                                                   "location":  "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application"
+                                               }
+                               },
+                  "existing_service":  {
+                                           "present":  true,
+                                           "upgrade":  true
+                                       },
+                  "files":  {
+                                "install_dir":  "C:\\Program Files\\PcTelemetry",
+                                "agent_dll_sha256":  "2351b638d6f36bd458d8cd24f19244878931a6b96ac8a6323f72542e714285c5",
+                                "shell_dll_sha256":  "d2008a6d4c73514d9f89da3bb89c613ab372285f97d540f5dff0c530328c8b7b",
+                                "shell_core_dll_sha256":  "62d878f7dfdd7c5382fcb7d610d1ea5f7755a179526516f7bf763f99a99f39ab",
+                                "agent_version":  "0.1.0.0",
+                                "shell_version":  "0.1.0.0"
+                            },
+                  "data_acl":  {
+                                   "root":  {
+                                                "owner":  "S-1-5-32-544",
+                                                "protected":  true,
+                                                "allow":  [
+                                                              "S-1-5-18:FullControl",
+                                                              "S-1-5-32-544:FullControl"
+                                                          ]
+                                            },
+                                   "state":  {
+                                                 "owner":  "S-1-5-32-544",
+                                                 "protected":  true,
+                                                 "allow":  [
+                                                               "S-1-5-18:FullControl",
+                                                               "S-1-5-32-544:FullControl"
+                                                           ]
+                                             },
+                                   "status":  {
+                                                  "owner":  "S-1-5-32-544",
+                                                  "protected":  true,
+                                                  "allow":  [
+                                                                "S-1-5-18:FullControl",
+                                                                "S-1-5-32-544:FullControl",
+                                                                "S-1-5-32-545:ReadAndExecute, Synchronize"
+                                                            ]
+                                              }
+                               },
+                  "service":  {
+                                  "name":  "PcTelemetryAgent",
+                                  "account":  "LocalSystem",
+                                  "start_mode":  "Auto",
+                                  "path_quoted":  true,
+                                  "upload_configured":  true
+                              },
+                  "shell":  {
+                                "check_exit":  0,
+                                "screen":  "dashboard",
+                                "runtime":  "157.0.4341.42",
+                                "shortcut":  true
+                            },
+                  "start":  {
+                                "service":  "Running",
+                                "status_file":  true,
+                                "collecting":  true
+                            }
+              },
+    "success":  true,
+    "finished_at_utc":  "2026-11-09T03:53:40.0806531Z"
+}

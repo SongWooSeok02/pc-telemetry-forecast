@@ -115,11 +115,13 @@ public static class HostStatusText
         ? "확인 불가"
         : agent.UploadState switch
         {
+            "paused_auth" => "인증 오류로 중지(재등록 필요)",
+            "not_configured" => "전송 미설정",
+            // 서비스가 멈추며 마지막으로 쓴 상태가 "재시도 중"이어도 실제로는 전송하지 않는다.
+            _ when agent.Collecting == false => "멈춤(수집 서비스 중지)",
             "ok" => "정상",
             "retrying" => "재시도 중",
-            "paused_auth" => "인증 오류로 중지(재등록 필요)",
             "idle" => "대기",
-            "not_configured" => "전송 미설정",
             _ => "확인 불가",
         };
 

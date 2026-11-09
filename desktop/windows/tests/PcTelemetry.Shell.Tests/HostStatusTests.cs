@@ -63,6 +63,15 @@ public class HostStatusTests
     }
 
     [Fact]
+    public void StoppedAgentIsNotShownAsRetrying()
+    {
+        // 설치 PC 관찰: 서비스 정지 직후 상태 파일은 collecting=false, state=retrying.
+        var s = AgentStatusReader.Parse(AgentJson.Replace("\"collecting\": true", "\"collecting\": false"), Now);
+        Assert.Equal("멈춤(수집 서비스 중지)", HostStatusText.Upload(s));
+        Assert.Equal("12개 배치", HostStatusText.Pending(s));
+    }
+
+    [Fact]
     public void UploadNotConfigured()
     {
         var s = AgentStatusReader.Parse("""
