@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PcTelemetry.Shell/PcTelemetry.Shell.csproj" />
+    <Project Path="src/PcTelemetry.Shell.Core/PcTelemetry.Shell.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PcTelemetry.Shell.Tests/PcTelemetry.Shell.Tests.csproj" />
+  </Folder>
+</Solution>

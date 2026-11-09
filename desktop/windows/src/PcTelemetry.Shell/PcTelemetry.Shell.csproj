@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- S1-06: 일반 사용자 권한으로 실행하는 WebView2 대시보드 셸. 센서·장비 토큰에 접근하지 않는다. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- 개발 도구·.NET 런타임이 없는 PC에서 실행되도록 런타임을 포함해 배포한다. -->
+    <SelfContained>true</SelfContained>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>PcTelemetry.Shell</AssemblyName>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 변경 시 desktop/windows/README.md의 SDK 버전과 런타임 검증을 함께 갱신한다. -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="[1.0.4314.35]" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- WPF 프로젝트는 System.IO를 암시적 using에 넣지 않는다. -->
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PcTelemetry.Shell.Core\PcTelemetry.Shell.Core.csproj" />
+  </ItemGroup>
+
+</Project>
