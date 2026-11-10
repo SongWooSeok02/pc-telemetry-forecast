@@ -6,6 +6,9 @@ tests/results/ci/
 
 agents/windows/**/bin/
 agents/windows/**/obj/
+desktop/windows/**/bin/
+desktop/windows/**/obj/
+desktop/windows/**/publish/
 
 .env
 .env.*

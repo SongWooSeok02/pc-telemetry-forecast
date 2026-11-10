@@ -1,0 +1,37 @@
+{
+  "task": "S1-06",
+  "checked_at_utc": "2026-11-09T03:47:38.022738Z",
+  "shell_version": "0.1.0",
+  "web_view2_sdk_version": "1.0.4314.35",
+  "os_version": "Microsoft Windows NT 10.0.26200.0",
+  "is64_bit_process": true,
+  "screen": "dashboard",
+  "runtime": {
+    "available": true,
+    "version": "157.0.4341.42",
+    "scope": "per_machine",
+    "location": "C:\\Program Files (x86)\\Microsoft\\EdgeWebView\\Application",
+    "error": null
+  },
+  "config": {
+    "ok": true,
+    "error": null,
+    "dashboard_origin": "http://127.0.0.1:4173/",
+    "service_name": "PcTelemetryAgent"
+  },
+  "host": {
+    "service_name": "PcTelemetryAgent",
+    "service_state": "stopped",
+    "agent_status": "fresh",
+    "agent_collecting": false,
+    "pending_batches": 49,
+    "upload_state": "retrying",
+    "pending_text": "49\uAC1C \uBC30\uCE58"
+  },
+  "install": {
+    "bootstrapper_present": true,
+    "download_page": "https://developer.microsoft.com/microsoft-edge/webview2/"
+  },
+  "user_data_folder": "%LOCALAPPDATA%\\PcTelemetry\\Shell\\WebView2",
+  "user_data_folder_matches_default": true
+}

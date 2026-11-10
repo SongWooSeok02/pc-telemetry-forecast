@@ -1,0 +1,28 @@
+{
+  "task": "S1-06",
+  "checked_at_utc": "2026-11-09T01:38:28.648300Z",
+  "shell_version": "0.1.0",
+  "web_view2_sdk_version": "1.0.4314.35",
+  "os_version": "Microsoft Windows NT 10.0.26200.0",
+  "is64_bit_process": true,
+  "screen": "runtime_missing",
+  "runtime": {
+    "available": false,
+    "version": null,
+    "scope": "unknown",
+    "location": null,
+    "error": "runtime_not_found"
+  },
+  "config": {
+    "ok": true,
+    "error": null,
+    "dashboard_origin": "http://127.0.0.1:5173/",
+    "service_name": "PcTelemetryAgent"
+  },
+  "install": {
+    "bootstrapper_present": false,
+    "download_page": "https://developer.microsoft.com/microsoft-edge/webview2/"
+  },
+  "user_data_folder": "%LOCALAPPDATA%\\PcTelemetry\\Shell\\WebView2",
+  "user_data_folder_matches_default": true
+}

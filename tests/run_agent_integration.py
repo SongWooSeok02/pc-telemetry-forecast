@@ -203,7 +203,8 @@ def main():
     reg.start()
 
     command = [str(Path(a.exe).resolve()), 'run', '--state-dir', str(state), '--seconds', str(a.seconds),
-               '--server', url, '--machine-id', machine, '--token-file', str(token_file)]
+               '--server', url, '--machine-id', machine, '--token-file', str(token_file),
+               '--status-file', str(work / 'agent-status.json')]
     started = utc()
     runs, collected = [], 0
     for _ in range(a.restarts + 1):
