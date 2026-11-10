@@ -94,7 +94,7 @@ internal static class Program
         }
 
         var started = DateTime.UtcNow;
-        Spool? spool = options.MachineId is null ? null : new Spool(store.Directory, events);
+        Spool? spool = options.MachineId is null ? null : new Spool(store.Directory, events, clock: new WindowsClock());
         var batcher = spool is null ? null : new Batcher(options.MachineId!.Value, spool);
         using var source = new LhmSource();
         var collector = new SensorCollector(source, new WindowsClock(), new RegistryBootId(), events, store, batcher,
@@ -120,8 +120,11 @@ internal static class Program
         using var stop = CancellationTokenSource.CreateLinkedTokenSource(token);
         if (options.Seconds is { } seconds) stop.CancelAfter(TimeSpan.FromSeconds(seconds));
         using var uploader = options.Server is null ? null
-            : new Uploader(options.Server, options.TokenFile!, spool!, events);
+            : new Uploader(options.Server, options.TokenFile!, spool!, events, collector.BootSessionId);
         using var uploadStop = new CancellationTokenSource();
+        using var monitor = uploader is null ? null : new ClockMonitor(options.Server!, options.TokenFile!,
+            new WindowsClock(), collector.BootSessionId, events, uploader);
+        var clockMonitoring = monitor?.RunAsync(uploadStop.Token) ?? Task.CompletedTask;
 
         var collect = Task.Run(() => collector.RunAsync(stop.Token), CancellationToken.None);
         var upload = uploader is null ? Task.CompletedTask : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
@@ -137,7 +140,7 @@ internal static class Program
         }
         await collect;
         await uploadStop.CancelAsync();
-        await upload;
+        await Task.WhenAll(upload, clockMonitoring);
         if (uploader is not null) await uploader.DrainAsync(TimeSpan.FromSeconds(20));
         WriteStats(statsPath, options, started, source, collector, uploader, spool);
         WriteStatus(options.StatusFile, collecting: false, uploader, spool);

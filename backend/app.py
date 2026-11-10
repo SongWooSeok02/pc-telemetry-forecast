@@ -17,11 +17,12 @@ log = logging.getLogger(__name__)
 
 
 class Rejected(Exception):
-    def __init__(self, status, code):
+    def __init__(self, status, code, request_id=None):
         self.status, self.code = status, code
+        self.request_id = request_id
 
 
-def create_app(dsn=None, *, clock=None, before_commit=None):
+def create_app(dsn=None, *, clock=None, before_commit=None, clock_precision=None):
     app = FastAPI()
     clock = clock or (lambda: datetime.now(timezone.utc))
 
@@ -31,14 +32,17 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
     from .registration import install
     install(app, connect, Rejected, clock)
 
+    from .device_time import install as install_time, monitored_precision
+    install_time(app, connect, Rejected, clock, clock_precision or monitored_precision)
+
     @app.exception_handler(Rejected)
     async def rejected(request, exc):
         headers = {'WWW-Authenticate': 'Bearer'} if exc.status == 401 else {}
         if exc.status == 503:
             headers['Retry-After'] = '5'
         return JSONResponse({'error': {'code': exc.code, 'message': exc.code,
-            'request_id': str(uuid.uuid4()),
-            'retryable': exc.code in ('SERVICE_UNAVAILABLE', 'SENSOR_CONFIG_PENDING'),
+            'request_id': exc.request_id or str(uuid.uuid4()),
+            'retryable': exc.code in ('SERVICE_UNAVAILABLE', 'SENSOR_CONFIG_PENDING', 'CLOCK_UNTRUSTED'),
             'details': []}}, status_code=exc.status, headers=headers)
 
     @app.exception_handler(psycopg.Error)

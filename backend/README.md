@@ -2,7 +2,7 @@
 
 S2-03 등록·회수 API와 역할 권한 변경은 [구현/검증 기록](../docs/s2-03-validation.md),
 Windows DPAPI/IPC는 [서비스 연동 안내](../agents/windows/README.md)를 따른다.
-신규 DB는 마이그레이션 001 다음 002를 적용한다. 아래 S1-03의 수동 토큰 발급/SELECT 전용
+신규 DB는 마이그레이션 001, 002, 003을 순서대로 적용한다. 아래 S1-03의 수동 토큰 발급/SELECT 전용
 설명은 기존 수집 전용 역할에 대한 기록이며 새 관리 API 역할의 권한과 구분한다.
 
 상태: 구현 및 로컬 PostgreSQL 통합 검증 완료, **S1-01 계약 승인·다른 팀원 리뷰 전**.
@@ -18,7 +18,7 @@ python -m venv .venv
 # 환경에 맞게 가상환경 활성화
 python -m pip install -r backend/requirements.txt
 # DATABASE_URL은 배포 환경의 비밀 설정으로 주입한다.
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/001_ingestion.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/001_ingestion.sql -f database/migrations/002_registration.sql -f database/migrations/003_quality.sql
 python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
 ```
 

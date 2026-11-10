@@ -9,11 +9,14 @@ namespace PcTelemetry.Agent;
 /// 스풀의 동결 배치를 POST /v1/telemetry/batches로 보낸다. 본문·ID·해시를 바꾸지 않고 재시도한다.
 /// 토큰은 파일에서 읽고 로그·이벤트에 남기지 않는다(DPAPI 저장은 S2-03/15.8 범위).
 /// </summary>
-internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEventSink events) : IDisposable
+internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEventSink events, Guid? boot) : IDisposable
 {
     private readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(10) };
     private readonly HashSet<string> _pendingConfigsReported = new(StringComparer.Ordinal);
     private int _attempt;
+    private long _reconnections;
+
+    public long Reconnections => Interlocked.Read(ref _reconnections);
 
     public long Sent { get; private set; }
     public long Retries { get; private set; }
@@ -66,13 +69,14 @@ internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEvent
         {
             if (token.IsCancellationRequested) return TimeSpan.Zero;
             var body = await File.ReadAllTextAsync(path, token).ConfigureAwait(false);
-            var (status, code) = await PostAsync(body, token).ConfigureAwait(false);
+            var (status, code) = await PostAsync(path, body, token).ConfigureAwait(false);
             switch (UploadPolicy.Classify(status, code))
             {
                 case UploadAction.Done:
                     spool.Complete(path);
                     Sent++;
                     _attempt = 0;
+                    if (State is "retrying" or "paused_auth") Interlocked.Increment(ref _reconnections);
                     State = "ok";
                     LastSuccessUtc = DateTime.UtcNow;
                     continue;
@@ -96,7 +100,7 @@ internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEvent
         return TimeSpan.FromSeconds(1);
     }
 
-    private async Task<(int? Status, string? Code)> PostAsync(string body, CancellationToken token)
+    private async Task<(int? Status, string? Code)> PostAsync(string path, string body, CancellationToken token)
     {
         string bearer;
         try
@@ -115,6 +119,7 @@ internal sealed class Uploader(Uri server, string tokenFile, Spool spool, IEvent
         request.Headers.Add("X-Content-SHA256", Canonical.Sha256Hex(body));
         try
         {
+            spool.RecordTransmission(path, boot);
             using var response = await _http.SendAsync(request, token).ConfigureAwait(false);
             var status = (int)response.StatusCode;
             if (status == 200) return (200, null);

@@ -56,6 +56,7 @@ class PostgreSQLIngestion(unittest.TestCase):
         cls.dsn = make_conninfo(cls.base, options=f'-c search_path={cls.schema} -c timezone=Asia/Seoul')
         with psycopg.connect(cls.dsn) as db:
             db.execute((ROOT/'database/migrations/001_ingestion.sql').read_text(encoding='utf-8-sig'))
+            db.execute((ROOT/'database/migrations/003_quality.sql').read_text(encoding='utf-8'))
 
     @classmethod
     def tearDownClass(cls):
@@ -79,6 +80,47 @@ class PostgreSQLIngestion(unittest.TestCase):
                 (hashlib.sha256(self.token.encode()).hexdigest(), self.body['machine_id'], self.now+timedelta(days=365)))
             for cid, cfg in configs.items():
                 db.execute('INSERT INTO sensor_configs VALUES(%s,%s,%s::jsonb)', (cid,cfg['machine_id'],json.dumps(cfg)))
+
+    def test_device_time_trust_and_authentication(self):
+        """Authenticated time exchange echoes the ID and defers when unsynchronized or reversed."""
+        request = dict(schema_version='0.1.0', request_id=str(uuid.uuid4()))
+        headers = {'Authorization': 'Bearer '+self.token}
+        endpoint = '/v1/device/time'
+        client = TestClient(create_app(self.dsn, clock=lambda: self.now, clock_precision=lambda: 1000))
+        self.assertEqual(client.post(endpoint, json=request).status_code, 401)
+        response = client.post(endpoint, json=request, headers=headers)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), dict(request, clock_status='synchronized', precision_us=1000,
+            server_received_at=self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            server_sent_at=self.now.strftime('%Y-%m-%dT%H:%M:%S.%fZ')))
+        times = iter((self.now, self.now-timedelta(seconds=2)))
+        reversed_clock = TestClient(create_app(self.dsn, clock=lambda: next(times), clock_precision=lambda: 1000))
+        for untrusted in (reversed_clock, TestClient(create_app(self.dsn, clock_precision=lambda: None))):
+            response = untrusted.post(endpoint, json=request, headers=headers)
+            self.assertEqual(response.status_code, 503)
+            error = response.json()['error']
+            self.assertEqual((error['code'], error['request_id'], error['retryable']),
+                ('CLOCK_UNTRUSTED', request['request_id'], True))
+
+    def test_quality_buckets_preserve_delayed_observation(self):
+        """A 24h delayed batch stays in its observed bucket and replay does not inflate quality counts."""
+        observed = self.now - timedelta(days=1)
+        sample = self.body['samples'][0]
+        sample['observed_at'] = observed.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        sensor = next(r for r in sample['readings'] if r['quality'] == 'ok')
+        sensor.update(quality='error', value=None, reason='probe_error')
+        response = self.send()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.send().json(), response.json())
+        with psycopg.connect(self.dsn) as db:
+            times = db.execute('SELECT DISTINCT observed_at, received_at, monotonic_ms FROM measurements').fetchall()
+            buckets = db.execute('SELECT bucket_seconds, bucket_start, sum(ok_count), sum(missing_count), '
+                'sum(error_count), sum(unsupported_count) FROM sensor_quality_buckets '
+                'GROUP BY bucket_seconds, bucket_start ORDER BY bucket_seconds').fetchall()
+        self.assertEqual(times, [(observed, self.now, sample['monotonic_ms'])])
+        counts = tuple(sum(r['quality'] == q for r in sample['readings'])
+            for q in ('ok', 'missing', 'error', 'unsupported'))
+        self.assertEqual(buckets, [(width, observed, *counts) for width in (10, 60)])
 
     def send(self, body=None, client=None, **headers):
         body = body or self.body

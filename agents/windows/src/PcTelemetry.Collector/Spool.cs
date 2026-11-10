@@ -10,14 +10,16 @@ public sealed class Spool : IBatchSink
 {
     private readonly IEventSink _events;
     private readonly Func<DateTime> _now;
+    private readonly IClock? _clock;
 
-    public Spool(string stateDirectory, IEventSink events, Func<DateTime>? now = null)
+    public Spool(string stateDirectory, IEventSink events, Func<DateTime>? now = null, IClock? clock = null)
     {
         PendingDir = Path.Combine(stateDirectory, "spool");
         QuarantineDir = Path.Combine(stateDirectory, "quarantine");
         Directory.CreateDirectory(PendingDir);
         Directory.CreateDirectory(QuarantineDir);
         _events = events;
+        _clock = clock;
         _now = now ?? (() => DateTime.UtcNow);
     }
 
@@ -29,7 +31,8 @@ public sealed class Spool : IBatchSink
     public void Accept(FrozenBatch batch)
     {
         // 파일명: 동결(enqueue) UTC + 첫 순번 + batch_id. 정렬 순서가 곧 전송 순서다.
-        var name = $"{_now():yyyyMMdd'T'HHmmssfffffff}-{batch.FirstSeq:D16}-{batch.BatchId:D}.json";
+        var stamp = _clock is null ? "" : $"_{batch.BootSessionId:N}_{_clock.InterruptMs:D16}";
+        var name = $"{_now():yyyyMMdd'T'HHmmssfffffff}-{batch.FirstSeq:D16}-{batch.BatchId:D}{stamp}.json";
         StateStore.WriteAtomic(Path.Combine(PendingDir, name), batch.Body);
     }
 
@@ -39,6 +42,24 @@ public sealed class Spool : IBatchSink
     public static DateTime EnqueuedAt(string path) =>
         DateTime.ParseExact(Path.GetFileName(path)[..22], "yyyyMMdd'T'HHmmssfffffff", CultureInfo.InvariantCulture,
             DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
+
+    public void RecordTransmission(string path, Guid? currentBoot)
+    {
+        var name = Path.GetFileNameWithoutExtension(path).Split('_');
+        var sent = _clock?.InterruptMs;
+        long? residence = null;
+        if (sent is { } now && currentBoot is { } boot && name.Length == 3 &&
+            name[1] == boot.ToString("N") && long.TryParse(name[2], out var enqueued) && enqueued >= 0 && enqueued <= now)
+            residence = now - enqueued;
+
+        _events.Emit(new CollectionEvent(Guid.NewGuid(), "buffer_transmission", _now(),
+            _clock?.UnbiasedMs ?? 0, currentBoot, new Dictionary<string, object?>
+            {
+                ["batch_id"] = name[0][^36..],
+                ["enqueued_at"] = Utc.Format(EnqueuedAt(path)),
+                ["buffer_residence_ms"] = residence,
+            }));
+    }
 
     public void Complete(string path) => File.Delete(path);
 
