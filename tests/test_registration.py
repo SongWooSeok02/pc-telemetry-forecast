@@ -6,6 +6,7 @@ from pathlib import Path
 import unittest
 import uuid
 import time
+from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor
 
 import psycopg
@@ -144,8 +145,21 @@ class Registration(unittest.TestCase):
         self.assertEqual(self.manage(machine, 'delete').status_code, 401)
 
     def test_registered_device_ingestion_then_delete(self):
-        """A newly registered credential stores a real batch; deletion rejects exact replay."""
+        """Registered PC moves offline -> online -> offline; replay preserves status, foreign/deleted PCs stay hidden."""
+        received = datetime.now(timezone.utc)
+        now = received
+        self.client = TestClient(create_app(self.dsn, clock=lambda: now))
+        self.addCleanup(self.client.close)
         device = self.consume(self.issue()).json()
+        path = '/v1/machines/' + device['machine_id']
+        owner = {'Authorization': 'Bearer '+self.session}
+        other = {'Authorization': 'Bearer '+self.other}
+        initial = self.client.get(path, headers=owner).json()
+        self.assertFalse(initial['online'])
+        self.assertIsNone(initial['last_received_at'])
+        self.assertEqual(self.client.get(path, headers=other).status_code, 404)
+        self.assertEqual(self.client.get('/v1/machines', headers=other).json(), {'machines': []})
+        self.assertEqual(self.client.get('/v1/machines').status_code, 401)
         batch = json.loads((ROOT/'tests/fixtures/s1-03-batch.json').read_text(encoding='utf-8'))
         batch['machine_id'] = device['machine_id']
         batch['sensor_config_id'] = str(uuid.uuid4())
@@ -158,8 +172,21 @@ class Registration(unittest.TestCase):
             return self.client.post('/v1/telemetry/batches', content=canonical(batch), headers={
                 'Authorization': 'Bearer '+device['device_token'], 'Content-Type':'application/json',
                 'X-Content-SHA256':digest(batch)})
-        self.assertEqual(send().status_code, 200)
+        first = send()
+        self.assertEqual(first.status_code, 200)
+        now = received + timedelta(minutes=2)
+        summary = self.client.get(path, headers=owner).json()
+        self.assertTrue(summary['online'])
+        self.assertEqual(datetime.fromisoformat(summary['last_received_at']), received)
+        self.assertEqual(summary['cpu_temperature_c'], 52.5)
+        self.assertIsNone(summary['gpu_temperature_c'])
+        self.assertEqual(self.client.get('/v1/machines', headers=owner).json(), {'machines': [summary]})
+        now += timedelta(microseconds=1)
+        self.assertEqual(send().json(), first.json())
+        self.assertEqual(self.client.get(path, headers=owner).json(), dict(summary, online=False))
         self.assertEqual(self.manage(device['machine_id'], 'delete').status_code, 200)
+        self.assertEqual(self.client.get(path, headers=owner).status_code, 404)
+        self.assertEqual(self.client.get('/v1/machines', headers=owner).json(), {'machines': []})
         self.assertEqual(send().status_code, 401)
 
     def test_registration_transaction_rollback(self):

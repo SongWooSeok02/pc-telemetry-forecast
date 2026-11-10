@@ -3,6 +3,7 @@ import hashlib
 import re
 import secrets
 import uuid
+from datetime import timedelta, timezone
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -13,7 +14,10 @@ def sha(value):
     return hashlib.sha256(value.encode()).hexdigest()
 
 
-def install(app, connect, rejected):
+ONLINE_WINDOW = timedelta(minutes=2)
+
+
+def install(app, connect, rejected, clock):
     def session(db, request):
         header = request.headers.get('authorization', '')
         row = None
@@ -66,6 +70,55 @@ def install(app, connect, rejected):
             "AND event='code_issued' AND occurred_at>CURRENT_TIMESTAMP-interval '1 hour'", (user,)).fetchone()[0]
         if count >= 10:
             raise rejected(429, 'REGISTRATION_RATE_LIMITED')
+
+    def summaries(request, machine=None):
+        with connect() as db:
+            user = session(db, request)
+            query = """
+                SELECT m.machine_id, latest.received_at, temps.cpu, temps.gpu
+                FROM machines m
+                LEFT JOIN LATERAL (
+                    SELECT batch_id, received_at FROM ingestion_batches
+                    WHERE machine_id=m.machine_id
+                    ORDER BY received_at DESC, batch_id DESC LIMIT 1
+                ) latest ON true
+                LEFT JOIN LATERAL (
+                    SELECT max(r.value) FILTER (WHERE sensor.scope='cpu_package') AS cpu,
+                           max(r.value) FILTER (WHERE sensor.scope='gpu_core') AS gpu
+                    FROM measurements r
+                    JOIN sensor_configs c USING (sensor_config_id)
+                    CROSS JOIN LATERAL (
+                        SELECT c.config->'sensors'->r.sensor_id->>'scope' AS scope
+                    ) sensor
+                    WHERE r.machine_id=m.machine_id AND r.received_at=latest.received_at
+                      AND r.batch_id=latest.batch_id AND r.unit='Cel'
+                ) temps ON true
+                WHERE m.owner_id=%s AND NOT m.deleted
+            """
+            params = (user,)
+            if machine is not None:
+                query += ' AND m.machine_id=%s'
+                params += (machine,)
+            rows = db.execute(query + ' ORDER BY m.machine_id', params).fetchall()
+        cutoff = clock().astimezone(timezone.utc) - ONLINE_WINDOW
+        return [
+            dict(machine_id=str(key), name=str(key), online=received is not None and received >= cutoff,
+                 last_received_at=received.astimezone(timezone.utc).isoformat() if received else None,
+                 cpu_temperature_c=float(cpu) if cpu is not None else None,
+                 gpu_temperature_c=float(gpu) if gpu is not None else None)
+            for key, received, cpu, gpu in rows
+        ]
+
+    @app.get('/v1/machines')
+    def list_machines(request: Request):
+        return result({'machines': summaries(request)})
+
+    @app.get('/v1/machines/{machine_id}')
+    def get_machine(machine_id: uuid.UUID, request: Request):
+        rows = summaries(request, machine_id)
+        if not rows:
+            raise rejected(404, 'MACHINE_NOT_FOUND')
+        return result(rows[0])
 
     @app.post('/v1/registration-codes')
     def issue(request: Request):

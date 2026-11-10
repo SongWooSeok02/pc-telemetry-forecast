@@ -1,0 +1,860 @@
+{
+  "executed_at_utc": "2026-11-10T15:11:15.254262+00:00",
+  "base_commit": "dfd8e69c180571893df23596a5bbdd6639fb54f9",
+  "pc": "DESKTOP-CC6CD6C",
+  "os": "Windows-10-10.0.19045-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "packages": {
+    "fastapi": "0.115.12",
+    "psycopg": "3.2.9",
+    "starlette": "0.46.2",
+    "httpx": "0.28.1"
+  },
+  "postgres_version": "PostgreSQL 16.15, compiled by Visual C++ build 1944, 64-bit",
+  "postgres_version_error": null,
+  "source_sha256": {
+    ".github/workflows/backend.yml": "1c227fb99da1efc07e2fe26971b28a5d3b730b6c1004fa1e8d7cf5f235b50846",
+    "agents/windows/Credentials.psm1": "7910013c684ff35ef13fa8297f0488ad058010d4868aedebe1ab656e621cb773",
+    "agents/windows/README.md": "9acfd592b8474fe0f4dc0f1492970e02f5ad13efc82b2b8df6e2ada10791e230",
+    "agents/windows/Register-Device.ps1": "7d6781be9a1d6f113ab4cbcfbe7a24c3933b931c2e53f45fb19d538906f9dfe6",
+    "backend/__init__.py": "7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6",
+    "backend/app.py": "3e4b51d0a04ecb006939d838c96e6f19650eed97c03daea0ee31880f6bf4577e",
+    "backend/contract.py": "466a0345e022fc03121a716d7ac0bcadc3047b5c698aec1406c8a19c1233bc31",
+    "backend/partitions.py": "fadea933bbe2884077967d1e3209da12251da13dec4b1480d6fbe716ac3e3d8d",
+    "backend/README.md": "c3edca20096bfc892602e705516f3e08d22c8ee3017bcef96d08e64700d40a79",
+    "backend/registration.py": "e7c86215be204c2befbfa5a5d3659e817a236aa8345222ea020cc0e77f713451",
+    "backend/requirements.txt": "ead1fc2951f82a00d3e9421cf780f3ec7b763ed2b41c99d9f42056b01266495d",
+    "database/migrations/001_ingestion.sql": "e822417c3dbfb7e70891360da0e7da30e8069d24ab54fed14d61cd45f743762f",
+    "database/migrations/002_registration.sql": "174cbc721a831173757e0a9ed6239c81c3f98b8525cc67545415bb80216221f5",
+    "tests/fixtures/s1-03-batch.json": "817cb97e30e19e6609170c33495078e83d55251e75311eb14a5c6b058c56d0e6",
+    "tests/run_backend.py": "eb4f8aa385530d5821586366654548e622cd825e12aaa46e63cb2c49a8d09ba1",
+    "tests/run_registration.py": "b1cfac27be84f743d1b5532ae947c1ae04bd73675328c889f04de1316a20bf5c",
+    "tests/test_backend.py": "bdf9360e61947c3f9766ae996ed4d3e5a91d9f9acf638d95f84ea96ae289e844",
+    "tests/test_backend_runner.py": "6e28ae7b2aa40ea30c62c62da5bb6b75afb753c44378e30f00ba8d258fb9e088",
+    "tests/test_registration.py": "1305d2b451b0997965c4cbbc2138aac58b89b2db20611a644afc9ff55c4804b1"
+  },
+  "postgres_executed": true,
+  "success": true,
+  "cases": [
+    {
+      "case": "test_registration.Registration.test_concurrent_delete_and_replacement",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_concurrent_delete_and_replacement",
+      "expected": "Deletion racing replacement leaves no live credentials or reusable codes.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:10.088717+00:00",
+      "duration_seconds": 0.485
+    },
+    {
+      "case": "test_registration.Registration.test_concurrent_rate_limit_and_reissue_limit",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_concurrent_rate_limit_and_reissue_limit",
+      "expected": "Concurrent code issuance cannot exceed the limit; failed rotation preserves prior code.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "429",
+          "expected": "429"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 429, 429]",
+          "expected": "[200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 429, 429]"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:10.573832+00:00",
+      "duration_seconds": 0.64
+    },
+    {
+      "case": "test_registration.Registration.test_concurrent_single_use",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_concurrent_single_use",
+      "expected": "Six concurrent consumers produce exactly one credential and five authentication failures.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "[200, 401, 401, 401, 401, 401]",
+          "expected": "[200, 401, 401, 401, 401, 401]"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:11.223920+00:00",
+      "duration_seconds": 0.079
+    },
+    {
+      "case": "test_registration.Registration.test_device_expiry_and_bad_inputs",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_device_expiry_and_bad_inputs",
+      "expected": "Expired device credentials and malformed enrollment requests fail without secret reflection.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:11.288936+00:00",
+      "duration_seconds": 0.187
+    },
+    {
+      "case": "test_registration.Registration.test_documented_database_role",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_documented_database_role",
+      "expected": "Documented least-privilege API role can enroll/manage, but cannot edit sessions/audits.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:11.484982+00:00",
+      "duration_seconds": 0.141
+    },
+    {
+      "case": "test_registration.Registration.test_expiry_reuse_owner_and_separation",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_expiry_reuse_owner_and_separation",
+      "expected": "Expired/reused codes fail; ownership cannot be supplied by the enrolling caller.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "404",
+          "expected": "404"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "UUID('2ac08dbd-40f0-4dcc-b943-d68c4defdf11')",
+          "expected": "UUID('2ac08dbd-40f0-4dcc-b943-d68c4defdf11')"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:11.628015+00:00",
+      "duration_seconds": 0.187
+    },
+    {
+      "case": "test_registration.Registration.test_expiry_while_waiting_for_owner_lock",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_expiry_while_waiting_for_owner_lock",
+      "expected": "A code that expires while queued on a lock is rejected at actual consumption time.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertTrue",
+          "actual": "True",
+          "expected": "True"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:11.804058+00:00",
+      "duration_seconds": 1.203
+    },
+    {
+      "case": "test_registration.Registration.test_registered_device_ingestion_then_delete",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_registered_device_ingestion_then_delete",
+      "expected": "Registered PC moves offline -> online -> offline; replay preserves status, foreign/deleted PCs stay hidden.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "404",
+          "expected": "404"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'machines': []}",
+          "expected": "{'machines': []}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertTrue",
+          "actual": "True",
+          "expected": "True"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "datetime.datetime(2026, 11, 10, 15, 11, 13, 40498, tzinfo=datetime.timezone.utc)",
+          "expected": "datetime.datetime(2026, 11, 10, 15, 11, 13, 40498, tzinfo=datetime.timezone.utc)"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "52.5",
+          "expected": "52.5"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'machines': [{'machine_id': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'name': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'online': True, 'last_received_at': '2026-11-10T15:11:13.040498+00:00', 'cpu_temperature_c': 52.5, 'gpu_temperature_c': None}]}",
+          "expected": "{'machines': [{'machine_id': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'name': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'online': True, 'last_received_at': '2026-11-10T15:11:13.040498+00:00', 'cpu_temperature_c': 52.5, 'gpu_temperature_c': None}]}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'batch_id': '33333333-3333-4333-8333-333333333333', 'received_at': '2026-11-10T15:11:13.040498Z', 'schema_version': '0.1.0', 'accepted_samples': 1}",
+          "expected": "{'schema_version': '0.1.0', 'batch_id': '33333333-3333-4333-8333-333333333333', 'accepted_samples': 1, 'received_at': '2026-11-10T15:11:13.040498Z'}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'machine_id': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'name': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'online': False, 'last_received_at': '2026-11-10T15:11:13.040498+00:00', 'cpu_temperature_c': 52.5, 'gpu_temperature_c': None}",
+          "expected": "{'machine_id': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'name': '419b81f0-7d2f-4ea4-bf9f-bdaea32132d0', 'online': False, 'last_received_at': '2026-11-10T15:11:13.040498+00:00', 'cpu_temperature_c': 52.5, 'gpu_temperature_c': None}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "404",
+          "expected": "404"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "{'machines': []}",
+          "expected": "{'machines': []}"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:13.014215+00:00",
+      "duration_seconds": 0.469
+    },
+    {
+      "case": "test_registration.Registration.test_registration_transaction_rollback",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_registration_transaction_rollback",
+      "expected": "Audit write failure rolls back code consumption, token and machine; retry succeeds.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "503",
+          "expected": "503"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "False",
+          "expected": "False"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:13.480602+00:00",
+      "duration_seconds": 0.109
+    },
+    {
+      "case": "test_registration.Registration.test_reissue_revoke_delete",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_reissue_revoke_delete",
+      "expected": "Rotation invalidates old tokens; revocation/deletion and pending-code cancellation persist.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'79b4854b-73ab-4773-94a3-fd7b6b48d721'",
+          "expected": "'79b4854b-73ab-4773-94a3-fd7b6b48d721'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "404",
+          "expected": "404"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:13.593629+00:00",
+      "duration_seconds": 0.36
+    },
+    {
+      "case": "test_registration.Registration.test_revocation_during_body_read",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_revocation_during_body_read",
+      "expected": "Revocation after initial authentication but before body persistence prevents writes.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:13.959715+00:00",
+      "duration_seconds": 0.109
+    },
+    {
+      "case": "test_registration.Registration.test_session_expiry_and_replacement_cancellation",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_session_expiry_and_replacement_cancellation",
+      "expected": "Expired/revoked user sessions fail independently; revoke cancels pending replacements.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:14.068741+00:00",
+      "duration_seconds": 0.281
+    },
+    {
+      "case": "test_registration.Registration.test_session_revoked_while_waiting_for_owner_lock",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_session_revoked_while_waiting_for_owner_lock",
+      "expected": "Logout while a management request waits on an owner lock prevents that mutation.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertTrue",
+          "actual": "True",
+          "expected": "True"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "False",
+          "expected": "False"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:14.347806+00:00",
+      "duration_seconds": 0.141
+    },
+    {
+      "case": "test_registration.Registration.test_upgrade_preserves_legacy_device_credentials",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_upgrade_preserves_legacy_device_credentials",
+      "expected": "Applying 002 to populated 001 preserves legacy authentication without inventing ownership.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "1",
+          "expected": "1"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "0",
+          "expected": "0"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:14.490840+00:00",
+      "duration_seconds": 0.266
+    },
+    {
+      "case": "test_registration.Registration.test_validation_and_rate_limit",
+      "reproduction": "python -m unittest discover -s tests -p test_registration.py -k test_validation_and_rate_limit",
+      "expected": "Unauthenticated issuance, owner injection, oversized input and excessive issuance fail.",
+      "actual": "All stated assertions matched",
+      "assertions": [
+        {
+          "assertion": "assertEqual",
+          "actual": "401",
+          "expected": "401"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "200",
+          "expected": "200"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "'no-store'",
+          "expected": "'no-store'"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "429",
+          "expected": "429"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "422",
+          "expected": "422"
+        },
+        {
+          "assertion": "assertEqual",
+          "actual": "413",
+          "expected": "413"
+        }
+      ],
+      "status": "pass",
+      "executed_at_utc": "2026-11-10T15:11:14.748622+00:00",
+      "duration_seconds": 0.453
+    }
+  ]
+}
