@@ -161,6 +161,8 @@ class Registration(unittest.TestCase):
         self.assertEqual(self.client.get('/v1/machines', headers=other).json(), {'machines': []})
         self.assertEqual(self.client.get('/v1/machines').status_code, 401)
         batch = json.loads((ROOT/'tests/fixtures/s1-03-batch.json').read_text(encoding='utf-8'))
+        for sample in batch['samples']:
+            sample['observed_at'] = (received-timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         batch['machine_id'] = device['machine_id']
         batch['sensor_config_id'] = str(uuid.uuid4())
         config = next(iter(json.loads((ROOT/'contracts/fixtures/sensor-configs.json').read_text(encoding='utf-8')).values()))

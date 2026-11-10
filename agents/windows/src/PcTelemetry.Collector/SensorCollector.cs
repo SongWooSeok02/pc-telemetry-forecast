@@ -267,7 +267,7 @@ public sealed class SensorCollector
             var monoMs = mono - _prevUnbiased;
             var interruptMs = interrupt - _prevInterrupt;
             var suspendedMs = interruptMs - monoMs;   // 절전 포함 시계 - 절전 제외 시계
-            var jumpMs = wallMs - interruptMs;          // 절전과 무관한 벽시계 변화
+            var jumpMs = wallMs - monoMs;
 
             if (suspendedMs >= _options.SuspendThresholdMs)
             {
@@ -284,7 +284,7 @@ public sealed class SensorCollector
                 });
                 _prevSampleMono = null;
             }
-            if (Math.Abs(jumpMs) >= _options.ClockJumpThresholdMs)
+            else if (Math.Abs(jumpMs) >= _options.ClockJumpThresholdMs)
             {
                 Stats.ClockJumps++;
                 Emit("clock_jump", new Dictionary<string, object?>

@@ -205,13 +205,15 @@ public class CollectorTests : IDisposable
         Assert.DoesNotContain(s.Readings, r => r.SensorId == "gpu0/core/temp");
     }
 
-    [Fact]
-    public void Suspend_resume_is_an_event_not_a_clock_jump_and_splits_batches()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-6000)]
+    public void Suspend_resume_is_an_event_not_a_clock_jump_and_splits_batches(int wallAdjustmentMs)
     {
         var c = NewCollector();
         c.Start();
         Run(c, 3);                               // 순번 0
-        _clock.Advance(3_601_000, 1_000, 3_601_000); // 1시간 절전: 벽시계·절전 포함 시계만 크게 증가
+        _clock.Advance(3_601_000 + wallAdjustmentMs, 1_000, 3_601_000); // 1시간 절전: 벽시계·절전 포함 시계만 크게 증가
         var after = c.Tick()!;
 
         var e = Assert.Single(_sink.OfType("suspend_resume"));
