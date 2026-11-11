@@ -103,3 +103,19 @@ CI는 PostgreSQL 16 서비스로 실행하며 보고서를 업로드한다. CI �
 S2-04/S3-03/S4-03의 중복·집계·규모 확장 검증. 현재 요청 범위에 대한 자동 통합 검사는
 로컬에서 실행했으며 [PR #2](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/2)에서
 원격 CI와 PR 기준 재리뷰를 진행한다. 외부 작업 상태는 변경하지 않았다.
+
+## S2-04 PC 조회
+
+사용자 세션 Bearer 토큰으로 `GET /v1/machines`와
+`GET /v1/machines/{machine_id}`를 호출한다. 목록 응답은 `{"machines": [...]}`이며
+상세 응답은 같은 요약 객체 한 건이다. 다른 사용자 소유 PC, 삭제된 PC, 없는 PC의 상세 요청은
+모두 `404 MACHINE_NOT_FOUND`로 응답한다.
+
+요약은 `machine_id`, `name`, `online`, `last_received_at`,
+`cpu_temperature_c`, `gpu_temperature_c`를 반환한다. 현재 등록 스키마에서는
+UUID를 표시 이름으로 사용한다. 온도는 가장 최근 수락 배치의 CPU 패키지 및 GPU 코어
+센서별 최대 섭씨값이며 유효 측정이 없으면 `null`이다.
+
+온라인은 최초로 커밋된 배치의 서버 수신 시각 중 최댓값이 조회 시점 기준 최근 120초
+이내일 때 참이다. 수신 이력이 없는 PC는 오프라인이며 마지막 수신 시각은 `null`이다.
+정확한 재전송은 최초 응답을 재사용하므로 마지막 수신 시각을 갱신하지 않는다.

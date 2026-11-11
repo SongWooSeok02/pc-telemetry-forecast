@@ -29,7 +29,7 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
         return psycopg.connect(dsn or os.environ['DATABASE_URL'], connect_timeout=5)
 
     from .registration import install
-    install(app, connect, Rejected)
+    install(app, connect, Rejected, clock)
 
     @app.exception_handler(Rejected)
     async def rejected(request, exc):

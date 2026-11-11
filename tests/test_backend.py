@@ -66,9 +66,9 @@ class PostgreSQLIngestion(unittest.TestCase):
         self.body = decode((ROOT/'tests/fixtures/s1-03-batch.json').read_text(encoding='utf-8'))
         self.token = 'synthetic-test-only'
         self.now = datetime.now(timezone.utc).replace(hour=12, minute=0, second=0, microsecond=0)
-        self.fail = False
+        self.fail_commit = False
         def hook(db):
-            if self.fail:
+            if self.fail_commit:
                 db.execute('SELECT 1/0')  # Real DB error after all inserts.
         self.app = create_app(self.dsn, clock=lambda: self.now, before_commit=hook)
         self.client = TestClient(self.app)
@@ -92,13 +92,28 @@ class PostgreSQLIngestion(unittest.TestCase):
                 ('ingestion_batches','ingestion_samples','measurements','reaggregation_queue'))
 
     def test_replay_response_loss_and_midnight(self):
-        """Discard first response; replay next UTC day returns identical response and unchanged rows."""
-        first = self.send()
-        self.assertEqual(first.status_code, 200, first.text)
+        """Cut the response after commit; replay next UTC day returns the stored response with unchanged rows."""
+        async def disconnect(scope, receive, send):
+            if scope['type'] != 'http':
+                return await self.app(scope, receive, send)
+
+            async def drop_response(message):
+                self.assertEqual(message['type'], 'http.response.start')
+                self.assertEqual(message['status'], 200)
+                raise ConnectionError('response dropped after commit')
+
+            await self.app(scope, receive, drop_response)
+
+        with TestClient(disconnect) as client, self.assertRaises(ConnectionError):
+            self.send(client=client)
         before = self.counts()
+        self.assertEqual(before, (1, 1, 3, 6))
+        with psycopg.connect(self.dsn) as db:
+            stored = db.execute('SELECT response FROM ingestion_batches').fetchone()[0]
         self.now += timedelta(days=1)
         second = self.send()
-        self.assertEqual(second.json(), first.json())
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(second.json(), stored)
         self.assertEqual(self.counts(), before)
 
     def test_concurrent_replay(self):
@@ -137,11 +152,11 @@ class PostgreSQLIngestion(unittest.TestCase):
 
     def test_database_error_and_retry(self):
         """SQL failure before commit leaves all four tables empty; retry commits once."""
-        self.fail = True
+        self.fail_commit = True
         response = self.send()
         self.assertEqual(response.status_code, 503)
         self.assertEqual(self.counts(), (0,0,0,0))
-        self.fail = False
+        self.fail_commit = False
         self.assertEqual(self.send().status_code, 200)
 
     def test_last_sample_invalid(self):
