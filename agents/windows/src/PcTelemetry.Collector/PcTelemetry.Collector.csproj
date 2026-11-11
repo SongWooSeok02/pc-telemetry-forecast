@@ -14,4 +14,9 @@
     <InternalsVisibleTo Include="PcTelemetry.Collector.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- S2-01 버퍼. 10.0.0은 취약한 SQLitePCLRaw 2.1.11(GHSA-2m69-gcr7-jv3q)을 끌어와 10.0.15(2.1.13)로 고정한다. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="[10.0.15]" />
+  </ItemGroup>
+
 </Project>

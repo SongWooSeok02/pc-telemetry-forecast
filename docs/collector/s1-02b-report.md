@@ -121,6 +121,7 @@
 ## 8. 남은 제한
 
 - 스풀은 파일 기반 최소 구현이다. SQLite 버퍼·한 트랜잭션 발급·장애 복구 검증은 S2-01.
+  → S2-01에서 `state\buffer.sqlite3`로 대체(기존 `spool/` 파일은 같은 ID로 가져옴). [S2-01 보고서](s2-01-report.md).
 - 장비 토큰은 평문 파일 경로(`--token-file`)로 받는다. S2-03 자격 증명 모듈(`agents/windows/Credentials.psm1`, DPAPI LocalMachine + ACL)이
   main에 있으나 C# 에이전트에서 읽는 연동은 설치 서비스(S2-02)와 함께 후속으로 한다.
 - 시각 오프셋 측정 API(계약 4절) 클라이언트는 이 작업 범위 밖이다.

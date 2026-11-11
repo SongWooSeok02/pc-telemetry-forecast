@@ -4,11 +4,13 @@
 
 상태(S1-02b): 1초 수집·센서 매핑·이벤트·불변 배치 구현. **PC 1대 실측, 다른 팀원 리뷰 전.**
 설계·검증 결과: [S1-02b 보고서](../../docs/collector/s1-02b-report.md), 센서 표: [sensor-support.md](../../docs/sensor-support.md).
+상태(S2-01): SQLite 미전송 버퍼·재전송·상한. **PC-A 장애 시나리오 실측, 다른 팀원 리뷰 전.**
+[S2-01 보고서](../../docs/collector/s2-01-report.md).
 
 | 경로 | 내용 |
 |---|---|
-| `src/PcTelemetry.Collector/` | LHM 비의존 핵심: 센서 매핑, 1초 루프, 부팅 세션·순번, 절전/시계 이벤트, 불변 배치·`ascii-json-v1` 해시, 파일 스풀 |
-| `src/PcTelemetry.Agent/` | LHM 0.9.6 어댑터, `QueryUnbiasedInterruptTime` 시계, BootId, 업로더, 콘솔/서비스 진입점 |
+| `src/PcTelemetry.Collector/` | LHM 비의존 핵심: 센서 매핑, 1초 루프, 부팅 세션·순번, 절전/시계 이벤트, 불변 배치·`ascii-json-v1` 해시, SQLite 미전송 버퍼(`SqliteBuffer`)·업로더(`Uploader`) |
+| `src/PcTelemetry.Agent/` | LHM 0.9.6 어댑터, `QueryUnbiasedInterruptTime` 시계, BootId, 콘솔/서비스 진입점, 상태 파일 |
 | `tests/PcTelemetry.Collector.Tests/` | 가상 센서·가짜 시계 기반 단위 테스트, 계약 공유 해시 벡터 |
 | `Credentials.psm1`, `Register-Device.ps1` | S2-03 자격 증명 저장(DPAPI·ACL)·등록 IPC. 아래 [S2-03 절](#s2-03-자격-증명-및-등록-ipc) |
 | `spike/` | S1-02a 스파이크 도구(운영 코드 아님) |
@@ -35,11 +37,35 @@ python tests/run_agent_integration.py --exe $exe --seconds 600 --pc-label pc-a  
 
 상태 디렉터리(기본 `%ProgramData%\PcTelemetry\state`): `boot-session.json`(부팅 세션·순번 예약),
 `components.json`(하드웨어→component_id), `sensor-configs.json`·`sensor-configs/<id>.json`(불변 구성·등록 본문),
-`spool/`(동결 배치), `quarantine/`, `events.jsonl`, `stats.json`. 실제 PC 상태 디렉터리는 커밋하지 않는다.
+`buffer.sqlite3`(S2-01 미전송 버퍼, 아래), `events.jsonl`, `stats.json`. 실제 PC 상태 디렉터리는 커밋하지 않는다.
 
 토큰은 현재 `--token-file`에서 읽어 헤더에만 쓴다. S2-03 자격 증명 저장소(`Get-DeviceCredential`) 연동은
-설치 서비스(S2-02)와 함께 후속으로 한다. SQLite 버퍼·재전송 정책은 S2-01,
-서비스 자동 시작·설치는 S2-02/S1-06 범위다.
+설치 서비스(S2-02)와 함께 후속으로 한다. 서비스 자동 시작·설치는 S2-02/S1-06 범위다.
+
+## S2-01 미전송 버퍼
+
+`state\buffer.sqlite3`(WAL, `synchronous=FULL`). 표와 규칙:
+
+| 표 | 내용 |
+|---|---|
+| `open_samples` | 수집 즉시 저장한 미동결 샘플. 강제 종료돼도 남고, 다음 시작 때 먼저 동결한다 |
+| `batches` | 동결 배치(`pending`·`quarantined`·`sent`). batch_id 발급·본문 동결·샘플 제거를 한 트랜잭션으로 커밋. 트리거가 ID·본문·해시·범위 수정과 `sent` 이후 재전송을 막는다. 전송 완료 시 본문을 지우고 원장 행을 24시간 보관 |
+| `gaps` | 상한으로 지운 미전송 범위(부팅 세션·순번·관측 시각·샘플 수·사유 `max_age`/`max_bytes`). 30일 보관 |
+| `meta` | `machine_id`, `dropped_samples_total` |
+
+- 전송: 가장 오래된 `pending` 한 건을 같은 ID·본문·해시로 보낸다. 실패해도 건너뛰지 않는다(순서 유지).
+  응답 유실·연결 실패·타임아웃·429/5xx는 3/6/12/24/48/60초(+0~20%) 백오프, `Retry-After`가 더 길면 따르되 최대 5분.
+  200의 `batch_id`·`accepted_samples`가 맞지 않으면 `upload_ack_mismatch`만 남기고 새 ID로 다시 묶지 않는다.
+  본문 해시가 동결 값과 다르면(디스크 손상) 보내지 않고 격리한다.
+- 상한: 미전송 데이터(대기·격리 배치 본문 + 미동결 샘플)의 동결 시각이 24시간을 넘거나 바이트 합이 500MB를 넘으면
+  오래된 배치부터 지운다. 수집 중 1분마다 검사하므로 최대 1분치만큼 넘을 수 있다. 벽시계가 뒤로 가도 만료로 보지 않는다.
+  지운 범위는 `gaps`·`buffer_pruned` 이벤트·공개 상태 파일(`upload.last_gap`, `dropped_samples_total`)에 남긴다.
+- 재시작: 열 때 `quick_check`, 손상이면 `buffer.sqlite3.corrupt-<UTC>`로 옮겨 보존하고 새로 만든다(`buffer_reset`).
+  machine_id가 바뀌면 이전 장비의 대기 배치를 격리한다. S1-02b `spool/`·`quarantine/` 파일은 같은 ID로 가져온 뒤 지운다.
+- 시험용 상한: `--buffer-max-age-seconds N`, `--buffer-max-bytes N`.
+- 토큰은 버퍼·이벤트·상태 파일에 쓰지 않는다(단위 테스트가 DB 파일·WAL 바이트를 검사).
+
+장애 복구 검증: `python tests/run_buffer_recovery.py --exe <exe> --scenario outage|kill|response-loss|cap-age|cap-bytes --pc-label pc-a`.
 
 ## S2-03 자격 증명 및 등록 IPC
 

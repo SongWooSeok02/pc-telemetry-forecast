@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- S1-02b: LHM 센서 어댑터·Windows 시계·스풀 전송을 묶은 수집 에이전트 실행 파일. -->
+  <!-- S1-02b: LHM 센서 어댑터·Windows 시계를 묶은 수집 에이전트 실행 파일. 버퍼·전송은 Collector(S2-01). -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>

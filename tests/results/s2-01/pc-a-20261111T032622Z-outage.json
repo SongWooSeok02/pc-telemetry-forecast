@@ -1,0 +1,254 @@
+{
+  "task": "S2-01",
+  "scenario": "outage",
+  "kind": "real agent -> tests/reference_api.py Store (SQLite ledger) over loopback HTTP",
+  "executed_at_utc": {
+    "started": "2026-11-11T03:26:22.097535Z",
+    "finished": "2026-11-11T03:58:53.998096Z"
+  },
+  "build": {
+    "base_commit": "977a9d3451ada41c8fe02f77d5d10132ff4a7028",
+    "dirty": true,
+    "agent_version": "0.1.0",
+    "python": "3.13.9",
+    "dll_sha256": {
+      "PcTelemetry.Agent.dll": "537d13504159b6a452907ecb72d0992a4e040e8fa6aae39b3ee160dd8a2ef8c8",
+      "PcTelemetry.Collector.dll": "59cc92fec3f58f3c4c4b9bab62ea3ca438a23161ae1612543e26148d18e6eb45"
+    }
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os": "Windows 10.0.26200"
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_buffer_recovery.py --exe <PcTelemetry.Agent.exe> --scenario outage --pc-label pc-a --outage-seconds 1800 --kill-during-outage 1"
+  ],
+  "plan_s": {
+    "total": 1950,
+    "actions": [
+      [
+        60,
+        "server_stop"
+      ],
+      [
+        960,
+        "kill"
+      ],
+      [
+        1860,
+        "server_start"
+      ]
+    ]
+  },
+  "timeline": [
+    {
+      "at_s": 60.0,
+      "utc": "2026-11-11T03:27:22.145930Z",
+      "action": "server_stop"
+    },
+    {
+      "at_s": 960.1,
+      "utc": "2026-11-11T03:42:22.215149Z",
+      "action": "kill"
+    },
+    {
+      "at_s": 963.2,
+      "utc": "2026-11-11T03:42:25.277466Z",
+      "action": "restart",
+      "seconds": 986
+    },
+    {
+      "at_s": 1860.1,
+      "utc": "2026-11-11T03:57:22.266889Z",
+      "action": "server_start"
+    }
+  ],
+  "server_downtime_utc": [
+    [
+      "2026-11-11T03:27:22.145977Z",
+      "2026-11-11T03:57:22.268827Z"
+    ],
+    [
+      "2026-11-11T03:58:53.998421Z",
+      null
+    ]
+  ],
+  "runs": [
+    {
+      "started": "2026-11-11T03:26:22.190111Z",
+      "ended": "2026-11-11T03:42:22.263821Z",
+      "exit_code": 1,
+      "forced_kill": true
+    },
+    {
+      "started": "2026-11-11T03:42:25.277422Z",
+      "ended": "2026-11-11T03:58:53.998048Z",
+      "exit_code": 0,
+      "forced_kill": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "agent final exit code",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq) on server",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server ledger batches == agent sent ledger (ids)",
+      "expected": "648 ids",
+      "actual": "648 ids",
+      "pass": true
+    },
+    {
+      "name": "server ledger sha256 == agent frozen sha256",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "server samples == sum(sample_count) of sent ledger",
+      "expected": 1941,
+      "actual": 1941,
+      "pass": true
+    },
+    {
+      "name": "server samples rows == ledger samples",
+      "expected": 1941,
+      "actual": 1941,
+      "pass": true
+    },
+    {
+      "name": "pending batches after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "open samples after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server seqs intersect pruned ranges",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "seq holes not explained by pruning (<= forced restarts)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "ack mismatches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "outage length >= requested - 1 s",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "samples observed during outage delivered (>= outage_s - restart allowance)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "upload_recovered events",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "agent actually retried during outage (max attempts > 1)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "no pruning in 30-min outage",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "detail": {
+    "outage_s": 1800.1,
+    "samples_observed_during_outage_on_server": 1793
+  },
+  "server_counts": {
+    "batches": 648,
+    "samples": 1941,
+    "measurements": 29115,
+    "reaggregate": 1941
+  },
+  "agent_buffer": {
+    "sent_ledger": 648,
+    "pending": 0,
+    "quarantined": 0,
+    "open_samples": 0,
+    "dropped_samples_total": 0,
+    "max_attempts": 35
+  },
+  "seq_holes": [
+    {
+      "first_missing": 956,
+      "last_missing": 1199
+    }
+  ],
+  "restart_restore": {
+    "restored_open_samples": [
+      0,
+      2
+    ],
+    "restored_batches_frozen": [
+      0,
+      1
+    ],
+    "pending_at_open": [
+      0,
+      301
+    ]
+  },
+  "events": {
+    "agent_started": 2,
+    "agent_stopped": 1,
+    "boot_session_started": 1,
+    "buffer_opened": 2,
+    "sensor_config_selected": 1,
+    "upload_recovered": 1,
+    "upload_retrying": 2
+  },
+  "final_status_upload": {
+    "configured": true,
+    "state": "ok",
+    "pending_batches": 0,
+    "last_success_at_utc": "2026-11-11T03:58:52.909466Z",
+    "quarantined_batches": 0,
+    "oldest_pending_at_utc": null,
+    "dropped_samples_total": 0,
+    "last_gap": null
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}

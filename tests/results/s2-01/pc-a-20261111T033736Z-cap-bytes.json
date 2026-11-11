@@ -1,0 +1,282 @@
+{
+  "task": "S2-01",
+  "scenario": "cap-bytes",
+  "kind": "real agent -> tests/reference_api.py Store (SQLite ledger) over loopback HTTP",
+  "executed_at_utc": {
+    "started": "2026-11-11T03:37:36.304653Z",
+    "finished": "2026-11-11T03:44:08.981255Z"
+  },
+  "build": {
+    "base_commit": "977a9d3451ada41c8fe02f77d5d10132ff4a7028",
+    "dirty": true,
+    "agent_version": "0.1.0",
+    "python": "3.13.9",
+    "dll_sha256": {
+      "PcTelemetry.Agent.dll": "537d13504159b6a452907ecb72d0992a4e040e8fa6aae39b3ee160dd8a2ef8c8",
+      "PcTelemetry.Collector.dll": "59cc92fec3f58f3c4c4b9bab62ea3ca438a23161ae1612543e26148d18e6eb45"
+    }
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os": "Windows 10.0.26200"
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_buffer_recovery.py --exe <PcTelemetry.Agent.exe> --scenario cap-bytes --pc-label pc-a --warmup-seconds 30 --after-seconds 60"
+  ],
+  "plan_s": {
+    "total": 390,
+    "actions": [
+      [
+        30,
+        "server_stop"
+      ],
+      [
+        330,
+        "server_start"
+      ]
+    ]
+  },
+  "timeline": [
+    {
+      "at_s": 30.1,
+      "utc": "2026-11-11T03:38:06.429089Z",
+      "action": "server_stop"
+    },
+    {
+      "at_s": 330.2,
+      "utc": "2026-11-11T03:43:06.498223Z",
+      "action": "server_start"
+    }
+  ],
+  "server_downtime_utc": [
+    [
+      "2026-11-11T03:38:06.429130Z",
+      "2026-11-11T03:43:06.500015Z"
+    ],
+    [
+      "2026-11-11T03:44:08.981598Z",
+      null
+    ]
+  ],
+  "runs": [
+    {
+      "started": "2026-11-11T03:37:36.316535Z",
+      "ended": "2026-11-11T03:44:08.981181Z",
+      "exit_code": 0,
+      "forced_kill": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "agent final exit code",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq) on server",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server ledger batches == agent sent ledger (ids)",
+      "expected": "74 ids",
+      "actual": "74 ids",
+      "pass": true
+    },
+    {
+      "name": "server ledger sha256 == agent frozen sha256",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "server samples == sum(sample_count) of sent ledger",
+      "expected": 221,
+      "actual": 221,
+      "pass": true
+    },
+    {
+      "name": "server samples rows == ledger samples",
+      "expected": 221,
+      "actual": 221,
+      "pass": true
+    },
+    {
+      "name": "pending batches after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "open samples after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server seqs intersect pruned ranges",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "seq holes not explained by pruning (<= forced restarts)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "ack mismatches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "pruned samples > 0",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "gap reason",
+      "expected": [
+        "max_bytes"
+      ],
+      "actual": [
+        "max_bytes"
+      ],
+      "pass": true
+    },
+    {
+      "name": "dropped_samples_total == sum(gap samples)",
+      "expected": 168,
+      "actual": 168,
+      "pass": true
+    },
+    {
+      "name": "buffer_pruned events",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "status file showed last_gap",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "server seqs + pruned ranges cover collected range",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    }
+  ],
+  "detail": {
+    "gaps": [
+      {
+        "reason": "max_bytes",
+        "state": "pending",
+        "first_seq": 27,
+        "last_seq": 71,
+        "first_observed_at": "2026-11-11T03:38:06.509999Z",
+        "last_observed_at": "2026-11-11T03:38:50.498705Z",
+        "batches": 15,
+        "samples": 45,
+        "bytes": 60988
+      },
+      {
+        "reason": "max_bytes",
+        "state": "pending",
+        "first_seq": 72,
+        "last_seq": 134,
+        "first_observed_at": "2026-11-11T03:38:51.496602Z",
+        "last_observed_at": "2026-11-11T03:39:53.505940Z",
+        "batches": 21,
+        "samples": 63,
+        "bytes": 85254
+      },
+      {
+        "reason": "max_bytes",
+        "state": "pending",
+        "first_seq": 135,
+        "last_seq": 194,
+        "first_observed_at": "2026-11-11T03:39:54.499010Z",
+        "last_observed_at": "2026-11-11T03:40:53.508863Z",
+        "batches": 20,
+        "samples": 60,
+        "bytes": 81211
+      }
+    ],
+    "status_last_gap_seen": {
+      "reason": "max_bytes",
+      "from_observed_at_utc": "2026-11-11T03:39:54.499010Z",
+      "to_observed_at_utc": "2026-11-11T03:40:53.508863Z",
+      "samples": 60,
+      "recorded_at_utc": "2026-11-11T03:42:42.834472Z"
+    }
+  },
+  "server_counts": {
+    "batches": 74,
+    "samples": 221,
+    "measurements": 3315,
+    "reaggregate": 221
+  },
+  "agent_buffer": {
+    "sent_ledger": 74,
+    "pending": 0,
+    "quarantined": 0,
+    "open_samples": 0,
+    "dropped_samples_total": 168,
+    "max_attempts": 1
+  },
+  "seq_holes": [],
+  "restart_restore": {
+    "restored_open_samples": [
+      0
+    ],
+    "restored_batches_frozen": [
+      0
+    ],
+    "pending_at_open": [
+      0
+    ]
+  },
+  "events": {
+    "agent_started": 1,
+    "agent_stopped": 1,
+    "boot_session_started": 1,
+    "buffer_opened": 1,
+    "buffer_pruned": 3,
+    "sensor_config_selected": 1,
+    "upload_recovered": 1,
+    "upload_retrying": 1
+  },
+  "final_status_upload": {
+    "configured": true,
+    "state": "ok",
+    "pending_batches": 0,
+    "last_success_at_utc": "2026-11-11T03:44:07.907850Z",
+    "quarantined_batches": 0,
+    "oldest_pending_at_utc": null,
+    "dropped_samples_total": 168,
+    "last_gap": {
+      "reason": "max_bytes",
+      "from_observed_at_utc": "2026-11-11T03:39:54.499010Z",
+      "to_observed_at_utc": "2026-11-11T03:40:53.508863Z",
+      "samples": 60,
+      "recorded_at_utc": "2026-11-11T03:42:42.834472Z"
+    }
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}

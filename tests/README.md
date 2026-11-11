@@ -55,3 +55,23 @@ CI: .github/workflows/contracts.yml에서 Windows/Ubuntu 각각 전체 검사를
 지정하고 `python tests/run_backend.py`를 실행한다. DB가 없으면 통합 검사는 미실행으로 기록한다.
 [실행·설계·제한](../backend/README.md), [증거](results/s1-03-backend.json)를 참고한다.
 S1-01 회귀 증거는 [s1-03-contract-regression.json](results/s1-03-contract-regression.json)이다.
+
+## S2-01 SQLite 버퍼 장애 복구
+
+실제 에이전트(`PcTelemetry.Agent.exe run`)를 참조 API `Store`(SQLite 원장)에 붙여 장애를 만든 뒤
+서버 원장·샘플 행과 에이전트 `state/buffer.sqlite3`(전송 원장·누락 범위)·순번 범위를 대조한다.
+토큰·machine_id는 매 실행 합성값이며 보고서에 쓰지 않는다. 결과: `tests/results/s2-01/`.
+
+| 시나리오 | 재현 | 기대값 |
+|---|---|---|
+| `outage` | 서버 30분 중지(열린 keep-alive 연결도 끊음), 중지 중 에이전트 강제 종료 1회 | 장애 중 관측 샘플 전송, 중복 0, 원장 일치, 잔여 0 |
+| `kill` | 서버 정상 중 `TerminateProcess` 3회 후 재시작 | 미동결 샘플 복원, 중복 0, 순번 구멍은 재시작 예약 건너뛰기만 |
+| `response-loss` | 서버가 커밋 후 응답 없이 연결 종료(5번째 새 배치마다, 10회) | 같은 ID 재전송에 저장된 200, 서버 배치 = 고유 ID |
+| `cap-age` / `cap-bytes` | 시험용 상한(120초 / 150,000바이트)보다 오래 서버 중지 | 오래된 미전송부터 제거, 누락 범위가 gaps·이벤트·상태 파일에 남고 서버 순번과 겹치지 않음 |
+
+```powershell
+dotnet build agents/windows/src/PcTelemetry.Agent -c Release
+python tests/run_buffer_recovery.py --exe <PcTelemetry.Agent.exe> --scenario outage --pc-label pc-a
+```
+
+S1-03 FastAPI/PostgreSQL 경로의 같은 시나리오는 S2-04와 함께 검증한다(미실행).

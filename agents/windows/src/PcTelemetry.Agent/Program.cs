@@ -4,7 +4,9 @@
 //       센서를 탐색해 계약 매핑(정의·원천 연결)을 출력한다. 임시 상태 디렉터리를 쓴다.
 //   PcTelemetry.Agent run [--state-dir DIR] [--seconds N]
 //                         [--server URL --machine-id UUID --token-file FILE] [--status-file PATH|none]
-//       콘솔에서 1초 수집. --machine-id가 있으면 3초 배치를 동결해 스풀에 쌓고, --server가 있으면 전송한다.
+//                         [--buffer-max-age-seconds N] [--buffer-max-bytes N]
+//       콘솔에서 1초 수집. --machine-id가 있으면 샘플을 SQLite 버퍼(state\buffer.sqlite3)에 즉시 저장하고
+//       3초 배치로 동결한다. --server가 있으면 전송한다. 버퍼 상한 기본값은 24시간/500MB(S2-01, README 5절).
 //   PcTelemetry.Agent service [위와 같은 옵션]
 //       Windows 서비스로 실행(LocalSystem 필요, S1-02a 5.5).
 
@@ -22,7 +24,8 @@ internal sealed record AgentOptions(
     Guid? MachineId,
     string? TokenFile,
     int IntervalMs,
-    string? StatusFile);
+    string? StatusFile,
+    BufferOptions Buffer);
 
 internal static class Program
 {
@@ -51,7 +54,15 @@ internal static class Program
                 o.GetValueOrDefault("status-file") is { } sf
                     ? (sf == "none" ? null : sf)
                     : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                        "PcTelemetry", "status", "agent-status.json"));
+                        "PcTelemetry", "status", "agent-status.json"),
+                new BufferOptions
+                {
+                    MaxAge = o.TryGetValue("buffer-max-age-seconds", out var age)
+                        ? TimeSpan.FromSeconds(int.Parse(age)) : TimeSpan.FromHours(24),
+                    MaxBytes = o.TryGetValue("buffer-max-bytes", out var bytes) ? long.Parse(bytes) : 500L * 1024 * 1024,
+                });
+            if (options.Buffer.MaxAge <= TimeSpan.Zero || options.Buffer.MaxBytes <= 0)
+                throw new ArgumentException("buffer limits must be positive");
             if (options.Server is not null && (options.MachineId is null || options.TokenFile is null))
                 throw new ArgumentException("--server requires --machine-id and --token-file");
         }
@@ -94,10 +105,12 @@ internal static class Program
         }
 
         var started = DateTime.UtcNow;
-        Spool? spool = options.MachineId is null ? null : new Spool(store.Directory, events);
-        var batcher = spool is null ? null : new Batcher(options.MachineId!.Value, spool);
+        // 재시작 복원: 이전 프로세스의 미동결 샘플을 동결하고 S1-02b 파일 스풀을 가져온다.
+        using var buffer = options.MachineId is null ? null
+            : SqliteBuffer.Open(store.PathOf(SqliteBuffer.FileName), options.MachineId.Value, events, options.Buffer);
+        buffer?.ImportLegacySpool(store.Directory);
         using var source = new LhmSource();
-        var collector = new SensorCollector(source, new WindowsClock(), new RegistryBootId(), events, store, batcher,
+        var collector = new SensorCollector(source, new WindowsClock(), new RegistryBootId(), events, store, buffer,
             new CollectorOptions { IntervalMs = options.IntervalMs });
 
         while (true)
@@ -120,33 +133,34 @@ internal static class Program
         using var stop = CancellationTokenSource.CreateLinkedTokenSource(token);
         if (options.Seconds is { } seconds) stop.CancelAfter(TimeSpan.FromSeconds(seconds));
         using var uploader = options.Server is null ? null
-            : new Uploader(options.Server, options.TokenFile!, spool!, events);
+            : new Uploader(options.Server, options.TokenFile!, buffer!, events);
         using var uploadStop = new CancellationTokenSource();
 
         var collect = Task.Run(() => collector.RunAsync(stop.Token), CancellationToken.None);
         var upload = uploader is null ? Task.CompletedTask : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
         var statsPath = store.PathOf("stats.json");
         var tick = 0;
-        WriteStatus(options.StatusFile, collecting: true, uploader, spool);
+        WriteStatus(options.StatusFile, collecting: true, uploader, buffer);
         while (!collect.IsCompleted)
         {
             await Task.WhenAny(collect, Task.Delay(TimeSpan.FromSeconds(10), CancellationToken.None));
-            WriteStatus(options.StatusFile, collecting: !collect.IsCompleted, uploader, spool);
+            WriteStatus(options.StatusFile, collecting: !collect.IsCompleted, uploader, buffer);
             if (++tick % 6 == 0 || collect.IsCompleted)
-                WriteStats(statsPath, options, started, source, collector, uploader, spool);
+                WriteStats(statsPath, options, started, source, collector, uploader, buffer);
         }
         await collect;
+        buffer?.Prune();
         await uploadStop.CancelAsync();
         await upload;
         if (uploader is not null) await uploader.DrainAsync(TimeSpan.FromSeconds(20));
-        WriteStats(statsPath, options, started, source, collector, uploader, spool);
-        WriteStatus(options.StatusFile, collecting: false, uploader, spool);
+        WriteStats(statsPath, options, started, source, collector, uploader, buffer);
+        WriteStatus(options.StatusFile, collecting: false, uploader, buffer);
         if (console) Console.WriteLine($"stats: {statsPath}");
         return 0;
     }
 
     private static void WriteStats(string path, AgentOptions options, DateTime started, LhmSource source,
-        SensorCollector collector, Uploader? uploader, Spool? spool)
+        SensorCollector collector, Uploader? uploader, SqliteBuffer? buffer)
     {
         var s = collector.Stats;
         var report = new Dictionary<string, object?>
@@ -179,8 +193,21 @@ internal static class Program
                 ["sent"] = uploader.Sent,
                 ["retries"] = uploader.Retries,
                 ["quarantined"] = uploader.Quarantined,
-                ["pending"] = spool?.Pending().Count,
+                ["ack_mismatches"] = uploader.AckMismatches,
             },
+            ["buffer"] = buffer?.Stats() is { } b ? new Dictionary<string, object?>
+            {
+                ["pending_batches"] = b.PendingBatches,
+                ["quarantined_batches"] = b.QuarantinedBatches,
+                ["open_samples"] = b.OpenSamples,
+                ["unsent_bytes"] = b.UnsentBytes,
+                ["oldest_unsent_at_utc"] = b.OldestUnsentUtc is { } t ? Utc.Format(t) : null,
+                ["sent_ledger_batches"] = b.SentLedgerBatches,
+                ["dropped_samples_total"] = b.DroppedSamplesTotal,
+                ["file_bytes"] = b.FileBytes,
+                ["max_age_hours"] = buffer.Options.MaxAge.TotalHours,
+                ["max_bytes"] = buffer.Options.MaxBytes,
+            } : null,
         };
         StateStore.WriteAtomic(path, JsonSerializer.Serialize(report, Pretty));
     }
@@ -188,10 +215,19 @@ internal static class Program
     /// <summary>
     /// 일반 사용자 셸(S1-06)이 읽는 공개 상태. 토큰·machine_id·센서값·호스트 정보를 넣지 않는다.
     /// 상태 디렉터리(서비스 전용 ACL)와 분리해 %ProgramData%\PcTelemetry\status에 둔다. 실패해도 수집은 계속한다.
+    /// S2-01: 버퍼 상한으로 지운 누락 범위는 관측 시각·샘플 수만 싣는다(부팅 세션 ID·순번은 state\buffer.sqlite3 gaps 표).
     /// </summary>
-    internal static void WriteStatus(string? path, bool collecting, Uploader? uploader, Spool? spool)
+    internal static void WriteStatus(string? path, bool collecting, Uploader? uploader, SqliteBuffer? buffer)
     {
         if (path is null) return;
+        BufferStats? b = null;
+        try
+        {
+            b = buffer?.Stats();
+        }
+        catch (Microsoft.Data.Sqlite.SqliteException)
+        {
+        }
         var status = new Dictionary<string, object?>
         {
             ["schema"] = "pc-telemetry/agent-status/1",
@@ -201,9 +237,20 @@ internal static class Program
             ["upload"] = new Dictionary<string, object?>
             {
                 ["configured"] = uploader is not null,
-                ["state"] = uploader?.State ?? (spool is null ? "not_configured" : "idle"),
-                ["pending_batches"] = spool?.Pending().Count,
+                ["state"] = uploader?.State ?? (buffer is null ? "not_configured" : "idle"),
+                ["pending_batches"] = b?.PendingBatches,
                 ["last_success_at_utc"] = uploader?.LastSuccessUtc is { } t ? Utc.Format(t) : null,
+                ["quarantined_batches"] = b?.QuarantinedBatches,
+                ["oldest_pending_at_utc"] = b?.OldestUnsentUtc is { } o ? Utc.Format(o) : null,
+                ["dropped_samples_total"] = b?.DroppedSamplesTotal,
+                ["last_gap"] = b?.LastGap is { } g ? new Dictionary<string, object?>
+                {
+                    ["reason"] = g.Reason,
+                    ["from_observed_at_utc"] = Utc.Format(g.FirstObservedUtc),
+                    ["to_observed_at_utc"] = Utc.Format(g.LastObservedUtc),
+                    ["samples"] = g.Samples,
+                    ["recorded_at_utc"] = Utc.Format(g.RecordedAtUtc),
+                } : null,
             },
         };
         try

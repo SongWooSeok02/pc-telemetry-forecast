@@ -23,6 +23,7 @@ import threading
 import time
 import uuid
 from collections import Counter, defaultdict
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -224,8 +225,11 @@ def main():
     bodies = backend.bodies()
     configs = {k[len('_payload_'):]: v for k, v in registered.items() if k.startswith('_payload_')}
     result = analyse(bodies, backend.counts(), configs)
-    pending = len(list((state / 'spool').glob('*.json')))
-    quarantined = len(list((state / 'quarantine').glob('*.json')))
+    # S2-01: 동결 배치는 state/buffer.sqlite3에 있다(파일 스풀 대체).
+    with closing(sqlite3.connect(state / 'buffer.sqlite3')) as buf:
+        states = dict(buf.execute('SELECT state, count(*) FROM batches GROUP BY state').fetchall())
+        pending = states.get('pending', 0) + buf.execute('SELECT count(*) FROM open_samples').fetchone()[0]
+        quarantined = states.get('quarantined', 0)
     event_types = Counter(e['type'] for e in events)
 
     checks = [
@@ -235,7 +239,7 @@ def main():
         ('duplicate (boot_session_id, sample_seq)', 0, result['seq_duplicates']),
         ('sample_seq gaps (only reservation skips at restarts)', a.restarts, result['seq_gaps']),
         ('non-ok readings carrying a value (0 instead of null)', 0, result['non_ok_with_value']),
-        ('spool pending after drain', 0, pending),
+        ('buffer pending (batches + open samples) after drain', 0, pending),
         ('quarantined batches', 0, quarantined),
         ('SENSOR_CONFIG_PENDING retried then accepted', True, event_types['sensor_config_pending'] >= 1 and result['samples'] > 0),
         ('interval on-time ratio (|dt-1000|<=100ms) >= 0.99', True, (result['interval_ms']['on_time_ratio'] or 0) >= 0.99),
