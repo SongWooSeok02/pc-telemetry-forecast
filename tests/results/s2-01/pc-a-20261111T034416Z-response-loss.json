@@ -1,0 +1,190 @@
+{
+  "task": "S2-01",
+  "scenario": "response-loss",
+  "kind": "real agent -> tests/reference_api.py Store (SQLite ledger) over loopback HTTP",
+  "executed_at_utc": {
+    "started": "2026-11-11T03:44:16.494997Z",
+    "finished": "2026-11-11T03:51:48.778822Z"
+  },
+  "build": {
+    "base_commit": "977a9d3451ada41c8fe02f77d5d10132ff4a7028",
+    "dirty": true,
+    "agent_version": "0.1.0",
+    "python": "3.13.9",
+    "dll_sha256": {
+      "PcTelemetry.Agent.dll": "537d13504159b6a452907ecb72d0992a4e040e8fa6aae39b3ee160dd8a2ef8c8",
+      "PcTelemetry.Collector.dll": "59cc92fec3f58f3c4c4b9bab62ea3ca438a23161ae1612543e26148d18e6eb45"
+    }
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os": "Windows 10.0.26200"
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_buffer_recovery.py --exe <PcTelemetry.Agent.exe> --scenario response-loss --pc-label pc-a"
+  ],
+  "plan_s": {
+    "total": 450,
+    "actions": []
+  },
+  "timeline": [],
+  "server_downtime_utc": [
+    [
+      "2026-11-11T03:51:48.779596Z",
+      null
+    ]
+  ],
+  "runs": [
+    {
+      "started": "2026-11-11T03:44:16.508021Z",
+      "ended": "2026-11-11T03:51:48.778769Z",
+      "exit_code": 0,
+      "forced_kill": false
+    }
+  ],
+  "checks": [
+    {
+      "name": "agent final exit code",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq) on server",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server ledger batches == agent sent ledger (ids)",
+      "expected": "150 ids",
+      "actual": "150 ids",
+      "pass": true
+    },
+    {
+      "name": "server ledger sha256 == agent frozen sha256",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "server samples == sum(sample_count) of sent ledger",
+      "expected": 448,
+      "actual": 448,
+      "pass": true
+    },
+    {
+      "name": "server samples rows == ledger samples",
+      "expected": 448,
+      "actual": 448,
+      "pass": true
+    },
+    {
+      "name": "pending batches after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "open samples after recovery",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "server seqs intersect pruned ranges",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "seq holes not explained by pruning (<= forced restarts)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "ack mismatches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "responses dropped after commit",
+      "expected": 10,
+      "actual": 10,
+      "pass": true
+    },
+    {
+      "name": "each dropped response replayed with same id (server returned stored 200)",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "server batches == unique ids",
+      "expected": 150,
+      "actual": 150,
+      "pass": true
+    }
+  ],
+  "detail": {
+    "dropped_responses": 10,
+    "replayed_requests": 10,
+    "ok_requests": 160
+  },
+  "server_counts": {
+    "batches": 150,
+    "samples": 448,
+    "measurements": 6720,
+    "reaggregate": 448
+  },
+  "agent_buffer": {
+    "sent_ledger": 150,
+    "pending": 0,
+    "quarantined": 0,
+    "open_samples": 0,
+    "dropped_samples_total": 0,
+    "max_attempts": 2
+  },
+  "seq_holes": [],
+  "restart_restore": {
+    "restored_open_samples": [
+      0
+    ],
+    "restored_batches_frozen": [
+      0
+    ],
+    "pending_at_open": [
+      0
+    ]
+  },
+  "events": {
+    "agent_started": 1,
+    "agent_stopped": 1,
+    "boot_session_started": 1,
+    "buffer_opened": 1,
+    "sensor_config_selected": 1,
+    "upload_recovered": 10,
+    "upload_retrying": 10
+  },
+  "final_status_upload": {
+    "configured": true,
+    "state": "ok",
+    "pending_batches": 0,
+    "last_success_at_utc": "2026-11-11T03:51:47.677030Z",
+    "quarantined_batches": 0,
+    "oldest_pending_at_utc": null,
+    "dropped_samples_total": 0,
+    "last_gap": null
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}

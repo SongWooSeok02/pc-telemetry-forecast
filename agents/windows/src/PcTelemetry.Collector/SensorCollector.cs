@@ -32,7 +32,7 @@ public sealed class SensorCollector
     private readonly IClock _clock;
     private readonly IBootIdProvider _bootIds;
     private readonly IEventSink _events;
-    private readonly Batcher? _batcher;
+    private readonly ISampleBatcher? _batcher;
     private readonly StateStore _store;
     private readonly CollectorOptions _options;
     private readonly ComponentRegistry _components;
@@ -51,7 +51,7 @@ public sealed class SensorCollector
     private long? _prevSampleMono;
 
     public SensorCollector(ISensorSource source, IClock clock, IBootIdProvider bootIds, IEventSink events,
-        StateStore store, Batcher? batcher, CollectorOptions? options = null)
+        StateStore store, ISampleBatcher? batcher, CollectorOptions? options = null)
     {
         _source = source;
         _clock = clock;
@@ -386,9 +386,10 @@ public interface IBatchSink
 }
 
 /// <summary>
-/// 3초(기본 3샘플) 단위로 샘플을 모아 동결한다. 부팅 세션·구성이 바뀌거나 절전 재개 시 즉시 끊는다.
+/// 메모리 배처(테스트·버퍼 없는 실행용). 3초(기본 3샘플) 단위로 샘플을 모아 동결한다. 부팅 세션·구성이 바뀌거나 절전 재개 시 즉시 끊는다.
+/// 운영 에이전트는 샘플을 즉시 영속화하는 <see cref="SqliteBuffer"/>를 쓴다.
 /// </summary>
-public sealed class Batcher(Guid machineId, IBatchSink sink, int samplesPerBatch = 3)
+public sealed class Batcher(Guid machineId, IBatchSink sink, int samplesPerBatch = 3) : ISampleBatcher
 {
     private readonly List<Sample> _pending = [];
     private (Guid Boot, Guid Config)? _key;

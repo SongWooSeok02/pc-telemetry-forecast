@@ -107,21 +107,4 @@ public class ContractTests
     [InlineData(504, "REQUEST_TIMEOUT", UploadAction.Retry)]
     public void Upload_policy_follows_contract(int? status, string? code, UploadAction expected) =>
         Assert.Equal(expected, UploadPolicy.Classify(status, code));
-
-    [Fact]
-    public void Spool_prunes_expired_batches_and_records_range()
-    {
-        using var dir = new TempDir();
-        var sink = new ListSink();
-        var now = new DateTime(2026, 11, 4, 0, 0, 0, DateTimeKind.Utc);
-        var spool = new Spool(dir.Path, sink, () => now);
-        var id = Guid.NewGuid();
-        var batch = BatchFactory.Freeze(id, id, id, [new Sample(0, now, 0, [Reading.Ok("cpu0/total/load", "%", 1m)])])[0];
-        spool.Accept(batch);
-        now = now.AddHours(25);
-        spool.Accept(batch with { FirstSeq = 1 });
-        Assert.Equal(1, spool.Prune());
-        Assert.Single(spool.Pending());
-        Assert.Single(sink.OfType("buffer_pruned"));
-    }
 }

@@ -1,0 +1,255 @@
+{
+  "task": "S1-02b",
+  "kind": "agent -> reference HTTP API integration (real sensors, loopback)",
+  "executed_at_utc": {
+    "started": "2026-11-11T03:52:04.131376Z",
+    "finished": "2026-11-11T03:54:09.406129Z"
+  },
+  "build": {
+    "base_commit": "977a9d3451ada41c8fe02f77d5d10132ff4a7028",
+    "dirty": true,
+    "agent_version": "0.1.0.0",
+    "lhm_version": "0.9.6.0",
+    "python": "3.13.9"
+  },
+  "environment": {
+    "pc_label": "pc-a",
+    "os_version": "Microsoft Windows NT 10.0.26200.0",
+    "is_elevated": true,
+    "is_system": false,
+    "pawnio_installed": true,
+    "pawnio_version": "2.2.0.0",
+    "sensor_sources": [
+      "lhm-0.9.6:Cpu:Clock:max(16xclock)",
+      "lhm-0.9.6:Cpu:Load:CPU Core Max",
+      "lhm-0.9.6:Cpu:Load:CPU Total",
+      "lhm-0.9.6:Cpu:Power:CPU Cores",
+      "lhm-0.9.6:Cpu:Power:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:CPU Package",
+      "lhm-0.9.6:Cpu:Temperature:Core Max",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Clock:GPU Memory",
+      "lhm-0.9.6:GpuNvidia:Load:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Power:GPU Package",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Core",
+      "lhm-0.9.6:GpuNvidia:Temperature:GPU Hot Spot",
+      "lhm-0.9.6:none"
+    ]
+  },
+  "reproduction": [
+    "dotnet build agents/windows/src/PcTelemetry.Agent -c Release",
+    "python tests/run_agent_integration.py --exe <PcTelemetry.Agent.exe> --seconds 60 --register-delay 5.0 --pc-label pc-a --restarts 1"
+  ],
+  "duration_s_per_run": 60,
+  "runs": [
+    {
+      "exit_code": 0,
+      "samples": 59,
+      "boot_session_id": "272bd764-aab4-4e45-9065-5821cf703a66"
+    },
+    {
+      "exit_code": 0,
+      "samples": 59,
+      "boot_session_id": "272bd764-aab4-4e45-9065-5821cf703a66"
+    }
+  ],
+  "checks": [
+    {
+      "name": "agent exit codes",
+      "expected": [
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0
+      ],
+      "pass": true
+    },
+    {
+      "name": "samples accepted by API == samples collected",
+      "expected": 118,
+      "actual": 118,
+      "pass": true
+    },
+    {
+      "name": "boot sessions (restarts keep the session)",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "name": "duplicate (boot_session_id, sample_seq)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "sample_seq gaps (only reservation skips at restarts)",
+      "expected": 1,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "name": "non-ok readings carrying a value (0 instead of null)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "buffer pending (batches + open samples) after drain",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "quarantined batches",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "name": "SENSOR_CONFIG_PENDING retried then accepted",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "interval on-time ratio (|dt-1000|<=100ms) >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    },
+    {
+      "name": "supported sensor ok ratio >= 0.99",
+      "expected": true,
+      "actual": true,
+      "pass": true
+    }
+  ],
+  "result": {
+    "server_counts": {
+      "batches": 40,
+      "samples": 118,
+      "measurements": 1770
+    },
+    "boot_sessions": 1,
+    "sensor_configs_used": [
+      "f17a2623-2d64-4f83-b878-45fb442e496e"
+    ],
+    "samples": 118,
+    "seq_first": 0,
+    "seq_last": 658,
+    "seq_duplicates": 0,
+    "seq_gaps": 1,
+    "interval_ms": {
+      "count": 116,
+      "min": 985,
+      "max": 1015,
+      "on_time_pm10pct": 116,
+      "on_time_ratio": 1.0
+    },
+    "supported_ok_ratio": 1.0,
+    "non_ok_with_value": 0,
+    "quality_counts": {
+      "cpu0/core-max/clock": {
+        "ok": 118
+      },
+      "cpu0/core-max/load": {
+        "ok": 118
+      },
+      "cpu0/core-max/temp": {
+        "ok": 118
+      },
+      "cpu0/cores/power": {
+        "ok": 118
+      },
+      "cpu0/fan": {
+        "unsupported:sensor_not_exposed": 118
+      },
+      "cpu0/package/power": {
+        "ok": 118
+      },
+      "cpu0/package/temp": {
+        "ok": 118
+      },
+      "cpu0/total/load": {
+        "ok": 118
+      },
+      "gpu0/board/power": {
+        "ok": 118
+      },
+      "gpu0/core/clock": {
+        "ok": 118
+      },
+      "gpu0/core/load": {
+        "ok": 118
+      },
+      "gpu0/core/temp": {
+        "ok": 118
+      },
+      "gpu0/fan": {
+        "unsupported:sensor_not_exposed": 118
+      },
+      "gpu0/hotspot/temp": {
+        "ok": 118
+      },
+      "gpu0/memory/clock": {
+        "ok": 118
+      }
+    },
+    "support": {
+      "cpu0/core-max/clock": "supported",
+      "cpu0/core-max/load": "supported",
+      "cpu0/core-max/temp": "supported",
+      "cpu0/cores/power": "supported",
+      "cpu0/fan": "unsupported",
+      "cpu0/package/power": "supported",
+      "cpu0/package/temp": "supported",
+      "cpu0/total/load": "supported",
+      "gpu0/board/power": "supported",
+      "gpu0/core/clock": "supported",
+      "gpu0/core/load": "supported",
+      "gpu0/core/temp": "supported",
+      "gpu0/fan": "unsupported",
+      "gpu0/hotspot/temp": "supported",
+      "gpu0/memory/clock": "supported"
+    }
+  },
+  "agent_stats": {
+    "cycles": 61,
+    "samples": 59,
+    "source_errors": 0,
+    "cycle_failures": 0,
+    "resumes": 0,
+    "clock_jumps": 0,
+    "intervals": {
+      "total": 58,
+      "on_time_pm10pct": 58,
+      "min_ms": 985,
+      "max_ms": 1014
+    },
+    "upload": {
+      "sent": 20,
+      "retries": 0,
+      "quarantined": 0,
+      "ack_mismatches": 0
+    },
+    "lhm_open_ms": 938
+  },
+  "events": {
+    "agent_started": 2,
+    "agent_stopped": 2,
+    "boot_session_started": 1,
+    "buffer_opened": 2,
+    "sensor_config_pending": 1,
+    "sensor_config_selected": 1,
+    "upload_recovered": 1,
+    "upload_retrying": 1
+  },
+  "config_registration_utc": {
+    "f17a2623-2d64-4f83-b878-45fb442e496e": "2026-11-11T03:52:13.325790Z"
+  },
+  "agent_stderr_tail": "",
+  "success": true
+}
