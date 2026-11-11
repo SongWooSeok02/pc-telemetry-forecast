@@ -36,6 +36,8 @@ try {
         $deadline = (Get-Date).AddSeconds(30)
         while ((Get-Service $ServiceName -ErrorAction SilentlyContinue) -and (Get-Date) -lt $deadline) { Start-Sleep -Milliseconds 500 }
     }
+    # S2-02 이벤트 로그 원본 등록만 지운다(이미 기록된 항목은 Windows 로그 보존 정책을 따른다).
+    if ([Diagnostics.EventLog]::SourceExists($ServiceName)) { Remove-EventLog -Source $ServiceName }
     # 셸이 열려 있으면 파일이 잠긴다. 사용자 UI는 종료해도 수집에 영향이 없다.
     Get-Process PcTelemetry.Shell -ErrorAction SilentlyContinue | Stop-Process -Force
     if (Test-Path $Shortcut) { Remove-Item -Force $Shortcut }
@@ -52,6 +54,7 @@ try {
         Where-Object { Test-Path (Join-Path $_.FullName 'AppData\Local\PcTelemetry\Shell') })
     $report.residue = [ordered]@{
         service = [bool](Get-Service $ServiceName -ErrorAction SilentlyContinue)
+        event_source = [Diagnostics.EventLog]::SourceExists($ServiceName)
         install_dir = Test-Path $InstallDir
         shortcut = Test-Path $Shortcut
         data_root = Test-Path $DataRoot

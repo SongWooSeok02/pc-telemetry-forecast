@@ -131,6 +131,9 @@ public sealed class Uploader : IDisposable
                     _buffer.MarkSent(batch.BatchId, ReceivedAt(result.Body));
                     Sent++;
                     _attempt = 0;
+                    // S2-02: 토큰 파일 권한·인증 오류가 풀린 시점을 남긴다(자동 복구 확인용).
+                    if (State == "paused_auth")
+                        Emit("upload_auth_recovered", new() { ["batch_id"] = batch.BatchId.ToString("D") });
                     State = "ok";
                     LastSuccessUtc = DateTime.UtcNow;
                     if (_retryingSince is { } since)

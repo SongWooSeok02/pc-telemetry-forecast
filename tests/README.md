@@ -75,3 +75,30 @@ python tests/run_buffer_recovery.py --exe <PcTelemetry.Agent.exe> --scenario out
 ```
 
 S1-03 FastAPI/PostgreSQL 경로의 같은 시나리오는 S2-04와 함께 검증한다(미실행).
+
+## S2-02 Windows 서비스 수명주기
+
+관리자 프롬프트에서 실행한다. `Install-PcTelemetry.ps1`로 서비스(LocalSystem)를 새로 설치하고, 고정 루프백 포트의
+참조 API(합성 토큰·machine_id)로 전송하게 한 뒤 시나리오를 실행한다. 작업 폴더(`--work`)에 참조 원장·합성 자격 증명·
+체크포인트를 남겨 재부팅·로그아웃 뒤 `resume` 단계가 이어서 검증한다. 결과: `tests/results/s2-02/`.
+
+| 단계 / 시나리오 | 재현 | 기대값 |
+|---|---|---|
+| `install` / install | 깨끗한 설치 | LocalSystem·자동 시작·따옴표 경로·복구 60/60/300초·failureflag·이벤트 원본·필요 권한 1개, 세션 0에서 수집 |
+| access_check | 시작 후 `service_access_check` | 계정 local_system, 상태 폴더·버퍼·토큰 파일 ok, 드라이버 필요 센서 권한 부족 0, 토큰 권한 `SeChangeNotifyPrivilege`만 |
+| graceful_stop_start | `sc stop` → `sc start` (서버 정상 / 서버 중지) | 5초 안에 중지, 실행 표시 삭제·WAL 체크포인트·`collecting=false`, 같은 부팅 세션·순번 재사용 없음, 대기 배치 재전송 |
+| forced_kill_recovery | 서비스 프로세스 `taskkill /F` | 수동 시작 없이 SCM 복구(60초), `unclean_shutdown_detected`, 미동결 샘플 복원 |
+| ui_close | 설치된 셸 실행 후 창 닫기 | 셸만 종료, 서비스 PID 유지, 상태 파일 계속 갱신 |
+| token_unreadable | `state\device.token` 이름 변경 후 복원 | 수집 계속, `upload_paused_auth`(TOKEN_FILE_UNREADABLE) → `upload_auth_recovered` |
+| state_write_denied | 상태 폴더에 SYSTEM 쓰기 거부 ACE 후 시작, 이후 제거 | 이벤트 1002(원인 포함)·종료 코드 1·SCM 재시도, ACE 제거 후 수동 시작 없이 복구 |
+| `resume --expect reboot` | 재부팅 후 로그인 | 새 부팅 세션·순번 0부터, 부팅 후 자동 시작, 이전 세션 정상 종료(비정상 표시 없음), 버퍼 전송 완료 |
+| `resume --expect logoff` | 로그아웃 후 다시 로그인 | 같은 서비스 프로세스·부팅 세션, 로그아웃 동안 샘플 간격 2.5초 이하·순번 구멍 없음 |
+
+```powershell
+powershell -ExecutionPolicy Bypass -File desktop\windows\install\Publish-PcTelemetry.ps1 -Out <publish> -NoWebView2Bootstrapper
+python tests/run_service_lifecycle.py install --publish <publish> --pc-label pc-a --work <work>
+# 재부팅·로그인 후 / 로그아웃·로그인 후
+python tests/run_service_lifecycle.py resume --expect reboot --publish <publish> --pc-label pc-a --work <work>
+python tests/run_service_lifecycle.py resume --expect logoff --publish <publish> --pc-label pc-a --work <work>
+python tests/run_service_lifecycle.py uninstall --publish <publish> --pc-label pc-a --work <work>
+```

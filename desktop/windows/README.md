@@ -40,13 +40,15 @@ $exe = "desktop/windows/src/PcTelemetry.Shell/bin/Release/net10.0-windows/win-x6
 | 항목 | 설정 | 근거 |
 |---|---|---|
 | 수집 서비스 | `PcTelemetryAgent`, **LocalSystem**, 자동 시작, 실패 시 재시작(60s/60s/300s) | S1-02a 5.5: LocalService로는 CPU 센서 null |
+| 복구·로그 (S2-02) | 실패 시 재시작에 `failureflag=1`(오류 종료 코드도 복구 대상). 이벤트 로그 원본 `PcTelemetryAgent`(Application) 등록 | [S2-02 보고서](../../docs/collector/s2-02-report.md) |
+| 최소 권한 (S2-02) | 서비스 SID `unrestricted`, 필요 권한 `SeChangeNotifyPrivilege`만(`sc privs`). 토큰에서 SeDebug·SeLoadDriver·SeTcb 등 제거 | PC-A 실측: 이 상태로 센서 13/15 ok |
 | 서비스 경로 | 따옴표로 감싼 `ImagePath`를 레지스트리에 쓰고 다시 읽어 확인 | S1-02a: PowerShell 5.1이 binPath 따옴표 제거 |
 | 센서 드라이버 | PawnIO 2.2.0 설치 여부·버전만 확인(설치하지 않음). 없으면 CPU 온도·전력·클럭은 `unsupported` | S1-02a 판정·설치 동의 |
 | UI | 셸은 `asInvoker`(일반 사용자). 센서·토큰 접근 없음 | S1-02a 결론, README 7·15.8 |
 | 데이터 폴더 | `%ProgramData%\PcTelemetry`, `state\`: 상속 해제, SYSTEM·Administrators만 FullControl. `status\`: + Users 읽기 | S2-03 `Credentials.psm1` 상위 경로 조건 |
 | WebView2 | 없으면 동봉 Evergreen 부트스트래퍼(Microsoft 서명 확인)로 `/silent /install` | README 7절 |
 | 업데이트 | 서비스 정지 → 프로그램 파일만 교체, `%ProgramData%` 상태·미전송 데이터 유지 | README 7절 |
-| 제거 | 서비스·프로그램·바로 가기 제거. 데이터는 `-RemoveData`일 때만, `Credentials\`·PawnIO·WebView2는 유지 | S2-03 회수 절차, 공유 구성요소 |
+| 제거 | 서비스·이벤트 로그 원본 등록·프로그램·바로 가기 제거. 데이터는 `-RemoveData`일 때만, `Credentials\`·PawnIO·WebView2는 유지 | S2-03 회수 절차, 공유 구성요소 |
 
 장비 토큰은 S2-03 DPAPI 저장소 연동 전까지 `-TokenFile`을 `state\device.token`(SYSTEM·Administrators 전용)에 복사한다.
 

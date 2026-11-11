@@ -7,12 +7,14 @@
 //                         [--buffer-max-age-seconds N] [--buffer-max-bytes N]
 //       콘솔에서 1초 수집. --machine-id가 있으면 샘플을 SQLite 버퍼(state\buffer.sqlite3)에 즉시 저장하고
 //       3초 배치로 동결한다. --server가 있으면 전송한다. 버퍼 상한 기본값은 24시간/500MB(S2-01, README 5절).
-//   PcTelemetry.Agent service [위와 같은 옵션]
-//       Windows 서비스로 실행(LocalSystem 필요, S1-02a 5.5).
+//   PcTelemetry.Agent service [위와 같은 옵션] [--stop-drain-seconds N]
+//       Windows 서비스로 실행(LocalSystem 필요, S1-02a 5.5). 수명주기·이벤트 로그·자동 복구는 Service.cs(S2-02).
+//       --stop-drain-seconds: 종료 때 남은 배치를 보내 보는 시간. 기본 run 20초, service 2초(OS 종료 대기 한도 안).
 
 using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.EventLog;
 using PcTelemetry.Collector;
 
 namespace PcTelemetry.Agent;
@@ -25,7 +27,8 @@ internal sealed record AgentOptions(
     string? TokenFile,
     int IntervalMs,
     string? StatusFile,
-    BufferOptions Buffer);
+    BufferOptions Buffer,
+    TimeSpan StopDrain);
 
 internal static class Program
 {
@@ -60,7 +63,10 @@ internal static class Program
                     MaxAge = o.TryGetValue("buffer-max-age-seconds", out var age)
                         ? TimeSpan.FromSeconds(int.Parse(age)) : TimeSpan.FromHours(24),
                     MaxBytes = o.TryGetValue("buffer-max-bytes", out var bytes) ? long.Parse(bytes) : 500L * 1024 * 1024,
-                });
+                },
+                TimeSpan.FromSeconds(o.TryGetValue("stop-drain-seconds", out var drain)
+                    ? int.Parse(drain) : args[0] == "service" ? 2 : 20));
+            if (options.StopDrain < TimeSpan.Zero) throw new ArgumentException("--stop-drain-seconds must be >= 0");
             if (options.Buffer.MaxAge <= TimeSpan.Zero || options.Buffer.MaxBytes <= 0)
                 throw new ArgumentException("buffer limits must be positive");
             if (options.Server is not null && (options.MachineId is null || options.TokenFile is null))
@@ -83,18 +89,28 @@ internal static class Program
                     return await RunAsync(options, cts.Token, console: true);
                 }
             case "service":
-                var builder = Host.CreateApplicationBuilder();
-                builder.Services.AddWindowsService(x => x.ServiceName = "PcTelemetryAgent");
-                builder.Services.AddHostedService(_ => new AgentService(options));
+                var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+                {
+                    Args = [],
+                    ContentRootPath = AppContext.BaseDirectory,
+                });
+                builder.Services.AddWindowsService(x => x.ServiceName = AgentService.ServiceName);
+                // 호스트 자체 경고·오류도 같은 이벤트 원본으로 모은다.
+                builder.Services.Configure<EventLogSettings>(x => x.SourceName = ServiceLog.Source);
+                builder.Services.Configure<HostOptions>(x => x.ShutdownTimeout = TimeSpan.FromSeconds(15));
+                builder.Services.AddHostedService(sp => new AgentService(options,
+                    sp.GetRequiredService<IHostApplicationLifetime>(), sp.GetRequiredService<IHostLifetime>()));
                 await builder.Build().RunAsync();
-                return 0;
+                // AgentService가 실패 시 Environment.ExitCode를 1로 둔다.
+                return Environment.ExitCode;
             default:
                 Console.Error.WriteLine($"unknown command: {args[0]}");
                 return 2;
         }
     }
 
-    internal static async Task<int> RunAsync(AgentOptions options, CancellationToken token, bool console)
+    internal static async Task<int> RunAsync(AgentOptions options, CancellationToken token, bool console,
+        RunProgress? progress = null)
     {
         var store = new StateStore(options.StateDir);
         var events = new JsonlEventSink(store.PathOf("events.jsonl"));
@@ -103,7 +119,31 @@ internal static class Program
             events.Emitted += e => Console.WriteLine(
                 $"{Utc.Format(e.ObservedAtUtc)} {e.Type} {JsonSerializer.Serialize(e.Details)}");
         }
+        else
+        {
+            events.Emitted += ServiceLog.Mirror;
+        }
 
+        // S2-02: 이전 실행이 정상 종료하지 못했으면 기록한다. 복원은 아래 버퍼 열기·부팅 세션이 한다.
+        var marker = RunMarker.Acquire(store, console ? "console" : "service", DateTime.UtcNow);
+        if (marker.Previous is { } previous)
+        {
+            events.Emit(new CollectionEvent(Guid.NewGuid(), "unclean_shutdown_detected", DateTime.UtcNow, 0, null,
+                new Dictionary<string, object?>
+                {
+                    ["previous_mode"] = previous.Mode,
+                    ["previous_started_at_utc"] = previous.StartedAtUtc,
+                }));
+        }
+        var code = await RunCoreAsync(options, store, events, token, console, progress).ConfigureAwait(false);
+        // 버퍼(SQLite)를 닫은 뒤에만 지운다. 예외로 빠져나가면 남겨 다음 시작이 비정상 종료로 기록한다.
+        marker.Release();
+        return code;
+    }
+
+    private static async Task<int> RunCoreAsync(AgentOptions options, StateStore store, JsonlEventSink events,
+        CancellationToken token, bool console, RunProgress? progress)
+    {
         var started = DateTime.UtcNow;
         // 재시작 복원: 이전 프로세스의 미동결 샘플을 동결하고 S1-02b 파일 스풀을 가져온다.
         using var buffer = options.MachineId is null ? null
@@ -137,6 +177,8 @@ internal static class Program
         using var uploadStop = new CancellationTokenSource();
 
         var collect = Task.Run(() => collector.RunAsync(stop.Token), CancellationToken.None);
+        progress?.MarkCollecting();
+        var accessChecked = false;
         var upload = uploader is null ? Task.CompletedTask : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
         var statsPath = store.PathOf("stats.json");
         var tick = 0;
@@ -145,6 +187,13 @@ internal static class Program
         {
             await Task.WhenAny(collect, Task.Delay(TimeSpan.FromSeconds(10), CancellationToken.None));
             WriteStatus(options.StatusFile, collecting: !collect.IsCompleted, uploader, buffer);
+            if (!accessChecked && collector.Config is not null)
+            {
+                // 센서 구성이 정해진 뒤(워밍업 후) 한 번 점검한다.
+                accessChecked = true;
+                events.Emit(new CollectionEvent(Guid.NewGuid(), "service_access_check", DateTime.UtcNow, 0,
+                    collector.BootSessionId, AccessCheck.Run(options, !console, collector, buffer)));
+            }
             if (++tick % 6 == 0 || collect.IsCompleted)
                 WriteStats(statsPath, options, started, source, collector, uploader, buffer);
         }
@@ -152,7 +201,7 @@ internal static class Program
         buffer?.Prune();
         await uploadStop.CancelAsync();
         await upload;
-        if (uploader is not null) await uploader.DrainAsync(TimeSpan.FromSeconds(20));
+        if (uploader is not null && options.StopDrain > TimeSpan.Zero) await uploader.DrainAsync(options.StopDrain);
         WriteStats(statsPath, options, started, source, collector, uploader, buffer);
         WriteStatus(options.StatusFile, collecting: false, uploader, buffer);
         if (console) Console.WriteLine($"stats: {statsPath}");
@@ -314,10 +363,4 @@ internal static class Program
         }
         return result;
     }
-}
-
-internal sealed class AgentService(AgentOptions options) : BackgroundService
-{
-    protected override Task ExecuteAsync(CancellationToken stoppingToken) =>
-        Task.Run(() => Program.RunAsync(options with { Seconds = null }, stoppingToken, console: false), stoppingToken);
 }
