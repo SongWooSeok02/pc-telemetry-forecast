@@ -20,7 +20,16 @@ using PcTelemetry.Collector;
 
 namespace PcTelemetry.Agent;
 
-/// <summary>RunAsync 진행 단계. 실패가 시작 중인지 수집 중인지 구분해 이벤트 ID를 고른다.</summary>
+/// <summary>
+/// 실행 중 구성 요소(업로더 등)가 실패해 수집을 정상 절차로 멈췄다. 실행 표시는 지우고(DB는 닫힘)
+/// 서비스는 실패 경로(이벤트 1005, 종료 코드 1 → SCM 재시작)로 간다.
+/// </summary>
+internal sealed class AgentFaultException(string message, Exception inner) : Exception(message, inner);
+
+/// <summary>
+/// RunAsync 진행 단계. 실패가 시작 중인지 수집 중인지 구분해 이벤트 ID를 고른다.
+/// 센서 구성이 정해진 뒤(워밍업·탐색 완료)에 수집 중으로 바뀐다.
+/// </summary>
 internal sealed class RunProgress
 {
     private volatile bool _collecting;
@@ -54,6 +63,11 @@ internal sealed class AgentService(AgentOptions options, IHostApplicationLifetim
                 return;
             }
             Fail(progress, $"collection ended without a stop request (exit {code})", code == 0 ? 1 : code);
+        }
+        catch (AgentFaultException ex)
+        {
+            // 수집은 정상 절차로 멈췄고(동결·DB 닫기) 실행 중 구성 요소가 실패했다(예: 업로더).
+            Fail(progress, ex.Message, 1);
         }
         catch (Exception ex)
         {
@@ -100,6 +114,7 @@ internal static class ServiceLog
         ["batch_quarantined"] = (1016, EventLogEntryType.Warning),
         ["buffer_reset"] = (1017, EventLogEntryType.Warning),
         ["buffer_pruned"] = (1018, EventLogEntryType.Warning),
+        ["upload_failed"] = (1019, EventLogEntryType.Error),
     };
 
     public static void Write(int id, EventLogEntryType type, string message)

@@ -135,8 +135,24 @@ internal static class Program
                     ["previous_started_at_utc"] = previous.StartedAtUtc,
                 }));
         }
-        var code = await RunCoreAsync(options, store, events, token, console, progress).ConfigureAwait(false);
-        // 버퍼(SQLite)를 닫은 뒤에만 지운다. 예외로 빠져나가면 남겨 다음 시작이 비정상 종료로 기록한다.
+        int code;
+        try
+        {
+            code = await RunCoreAsync(options, store, events, token, console, progress).ConfigureAwait(false);
+        }
+        catch (AgentFaultException ex) when (console)
+        {
+            // 수집·버퍼는 정상 절차로 닫혔다(업로더 장애). 콘솔에서는 종료 코드 1로 알린다.
+            marker.Release();
+            Console.Error.WriteLine(ex.Message);
+            return 1;
+        }
+        catch (AgentFaultException)
+        {
+            marker.Release();
+            throw;
+        }
+        // 버퍼(SQLite)를 닫은 뒤에만 지운다. 그 밖의 예외로 빠져나가면 남겨 다음 시작이 비정상 종료로 기록한다.
         marker.Release();
         return code;
     }
@@ -177,15 +193,34 @@ internal static class Program
         using var uploadStop = new CancellationTokenSource();
 
         var collect = Task.Run(() => collector.RunAsync(stop.Token), CancellationToken.None);
-        progress?.MarkCollecting();
         var accessChecked = false;
-        var upload = uploader is null ? Task.CompletedTask : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
+        var upload = uploader is null ? null : Task.Run(() => uploader.RunAsync(uploadStop.Token), CancellationToken.None);
+        Exception? uploadFault = null;
         var statsPath = store.PathOf("stats.json");
         var tick = 0;
         WriteStatus(options.StatusFile, collecting: true, uploader, buffer);
         while (!collect.IsCompleted)
         {
-            await Task.WhenAny(collect, Task.Delay(TimeSpan.FromSeconds(10), CancellationToken.None));
+            var delay = Task.Delay(TimeSpan.FromSeconds(10), CancellationToken.None);
+            await (upload is not null && uploadFault is null
+                ? Task.WhenAny(collect, upload, delay)
+                : Task.WhenAny(collect, delay));
+            // 센서 구성이 정해지면(워밍업·탐색 완료) 수집 중으로 본다. 그 전 실패는 시작 실패(1002)다.
+            if (collector.Config is not null) progress?.MarkCollecting();
+            if (upload is { IsCompleted: true } && uploadFault is null)
+            {
+                // 업로더는 uploadStop 전에는 끝나지 않는다. 먼저 끝났으면 예외로 죽은 것이다(예: SQLite 쓰기 오류).
+                // 전송 없이 수집만 계속하지 않도록 수집을 정상 절차로 멈추고(동결·DB 닫기) 실패로 끝내 SCM이 다시 시작하게 한다.
+                uploadFault = upload.Exception?.GetBaseException()
+                    ?? new InvalidOperationException("uploader exited without a stop request");
+                events.Emit(new CollectionEvent(Guid.NewGuid(), "upload_failed", DateTime.UtcNow, 0, collector.BootSessionId,
+                    new Dictionary<string, object?>
+                    {
+                        ["error"] = uploadFault.GetType().Name,
+                        ["message"] = uploadFault.Message,
+                    }));
+                await stop.CancelAsync();
+            }
             WriteStatus(options.StatusFile, collecting: !collect.IsCompleted, uploader, buffer);
             if (!accessChecked && collector.Config is not null)
             {
@@ -198,10 +233,32 @@ internal static class Program
                 WriteStats(statsPath, options, started, source, collector, uploader, buffer);
         }
         await collect;
+        if (collector.Config is not null) progress?.MarkCollecting();
         buffer?.Prune();
         await uploadStop.CancelAsync();
-        await upload;
-        if (uploader is not null && options.StopDrain > TimeSpan.Zero) await uploader.DrainAsync(options.StopDrain);
+        var drain = uploadFault is null;
+        if (uploadFault is null && upload is not null)
+        {
+            try
+            {
+                await upload;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                // 중지 요청 뒤 종료 절차 중에 업로더가 죽었다. 수집은 이미 정상 종료했고 중지가 요청된 상태이므로
+                // 실패로 끝내지 않고(SCM이 중지한 서비스를 되살리지 않게) 기록만 하고 마무리 전송을 건너뛴다.
+                events.Emit(new CollectionEvent(Guid.NewGuid(), "upload_failed", DateTime.UtcNow, 0, collector.BootSessionId,
+                    new Dictionary<string, object?> { ["error"] = ex.GetType().Name, ["message"] = ex.Message, ["during_stop"] = true }));
+                drain = false;
+            }
+        }
+        if (uploadFault is not null)
+        {
+            WriteStats(statsPath, options, started, source, collector, uploader, buffer);
+            WriteStatus(options.StatusFile, collecting: false, uploader, buffer);
+            throw new AgentFaultException($"upload failed: {uploadFault.GetType().Name}: {uploadFault.Message}", uploadFault);
+        }
+        if (drain && uploader is not null && options.StopDrain > TimeSpan.Zero) await uploader.DrainAsync(options.StopDrain);
         WriteStats(statsPath, options, started, source, collector, uploader, buffer);
         WriteStatus(options.StatusFile, collecting: false, uploader, buffer);
         if (console) Console.WriteLine($"stats: {statsPath}");

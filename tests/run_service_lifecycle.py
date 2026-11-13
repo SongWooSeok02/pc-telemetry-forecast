@@ -510,6 +510,59 @@ class Run:
                     kept_collecting=collecting_paused is True and (pending_paused or 0) > 0,
                     recovered=bool(recovered), drained=drained, service_pid_unchanged=sc_query()['pid'] == q0['pid'])
 
+        # S6b uploader dies at run time (SQLite write error) -> service failure path -> SCM recovery (PR #31 review P2)
+        sc = self.scenario('upload_fault', [
+            'hold an exclusive write lock on state\\buffer.sqlite3 (uploader MarkSent fails after busy_timeout 5 s)',
+            'release the lock as soon as upload_failed is emitted', 'wait for SCM recovery restart (no manual start)'],
+            'upload_failed (Event 1019) and Event 1005, collection stopped cleanly (agent_stopped, run marker removed), '
+            'service exits with code 1, SCM restarts it, no unclean_shutdown_detected, same boot session, seq not reused, '
+            'buffer drains')
+        q0 = sc_query()
+        boot = self.boot_session()
+        self.drain(60)
+        before_max = self.max_server_seq(boot)
+        mark = len((self.tail.poll(), self.tail.seen)[1])
+        t_lock = datetime.now(timezone.utc)
+        t0 = time.monotonic()
+
+        def seen(kind):
+            self.tail.poll()
+            return [e for e in self.tail.seen[mark:] if e['type'] == kind]
+        lock = sqlite3.connect(str(STATE / 'buffer.sqlite3'), timeout=10, isolation_level=None)
+        try:
+            lock.execute('BEGIN EXCLUSIVE')
+            failed = wait(lambda: seen('upload_failed'), 60, 0.1)
+        finally:
+            # 수집 종료 시 남은 샘플 동결(쓰기)이 busy_timeout 안에 끝나도록 바로 푼다.
+            lock.execute('ROLLBACK')
+            lock.close()
+        t_failed = round(time.monotonic() - t0, 1)
+        exited = wait(lambda: sc_query()['pid'] != q0['pid'], 30, 0.2)
+        q_exit = sc_query()
+        back = wait(lambda: sc_query()['state'] == 'RUNNING' and sc_query()['pid'] not in (0, q0['pid']), a.recovery_wait, 1)
+        restart_s = round(time.monotonic() - t0, 1)
+        collecting = self.service_running_and_collecting(60)
+        time.sleep(3)
+        after = (self.tail.poll(), self.tail.seen[mark:])[1]
+        stopped = [e for e in after if e['type'] == 'agent_stopped']
+        unclean = [e for e in after if e['type'] == 'unclean_shutdown_detected']
+        restarted = [e for e in after if e['type'] == 'agent_started']
+        app = win_events(t_lock, 'Application', SERVICE, [1005, 1019])
+        drained = self.drain(120)
+        sc['actual'] = {'upload_failed': failed[0]['details'] if failed else None, 'upload_failed_after_s': t_failed,
+                        'sc_after_exit': q_exit, 'restart_after_s': restart_s,
+                        'events': [{'id': e['id'], 'time_utc': e['time_utc'], 'message': e.get('message', '')[:300]} for e in app],
+                        'next_seq_after': restarted[0]['details']['next_seq'] if restarted else None,
+                        'server_max_seq_before': before_max, 'drained': drained}
+        self.finish(sc, upload_failed=bool(failed), logged_1019=any(e['id'] == 1019 for e in app),
+                    logged_1005=any(e['id'] == 1005 and 'upload failed' in (e.get('message') or '') for e in app),
+                    collection_stopped_cleanly=bool(stopped) and not unclean, process_exited=bool(exited),
+                    exit_code_1=q_exit['service_exit_code'] == 1 or q_exit['win32_exit_code'] == 1,
+                    scm_restarted=bool(back), collecting=collecting,
+                    same_boot_session=bool(restarted) and restarted[0]['boot_session_id'] == boot,
+                    seq_not_reused=bool(restarted) and before_max is not None and restarted[0]['details']['next_seq'] > before_max,
+                    drained=drained)
+
         # S7 state folder write denied for LocalSystem -> start failure logged -> SCM recovery after the fix
         sc = self.scenario('state_write_denied', [
             'sc stop', 'icacls state /deny SYSTEM:(OI)(CI)(W)', 'sc start (fails)', 'wait for a recovery attempt',
