@@ -90,6 +90,7 @@ S1-03 FastAPI/PostgreSQL 경로의 같은 시나리오는 S2-04와 함께 검증
 | forced_kill_recovery | 서비스 프로세스 `taskkill /F` | 수동 시작 없이 SCM 복구(60초), `unclean_shutdown_detected`, 미동결 샘플 복원 |
 | ui_close | 설치된 셸 실행 후 창 닫기 | 셸만 종료, 서비스 PID 유지, 상태 파일 계속 갱신 |
 | token_unreadable | `state\device.token` 이름 변경 후 복원 | 수집 계속, `upload_paused_auth`(TOKEN_FILE_UNREADABLE) → `upload_auth_recovered` |
+| upload_fault | 실행 중 `stateuffer.sqlite3`에 배타 쓰기 잠금, `upload_failed` 직후 해제 | 이벤트 1019·1005·종료 코드 1, 수집 정상 종료(`agent_stopped`, 비정상 표시 없음), SCM 재시작, 같은 부팅 세션·순번 재사용 없음, 버퍼 전송 |
 | state_write_denied | 상태 폴더에 SYSTEM 쓰기 거부 ACE 후 시작, 이후 제거 | 이벤트 1002(원인 포함)·종료 코드 1·SCM 재시도, ACE 제거 후 수동 시작 없이 복구 |
 | `resume --expect reboot` | 재부팅 후 로그인 | 새 부팅 세션·순번 0부터, 부팅 후 자동 시작, 이전 세션 정상 종료(비정상 표시 없음), 버퍼 전송 완료 |
 | `resume --expect logoff` | 로그아웃 후 다시 로그인 | 같은 서비스 프로세스·부팅 세션, 로그아웃 동안 샘플 간격 2.5초 이하·순번 구멍 없음 |

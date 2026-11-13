@@ -1,6 +1,6 @@
 # S2-02 Windows 서비스 수명주기·자동 복구 — 구현·검증 보고서
 
-상태: **구현·PC-A 설치 서비스 실측 완료. 다른 팀원 리뷰 전, 실제 사용자 로그아웃은 미검증(PC-A는 학교 관리 노트북으로
+상태: **구현·PC-A 설치 서비스 실측 완료. PR #31 1차 리뷰(P2·P3) 반영, 재리뷰 전. 실제 사용자 로그아웃은 미검증(PC-A는 학교 관리 노트북으로
 로그아웃 불가, 6절). 완료로 변경하지 않는다.** 담당 A. 기간 2026-11-05~11-10 KST(마감 초과, 11-11 실행).
 선행: S1-02a(LocalSystem 필요, 5.5), S1-02b(부팅 세션·순번), S2-01(SQLite 버퍼), S1-06(설치 스크립트).
 
@@ -28,10 +28,15 @@
     `ServiceSidType`, `RequiredPrivileges`)에서 읽는다(한국어 Windows에서 `sc.exe qfailure` 출력이 번역돼 판정이 틀렸음).
 - **이벤트 로그**: 1000 시작(버전·계정 종류·상태 폴더·전송 설정 여부), 1001 정상 종료(소요 ms), 1002 시작 실패(예외 종류·메시지),
   1003 비정상 종료 감지, 1004 접근 점검, 1005 수집 중 실패, 1010~1018 주요 수집 이벤트(부팅 세션, 전송 재시도/복구, 인증 일시정지/복구,
-  격리, 버퍼 초기화/상한 제거). 상태 폴더를 못 쓰는 권한 오류도 남도록 파일이 아니라 이벤트 로그를 쓴다. 토큰·계정 이름·호스트 이름 없음.
+  격리, 버퍼 초기화/상한 제거), 1019 업로더 실패. 상태 폴더를 못 쓰는 권한 오류도 남도록 파일이 아니라 이벤트 로그를 쓴다. 토큰·계정 이름·호스트 이름 없음.
 - **실패 → 자동 복구**: 시작/수집 실패를 1002/1005로 남기고 종료 코드 1로 끝낸다. **`Environment.ExitCode`만 두면 .NET 서비스 호스트가
   SCM에 0을 보고해 복구가 걸리지 않았다**(파일럿 실측: `WIN32_EXIT_CODE 0`, 서비스 정지 상태로 방치). `ServiceBase.ExitCode`를 직접
   설정해 SCM이 7023(오류 종료)·7031(복구 동작)을 기록하고 다시 시작하게 했다.
+  시작 실패와 수집 중 실패는 센서 구성이 정해진 시점(워밍업·탐색 완료)으로 가른다. 그 전 실패는 1002, 이후는 1005(PR #31 리뷰 P3).
+- **실행 중 업로더 실패**(PR #31 리뷰 P2): 업로더 작업은 중지 요청 전에는 끝나지 않으므로 먼저 끝나면 예외로 죽은 것으로 본다
+  (예: SQLite 쓰기 오류). 이전에는 수집 루프가 업로더를 종료 때만 기다려 전송 없이 수집만 계속되고 SCM 복구도 걸리지 않았다.
+  이제 `upload_failed`(1019)를 남기고 수집을 정상 절차로 멈춘 뒤(동결·DB 닫기·`agent.running` 삭제) 1005·종료 코드 1로 끝내
+  SCM이 다시 시작한다. 중지 요청 뒤 종료 절차 중에 업로더가 실패하면 중지한 서비스를 되살리지 않도록 기록만 하고 마무리 전송을 건너뛴다.
 - **정상 종료**(SCM 중지·OS 종료): 수집 취소 → 미동결 샘플 동결 → 상한 정리 → 전송 취소 → 마무리 전송(서비스 기본 2초,
   `--stop-drain-seconds`) → 통계·상태 파일(`collecting=false`) → SQLite 닫기(WAL 체크포인트) → `agent.running` 삭제.
   S1-02b의 마무리 전송 20초는 **이 PC의 OS 서비스 종료 대기 한도(`WaitToKillServiceTimeout` 5000ms)를 넘어** OS 종료 때 강제 종료될 수
@@ -55,14 +60,15 @@
 | PC | PC-A(S1-02a·S1-02b·S2-01과 같은 노트북, 학교 지원 관리 PC, 자동 로그인) |
 | OS | Windows 11 Pro 10.0.26200, `WaitToKillServiceTimeout` 5000ms |
 | 드라이버 | PawnIO 2.2.0.0 |
-| 빌드 | 커밋 `e54c4b5` + 이 PR 변경(작업 트리, manifest `dirty=true`), .NET SDK 10.0.300. Agent dll SHA-256 `5ec0e29197e1…`(배포 폴더·설치본·재빌드 결과 동일) |
+| 빌드 | 1차(11-11): 커밋 `e54c4b5` + 이 PR 변경(작업 트리, manifest `dirty=true`), Agent dll SHA-256 `5ec0e29197e1…`(배포 폴더·설치본·재빌드 결과 동일). 2차(11-13, 리뷰 반영): 커밋 `016b2fc`(manifest `dirty=false`), Agent dll `ca4e9e28499a…`(배포 폴더 = 설치본). 러너는 `016b2fc` 뒤 `upload_fault` 시나리오 수정분(대기 배치 확보) 포함. .NET SDK 10.0.300 |
 | 설치 | `Publish-PcTelemetry.ps1 -NoWebView2Bootstrapper` → `Install-PcTelemetry.ps1 -SkipWebView2`(WebView2 기설치) |
 | 서버 | 참조 API(`tests/reference_api.py` `Store`, SQLite 원장)를 루프백 고정 포트로 실행, 합성 토큰·machine_id |
 | 러너 | `tests/run_service_lifecycle.py`(관리자 Python 3.13.9). 단계 사이 원장·체크포인트를 작업 폴더에 보관 |
 
 ## 4. 자동 검증
 
-`dotnet test agents/windows/tests/PcTelemetry.Collector.Tests`: **65/65 통과**(2026-11-11 KST, S2-01 60개 + 5개).
+`dotnet test agents/windows/tests/PcTelemetry.Collector.Tests`: **65/65 통과**(2026-11-11 KST, S2-01 60개 + 5개. 리뷰 반영 후 2026-11-13 재실행 65/65).
+리뷰 반영분(업로더 감시·시작/실행 실패 구분)은 Agent 프로젝트(LHM·SCM 의존)에 있어 단위 테스트 대신 설치 서비스 실측 R6b로 확인했다.
 
 | ID | 테스트 | 확인 |
 |---|---|---|
@@ -78,6 +84,11 @@
 [resume-reboot](../../tests/results/s2-02/pc-a-20261111T094642Z-resume-reboot.json)(R8),
 [uninstall](../../tests/results/s2-02/pc-a-20261111T094744Z-uninstall.json)(R9). 시각은 KST.
 
+**2차 실행(2026-11-13, 리뷰 반영 빌드 `016b2fc`)**: [install](../../tests/results/s2-02/pc-a-20261113T050906Z-install.json)(R0~R7·R6b·원장),
+[uninstall](../../tests/results/s2-02/pc-a-20261113T050929Z-uninstall.json). R0~R7 모두 다시 성공(중지 1.38초/2.35초, 강제 종료 후 60.8초 뒤 SCM 재시작,
+상태 폴더 쓰기 거부 → 1002 2회 → ACE 제거 297.2초 뒤 복구, 원장 53배치·152샘플·중복 0). 재부팅(R8)은 1차 빌드로만 확인했다(변경이 종료·재부팅 경로를 바꾸지 않음).
+같은 날 먼저 돌린 실행은 `upload_fault` 시나리오 설계 오류(버퍼를 비운 뒤 잠가 업로더가 쓸 배치가 없음)로 그 시나리오만 실패해 결과 파일을 남기지 않고 시나리오를 고쳐 처음부터 다시 실행했다.
+
 | ID | 시각 | 재현 | 기대값 | 실제값 | 판정 |
 |---|---|---|---|---|---|
 | R0 | 15:00:44~55 | 깨끗한 설치 | LocalSystem·Auto·따옴표·복구 60/60/300초·failureflag·원본·필요 권한 1개, 수집 | 모두 일치(초기화 86400초, SID 유형 1, `[SeChangeNotifyPrivilege]`), 서비스 프로세스 세션 0, 설치 dll = manifest | 성공 |
@@ -88,6 +99,7 @@
 | R5 | 15:03:09~30 | 설치된 셸 실행 → 창 닫기 | 셸만 종료, 서비스 유지 | 셸 종료, 서비스 PID 동일, 닫은 뒤 상태 파일 갱신·`collecting=true` | 성공 |
 | R6 | 15:03:30~04:34 | `state\device.token` 이름 변경 → 복원 | 전송만 멈춤, 수집 계속, 자동 재개 | `upload_paused_auth`(401 `TOKEN_FILE_UNREADABLE`), 멈춘 동안 대기 6개로 증가·`collecting=true`, 복원 후 `upload_auth_recovered`, 전송 완료, PID 동일 | 성공 |
 | R7 | 15:04:34~10:38 | `sc stop` → 상태 폴더에 SYSTEM 쓰기 거부 ACE → `sc start` → ACE 제거 | 원인 로그, 종료 코드 1, SCM 재시도, 고친 뒤 수동 시작 없이 복구 | 1002 "Start failed: UnauthorizedAccessException … agent.running.tmp … denied" 2회(15:04:36, 15:05:36 SCM 재시도), `WIN32_EXIT_CODE 1`, SCM 7023+7031 2회. ACE 제거 301.3초 뒤(3번째 복구 지연 5분) 수동 시작 없이 수집 재개 | 성공 |
+| R6b | 11-13 13:56:07~58:59 | 참조 API 중지(대기 배치 2개) → `stateuffer.sqlite3`에 배타 쓰기 잠금 → `upload_failed` 직후 해제·API 재개 | 업로더 실패가 서비스 실패 경로로: 1019·1005, 수집 정상 종료, 종료 코드 1, SCM 재시작, 같은 세션·순번 재사용 없음, 전송 | 잠금 후 재시도 기록(쓰기)이 busy_timeout 뒤 `SqliteException` 'database is locked' → 1019·1005 "Collection failed: upload failed: SqliteException …"(13:57:53), `WIN32_EXIT_CODE 1`, `agent_stopped` 있음·`unclean_shutdown_detected` 없음, 약 60초 뒤 SCM 재시작, next_seq 2400 > 서버 최대 1883, 전송 완료 | 성공 |
 | 원장 | 15:10:38 | 서버 원장 ↔ 버퍼 | 중복 0, 대기·격리 0 | 서버 49배치·146샘플(한 부팅 세션, 순번 0~1885 중 재시작 예약 건너뛰기만), 버퍼 sent 49·pending 0·quarantined 0 | 성공 |
 | R8 | 15:31~18:46 | 체크포인트 → Windows 다시 시작 → 자동 로그인 → `resume --expect reboot` | 새 부팅 세션·0부터, 자동 시작, 이전 세션 정상 종료, 버퍼 전송 | 아래 | 성공 |
 | R9 | 18:47 | `uninstall` | 서비스·원본·데이터 제거 | 잔여 없음(PawnIO 유지) | 성공 |
@@ -111,7 +123,8 @@ R8 상세. **재부팅이 두 번 일어났다**(15:31:51 종료 → 15:32:04 �
 | S2-03 DPAPI 자격 증명(`device.dpapi`) 읽기·등록 IPC 호스팅 | 미구현. 설치 스크립트가 복사한 `state\device.token`(SYSTEM·Administrators 전용) 접근만 검증 | 서비스(C#)가 S2-03 형식을 읽는 방식·등록 파이프 호스팅을 B와 합의 후 후속 |
 | 2번째 PC·개발 도구 없는 PC | 미검증(PC-A 1대) | 다중 PC 검증 |
 | S1-03 FastAPI/PostgreSQL 경로 | 미검증(참조 API로만) | S2-04와 함께 |
-| 다른 팀원 리뷰 | 전 | PR |
+| 다른 팀원 리뷰 | 1차 리뷰(P2·P3) 반영, 재리뷰 전 | PR #31 |
+| 센서 구성 전 실패의 1002 기록(P3) | 코드 경로만 확인. 워밍업·탐색 중 예외를 실기에서 일으킬 방법이 없어 실측하지 않았다(주기 예외는 수집기가 잡아 `collector_cycle_failed`로 남김) | — |
 
 ## 7. 남은 제한·합의 필요
 

@@ -512,8 +512,10 @@ class Run:
 
         # S6b uploader dies at run time (SQLite write error) -> service failure path -> SCM recovery (PR #31 review P2)
         sc = self.scenario('upload_fault', [
-            'hold an exclusive write lock on state\\buffer.sqlite3 (uploader MarkSent fails after busy_timeout 5 s)',
-            'release the lock as soon as upload_failed is emitted', 'wait for SCM recovery restart (no manual start)'],
+            'stop reference API until batches are pending',
+            'hold an exclusive write lock on state\\buffer.sqlite3 (uploader RecordAttempt/MarkSent fails after busy_timeout 5 s)',
+            'release the lock and restart the API as soon as upload_failed is emitted',
+            'wait for SCM recovery restart (no manual start)'],
             'upload_failed (Event 1019) and Event 1005, collection stopped cleanly (agent_stopped, run marker removed), '
             'service exits with code 1, SCM restarts it, no unclean_shutdown_detected, same boot session, seq not reused, '
             'buffer drains')
@@ -528,14 +530,19 @@ class Run:
         def seen(kind):
             self.tail.poll()
             return [e for e in self.tail.seen[mark:] if e['type'] == kind]
+        # 업로더가 DB에 쓰려면 대기 배치가 있어야 한다(잠금 중에는 새 배치가 동결되지 않음). 서버를 멈춰 배치를 쌓고
+        # 잠근다: 다음 재시도의 RecordAttempt(또는 성공 시 MarkSent)가 busy_timeout 뒤 SQLite 오류로 실패한다.
+        self.api.stop()
+        pending_before = wait(lambda: ((buffer_stats() or {}).get('pending') or 0) >= 2 and buffer_stats()['pending'], 30, 0.5)
         lock = sqlite3.connect(str(STATE / 'buffer.sqlite3'), timeout=10, isolation_level=None)
         try:
             lock.execute('BEGIN EXCLUSIVE')
-            failed = wait(lambda: seen('upload_failed'), 60, 0.1)
+            failed = wait(lambda: seen('upload_failed'), 120, 0.1)
         finally:
             # 수집 종료 시 남은 샘플 동결(쓰기)이 busy_timeout 안에 끝나도록 바로 푼다.
             lock.execute('ROLLBACK')
             lock.close()
+            self.api.start()
         t_failed = round(time.monotonic() - t0, 1)
         exited = wait(lambda: sc_query()['pid'] != q0['pid'], 30, 0.2)
         q_exit = sc_query()
@@ -549,7 +556,8 @@ class Run:
         restarted = [e for e in after if e['type'] == 'agent_started']
         app = win_events(t_lock, 'Application', SERVICE, [1005, 1019])
         drained = self.drain(120)
-        sc['actual'] = {'upload_failed': failed[0]['details'] if failed else None, 'upload_failed_after_s': t_failed,
+        sc['actual'] = {'pending_before_lock': pending_before or None,
+                        'upload_failed': failed[0]['details'] if failed else None, 'upload_failed_after_s': t_failed,
                         'sc_after_exit': q_exit, 'restart_after_s': restart_s,
                         'events': [{'id': e['id'], 'time_utc': e['time_utc'], 'message': e.get('message', '')[:300]} for e in app],
                         'next_seq_after': restarted[0]['details']['next_seq'] if restarted else None,
