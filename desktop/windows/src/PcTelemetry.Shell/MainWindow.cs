@@ -123,6 +123,13 @@ internal sealed class MainWindow : Window
         if (webView is null) return;
         var show = WindowState != WindowState.Minimized && offlineOverlay is null;
         webView.Visibility = show ? Visibility.Visible : Visibility.Hidden;
+        if (webView.CoreWebView2 is { } core)
+        {
+            // S2-06 host contract contains only visibility, never authentication data.
+            core.PostWebMessageAsJson(show
+                ? """{"type":"pc-telemetry:host-visibility","visible":true}"""
+                : """{"type":"pc-telemetry:host-visibility","visible":false}""");
+        }
     }
 
     // ---- 화면 전환 ----
@@ -203,6 +210,7 @@ internal sealed class MainWindow : Window
             {
                 SetServer(ServerState.Connected, null);
                 HideOffline(host);
+                UpdateWebViewVisibility();
                 return;
             }
             // 정책으로 취소한 이동은 연결 실패가 아니다.

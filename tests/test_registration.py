@@ -84,6 +84,68 @@ class Registration(unittest.TestCase):
             self.assertEqual(db.execute('SELECT owner_id FROM machines WHERE machine_id=%s',
                 (device['machine_id'],)).fetchone()[0], self.user)
 
+    def test_browser_session_expiry_logout_and_relogin(self):
+        client = TestClient(create_app(self.dsn), base_url='https://testserver')
+        self.addCleanup(client.close)
+        cookie = '__Host-pct_session'
+
+        def sign_in(token):
+            client.cookies.set(cookie, token, domain='testserver.local', path='/')
+            response = client.get('/v1/user/session')
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.headers['cache-control'], 'no-store')
+            self.assertNotIn(token, response.text)
+            self.assertGreater(response.json()['expires_in_ms'], 0)
+            return {'X-Pct-Session': response.json()['scope']}
+
+        device = self.consume(self.issue()).json()
+        machine = device['machine_id']
+        current = f'/v1/dashboard/machines/{machine}/current'
+        headers = sign_in(self.session)
+        self.assertEqual(client.get(current).status_code, 401)
+        self.assertEqual(client.get(current, headers=headers).json()['machineId'], machine)
+        # A cookie without the matching scope cannot perform a state change.
+        self.assertEqual(client.post('/v1/user/session/logout').status_code, 401)
+        self.assertEqual(client.post('/v1/telemetry/batches', json={}).status_code, 401)
+        self.assertEqual(client.get(current, headers={'Authorization': 'Bearer ' + device['device_token'],
+                                                       **headers}).status_code, 401)
+        # An in-flight request carrying the old scope must not read under a new cookie.
+        other_headers = sign_in(self.other)
+        self.assertEqual(client.get(current, headers=headers).status_code, 401)
+        self.assertEqual(client.get(current, headers=other_headers).status_code, 404)
+        self.assertEqual(client.post('/v1/user/session/logout', headers=headers).status_code, 401)
+        self.assertEqual(client.get('/v1/user/session').status_code, 200)
+
+        headers = sign_in(self.session)
+        # Ownership is read again on every selected-PC request.
+        with psycopg.connect(self.dsn) as db:
+            db.execute('UPDATE machines SET deleted=true WHERE machine_id=%s', (machine,))
+        denied = client.get(current, headers=headers)
+        self.assertEqual(denied.status_code, 404)
+        self.assertEqual(denied.headers['cache-control'], 'no-store')
+        self.assertEqual(client.get('/v1/user/session').status_code, 200)
+        with psycopg.connect(self.dsn) as db:
+            db.execute('UPDATE machines SET deleted=false WHERE machine_id=%s', (machine,))
+            db.execute("UPDATE user_sessions SET expires_at=clock_timestamp()-interval '1 second' "
+                       "WHERE token_sha256=%s", (hashlib.sha256(self.session.encode()).hexdigest(),))
+        for path in (current, '/v1/user/session'):
+            expired = client.get(path, headers=headers)
+            self.assertEqual(expired.status_code, 401)
+            self.assertEqual(expired.json()['error']['code'], 'USER_SESSION_EXPIRED')
+            self.assertFalse(expired.json()['error']['retryable'])
+            self.assertEqual(expired.headers['cache-control'], 'no-store')
+        self.assertEqual(self.authorized(device['device_token']), 422)
+
+        renewed = 'synthetic-renewed-' + uuid.uuid4().hex
+        with psycopg.connect(self.dsn) as db:
+            db.execute("INSERT INTO user_sessions VALUES(%s,%s,clock_timestamp()+interval '1 hour',false)",
+                       (hashlib.sha256(renewed.encode()).hexdigest(), self.user))
+        headers = sign_in(renewed)
+        self.assertEqual(client.get(current, headers=headers).status_code, 200)
+        self.assertEqual(client.post('/v1/user/session/logout', headers=headers).status_code, 204)
+        self.assertEqual(client.get(current, headers=headers).json()['error']['code'], 'USER_UNAUTHENTICATED')
+        self.assertEqual(self.authorized(device['device_token']), 422)
+
     def test_reissue_revoke_delete(self):
         """Rotation invalidates old tokens; revocation/deletion and pending-code cancellation persist."""
         device = self.consume(self.issue()).json()
@@ -174,6 +236,12 @@ class Registration(unittest.TestCase):
                 'X-Content-SHA256':digest(batch)})
         first = send()
         self.assertEqual(first.status_code, 200)
+        current_path = f"/v1/dashboard/machines/{device['machine_id']}/current"
+        current = self.client.get(current_path, headers=owner)
+        self.assertEqual(current.status_code, 200)
+        self.assertEqual(current.headers['cache-control'], 'no-store')
+        self.assertIn(52.5, [item['value'] for item in current.json()['readings']])
+        self.assertEqual(self.client.get(current_path, headers=other).status_code, 404)
         now = received + timedelta(minutes=2)
         summary = self.client.get(path, headers=owner).json()
         self.assertTrue(summary['online'])
@@ -315,14 +383,14 @@ class Registration(unittest.TestCase):
         self.assertEqual(self.manage('invalid-uuid', 'delete').status_code, 422)
 
     def test_documented_database_role(self):
-        """Documented least-privilege API role can enroll/manage, but cannot edit sessions/audits."""
+        """API role can revoke sessions, but cannot mint or extend them or delete audit rows."""
         role = 's203_api_' + uuid.uuid4().hex
         with psycopg.connect(self.base) as db:
             db.execute(f'CREATE ROLE {role} NOLOGIN')
             db.execute(f'GRANT USAGE ON SCHEMA {self.schema} TO {role}')
             for table in ('machines', 'registration_codes', 'device_credentials'):
                 db.execute(f'GRANT SELECT,INSERT,UPDATE ON {self.schema}.{table} TO {role}')
-            db.execute(f'GRANT SELECT ON {self.schema}.user_sessions TO {role}')
+            db.execute(f'GRANT SELECT, UPDATE (revoked) ON {self.schema}.user_sessions TO {role}')
             db.execute(f'GRANT SELECT,INSERT ON {self.schema}.credential_audit TO {role}')
             db.execute(f'GRANT USAGE ON SEQUENCE {self.schema}.credential_audit_event_id_seq TO {role}')
         try:
@@ -337,6 +405,11 @@ class Registration(unittest.TestCase):
                 machine = enrollment.json()['machine_id']
                 self.assertEqual(client.post(f'/v1/machines/{machine}/revoke',headers=headers).status_code, 200)
                 self.assertEqual(client.post(f'/v1/machines/{machine}/delete',headers=headers).status_code, 200)
+                self.assertEqual(client.post('/v1/user/session/logout', headers=headers).status_code, 204)
+                self.assertEqual(client.get('/v1/user/session', headers=headers).status_code, 401)
+            with psycopg.connect(limited_dsn) as db:
+                with self.assertRaises(psycopg.errors.InsufficientPrivilege):
+                    db.execute('UPDATE user_sessions SET expires_at=clock_timestamp()')
             for table in ('user_sessions', 'credential_audit'):
                 with psycopg.connect(limited_dsn) as db:
                     with self.assertRaises(psycopg.errors.InsufficientPrivilege):

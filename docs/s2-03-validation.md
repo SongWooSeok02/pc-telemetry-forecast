@@ -37,6 +37,7 @@ APM/프록시 로깅 대상에서 제외한다. 토큰을 URL에 넣는 클라�
 장비/소유자 삭제는 수집 이력을 지우지 않는다. 이력 보존/개인정보 삭제 정책과 별개다.
 API DB 역할에는 machines/registration_codes/device_credentials의 SELECT/INSERT/UPDATE,
 user_sessions SELECT, credential_audit SELECT/INSERT 및 identity sequence USAGE만 부여한다.
+S3-07 배포 시 세션 로그아웃에 필요한 추가 권한은 [세션 계약](s3-07-session.md)을 따른다.
 세션 발급 역할과 migration-owner를 분리하고 감사 UPDATE/DELETE를 부여하지 않는다.
 기존 README의 device_credentials SELECT 전용 설명은 관리 API 역할에는 적용되지 않는다.
 

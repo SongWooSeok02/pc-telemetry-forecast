@@ -28,6 +28,10 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
     def connect():
         return psycopg.connect(dsn or os.environ['DATABASE_URL'], connect_timeout=5)
 
+    from .user_session import install_user_session
+    install_user_session(app, connect, Rejected)
+    from .dashboard_current import install_dashboard_current
+    install_dashboard_current(app, connect, Rejected)
     from .registration import install
     install(app, connect, Rejected, clock)
     from .history import install_history
@@ -37,7 +41,9 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
 
     @app.exception_handler(Rejected)
     async def rejected(request, exc):
-        headers = {'WWW-Authenticate': 'Bearer'} if exc.status == 401 else {}
+        headers = {'Cache-Control': 'no-store'}
+        if exc.status == 401:
+            headers['WWW-Authenticate'] = 'Bearer'
         if exc.status == 503:
             headers['Retry-After'] = '5'
         return JSONResponse({'error': {'code': exc.code, 'message': exc.code,
