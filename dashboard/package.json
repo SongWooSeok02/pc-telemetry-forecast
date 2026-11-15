@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
+    "test": "node --test tests/browserSession.test.mjs tests/queryScheduler.test.ts",
     "build": "tsc -b && vite build",
     "test:scheduler": "node --experimental-strip-types --test tests/queryScheduler.test.ts",
     "preview": "vite preview --host 127.0.0.1"

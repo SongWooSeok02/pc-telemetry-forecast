@@ -17,12 +17,13 @@
 - **대시보드 주소**: 설치 폴더 `shell\shell.json`의 `dashboard_url`(개발 시 `--dashboard-url`). https만 허용(루프백 http 예외),
   사용자 정보·`token`·`password`·`code` 등 인증 쿼리는 거부한다. 같은 origin만 셸에서 열고 외부 https는 기본 브라우저, 그 외 차단.
 - **세션 분리**: WebView2 사용자 데이터는 Windows 사용자별 `%LOCALAPPDATA%\PcTelemetry\Shell\WebView2`.
-  셸은 장비 토큰·상태 폴더에 접근하지 않는다.
+  셸은 장비 토큰·상태 폴더에 접근하지 않는다. 공통 웹 세션과 같은 origin의 로그인 배치는
+  [S3-07 세션 계약](../../docs/s3-07-session.md)을 따른다.
 - **상태 줄**: 수집 서비스(SCM 조회만, 제어 없음) · 서버 연결 · 전송 대기 배치 수 · 전송 상태.
   전송 대기는 에이전트가 10초마다 쓰는 공개 상태 파일 `%ProgramData%\PcTelemetry\status\agent-status.json`
   (`pc-telemetry/agent-status/1`, 토큰·machine_id·센서값 없음)에서 읽는다. 확인하지 못한 값은 0이 아니라 "확인 불가".
 - **오프라인**: 대시보드 서버에 닿지 않으면 연결 상태·로컬 대기 데이터 수를 보여 주고 [다시 연결]을 둔다(자동 재시도 없음).
-- **최소화**(README 15.6): WebView2를 숨겨 웹에 `visibilitychange: hidden`을 전달하고 상태 확인을 멈춘다. 복원은 표시만 바꾼다.
+- **최소화**(README 15.6): WebView2를 숨겨 웹에 `visibilitychange: hidden`을 전달하고 상태 확인을 멈춘다. 창 상태는 S2-06의 가시성 메시지로도 전달하며, 셸은 인증 정보를 메시지로 보내지 않는다.
 - **창 닫기**: 셸만 종료한다. 수집 서비스는 계속 실행된다.
 - `--check [--out PATH]`: 창 없이 런타임·설정·서비스·상태 파일 판정을 JSON으로 남긴다(종료 코드 0 표시 가능, 2 런타임 없음, 3 설정 오류).
 

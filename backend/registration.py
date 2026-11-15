@@ -10,6 +10,8 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
+from .user_session import require_session as require_user_session
+
 
 def sha(value):
     return hashlib.sha256(value.encode()).hexdigest()
@@ -19,21 +21,7 @@ ONLINE_WINDOW = timedelta(minutes=2)
 
 
 def session(rejected, db, request):
-    header = request.headers.get('authorization', '')
-    row = None
-    if header.startswith('Bearer ') and 0 < len(header[7:]) <= 512:
-        row = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
-            'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
-    if row is None:
-        raise rejected(401, 'USER_UNAUTHENTICATED')
-    # Serialize owner operations: prevents issuing a replacement code racing deletion.
-    db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(row[0]),))
-    # Lock waits must not extend a user's session lifetime or bypass logout.
-    active = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
-        'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
-    if active is None:
-        raise rejected(401, 'USER_UNAUTHENTICATED')
-    return row[0]
+    return require_user_session(rejected, db, request)[0]
 
 
 def owned(rejected, db, user, machine):
