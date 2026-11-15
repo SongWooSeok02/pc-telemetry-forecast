@@ -36,7 +36,7 @@ services:
       PGDATABASE: ${POSTGRES_DB:?set POSTGRES_DB}
     volumes:
       - ../database/migrations:/migrations:ro
-    command: [psql, -v, ON_ERROR_STOP=1, -f, /migrations/001_ingestion.sql, -f, /migrations/002_registration.sql, -f, /migrations/004_aggregation.sql]
+    command: [psql, -v, ON_ERROR_STOP=1, -f, /migrations/001_ingestion.sql, -f, /migrations/002_registration.sql, -f, /migrations/004_aggregation.sql, -f, /migrations/005_forecast.sql]
     restart: 'no'
   api:
     <<: *app
@@ -56,6 +56,15 @@ services:
         condition: service_completed_successfully
     command: [python, -m, backend.aggregation]
     restart: unless-stopped
+  forecast:
+    <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: [python, -m, backend.forecast]
+    volumes:
+      - forecast-models:/models:ro
+    restart: unless-stopped
   partitions:
     <<: *app
     profiles: [maintenance]
@@ -66,3 +75,4 @@ services:
     restart: 'no'
 volumes:
   dev-db:
+  forecast-models:

@@ -28,6 +28,7 @@ jobs:
       - run: python -m unittest discover -s tests -p test_backend_runner.py
       - run: python -m unittest discover -s tests -p test_partitions.py
       - run: python -m unittest discover -s tests -p test_aggregation.py -v
+      - run: python -m unittest discover -s tests -p test_forecast.py -v
       - run: python tests/run_backend.py
       - run: python tests/run_registration.py
       - run: python tests/run_https_registration.py

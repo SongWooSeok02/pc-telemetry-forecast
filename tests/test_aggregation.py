@@ -119,7 +119,8 @@ class AggregationIntegration(unittest.TestCase):
         self.assertEqual([r['provisional'] for r in minute], [False, True])
         self.assertTrue(all(r['updated_at'] and not r['pending'] for r in minute))
         with self.connect() as db:
-            db.execute('INSERT INTO predictions VALUES (%s,%s,%s,%s,55,%s)',
+            db.execute('INSERT INTO predictions (machine_id,sensor_id,target_at,generated_at,value,model_version) '
+                       'VALUES (%s,%s,%s,%s,55,%s)',
                        (self.machine, SENSOR, self.now, self.now, 'baseline'))
         self.assertEqual(self.read('/predictions').json()['items'][0]['value'], 55)
         self.assertEqual(len(self.read('/measurements').json()['items']), 6)
