@@ -25,6 +25,6 @@ class PartitionWorker(unittest.TestCase):
             partitions.main()
         statements = [call.args[0] for call in
                       connect.return_value.__enter__.return_value.execute.call_args_list]
-        self.assertEqual(statements[-1], 'SELECT ensure_measurement_partitions()')
-        connect.return_value.__exit__.assert_called_once_with(None, None, None)
+        self.assertEqual(statements[-2:], ['SELECT ensure_measurement_partitions()', 'SELECT prune_telemetry()'])
+        self.assertEqual(connect.return_value.__exit__.call_count, 2)
         self.assertIn('partition_maintenance_success', ''.join(logs.output))

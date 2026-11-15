@@ -27,6 +27,7 @@ jobs:
       - run: pip install -r backend/requirements.txt
       - run: python -m unittest discover -s tests -p test_backend_runner.py
       - run: python -m unittest discover -s tests -p test_partitions.py
+      - run: python -m unittest discover -s tests -p test_aggregation.py -v
       - run: python tests/run_backend.py
       - run: python tests/run_registration.py
       - run: python tests/run_https_registration.py
