@@ -9,8 +9,8 @@ S1-02a의 버전·드라이버 관측 자료는 아직 저장소에 없다.
 | 구성 | 개발 기준 | 현재 실행/검사 |
 |---|---|---|
 | API | Python 3.12, backend/requirements.txt 고정 직접 의존성 | FastAPI 이미지 빌드, Ruff 치명 오류 검사, PostgreSQL 통합 검사 |
-| DB | PostgreSQL 16, 빈 전용 DB | 001_ingestion.sql 1회 적용, 파티션 준비/중복/원자성 검사 |
-| 작업자 | API와 같은 Python 이미지 | 구현된 파티션 관리 명령만 제공. 예측·집계 작업자는 미구현 |
+| DB | PostgreSQL 16, 빈 전용 DB | Compose에서 001·002·004·005를 1회 적용 |
+| 작업자 | API와 같은 Python 이미지 | 파티션 관리, 집계, [예측](../docs/s3-05-forecast.md) |
 | Windows 에이전트 | Windows 11 x64 목표, .NET/LHM 버전은 A의 S1-02a 결과로 확정 | 소스·프로젝트 없음. .NET 빌드/센서 검증 미연결 |
 | 대시보드 | React/TypeScript 계획, Node.js 22는 현재 계약 생산자 검사에 사용 | package.json·UI 소스 없음. UI 빌드/정적 검사 미연결 |
 
@@ -63,8 +63,10 @@ TLS·비밀 주입·백업·알림을 별도로 적용한다.
 | BACKEND_REPORT | 테스트 프로세스 | 기본 tests/results/s1-03-backend.json, 개인 실행 시 local-evidence/ 아래 지정 |
 | CONTRACT_REPORT | 테스트 프로세스 | 기본 tests/results/s1-01-contracts.json, 개인 실행 시 local-evidence/ 아래 지정 |
 | NODE_BINARY | 필요 시 테스트 프로세스 | Node 실행 파일 경로 |
+| FORECAST_MODEL_DIR | 예측 작업자 | 모델 파일 디렉터리. 기본 `/models` |
 
-에이전트/대시보드의 미확정 환경변수나 예측 작업자의 가짜 실행 명령은 만들지 않는다.
+예측 작업자는 Compose에서 `up -d forecast`로 실행한다. 예측 대상과 파일 등록은
+[예측 운영 문서](../docs/s3-05-forecast.md)를 따른다.
 해당 구현 PR에서 버전·환경 예제·빌드·정적 검사·핵심 테스트를 함께 추가한다.
 `.env`, 로컬 DB, 모델, `local-evidence/`는 무시한다. 추적 중인 파일에는 ignore가 소급되지
 않으므로 제출 전 `git diff --cached`를 확인한다. 토큰·연결 문자열·PC 원본 자료는 붙이지 않는다.
