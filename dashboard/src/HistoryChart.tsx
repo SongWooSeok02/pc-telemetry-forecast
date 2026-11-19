@@ -129,7 +129,7 @@ export default function HistoryChart({ response, busy, error, sensorUnsupported,
     <div className="history-meta">
       <strong>{selectedLabel}</strong><span>{response?.unit ?? '단위 대기'}</span><span className="history-meta__status">{latestStatus}</span>
       <span>마지막 관측 {time(latestPoint?.lastObservedAt)} <i>·</i> 데이터 경과 {elapsed(latestPoint?.lastObservedAt)}</span>
-      <span>마지막 수신 {time(lastReceipt)} <i>·</i> 수신 지연 {delay(latestPoint?.lastObservedAt, lastReceipt)}</span>
+      <span>마지막 수신 {time(lastReceipt)} <i>·</i> 최신 관측 수신 지연 {delay(latestPoint?.lastObservedAt, latestPoint?.receivedAt)}</span>
       {response?.aggregationPending && <span className="aggregation-state">집계 갱신 대기</span>}
     </div>
     {error && <p className="notice" role="status">과거 데이터를 불러오지 못했습니다. 표시 중인 이전 데이터는 유지됩니다. {error}</p>}
