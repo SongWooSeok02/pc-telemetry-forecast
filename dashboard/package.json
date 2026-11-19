@@ -7,6 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "tsc -b && vite build",
     "test:scheduler": "node --experimental-strip-types --test tests/queryScheduler.test.ts",
+    "test:forecast": "node --experimental-strip-types --test tests/forecastData.test.ts tests/forecastRender.test.ts",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
