@@ -24,4 +24,5 @@ jobs:
       - run: npm install --no-package-lock
       - run: npm run test:forecast
       - run: npm run test:scheduler
+      - run: npm run test:session
       - run: npm run build

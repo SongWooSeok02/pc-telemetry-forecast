@@ -118,7 +118,7 @@ export default function HistoryChart({ response, busy, error, sensorUnsupported,
     <div className="section-heading history-heading">
       <div><p className="eyebrow">HISTORICAL TELEMETRY</p><h2 id="history-title">과거 차트</h2></div>
       <div className="history-tools">
-        <label className="history-range">기간<select value={rangeLabel} onChange={(event) => { setZoom([0, 1]); onRangeChange(event.target.value) }} aria-label="과거 조회 기간">
+        <label className="history-range">기간<select value={rangeLabel} onChange={(event) => onRangeChange(event.target.value)} aria-label="과거 조회 기간">
           <option value="1h">1시간</option><option value="6h">6시간</option><option value="24h">24시간</option><option value="7d">7일</option><option value="30d">30일</option><option value="90d">90일</option>
         </select></label>
         <button className="chart-zoom" onClick={() => zoomBy(0.7)} aria-label="차트 확대" title="확대">＋</button>

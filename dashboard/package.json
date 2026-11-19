@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "test:scheduler": "node --experimental-strip-types --test tests/queryScheduler.test.ts",
     "test:forecast": "node --experimental-strip-types --test tests/forecastData.test.ts tests/forecastRender.test.ts",
+    "test:session": "node --experimental-strip-types --test tests/browserSession.test.mjs",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {

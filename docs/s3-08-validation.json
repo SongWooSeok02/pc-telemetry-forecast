@@ -1,0 +1,44 @@
+{
+  "input": "fixed fixtures, fake monotonic timer and document/WebView events",
+  "expected": {
+    "forecast_tests": 15,
+    "scheduler_tests": 27,
+    "session_tests": 3,
+    "total_tests": 45,
+    "all_exit_codes": 0
+  },
+  "build_base": "45103c4",
+  "ci": "pending",
+  "limitations": [
+    "No live PC, deployed authentication API or WebView2 integrated demonstration",
+    "No interactive zoom/scroll demonstration",
+    "S3-05 prediction unit response field pending"
+  ],
+  "version": "dashboard 0.1.0 / S3-08",
+  "auth_source": "origin/codex/s3-07 e7cebae frontend files",
+  "finished_at_utc": "2026-11-19T11:12:54.7483484Z",
+  "started_at_utc": "2026-11-19T11:12:48.7091597Z",
+  "actual": {
+    "scheduler_exit": 0,
+    "scheduler_tests": 27,
+    "session_tests": 3,
+    "diff_exit": 0,
+    "build_exit": 0,
+    "forecast_tests": 15,
+    "forecast_exit": 0,
+    "session_exit": 0
+  },
+  "environment": {
+    "os": "Windows",
+    "architecture": "AMD64",
+    "node": "v26.13.0"
+  },
+  "reproduction": [
+    "npm --prefix dashboard run test:scheduler",
+    "npm --prefix dashboard run test:forecast",
+    "npm --prefix dashboard run test:session",
+    "npm --prefix dashboard run build",
+    "git diff --check"
+  ],
+  "passed": true
+}
