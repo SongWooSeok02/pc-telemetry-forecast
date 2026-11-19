@@ -1,0 +1,36 @@
+{
+  "pipeline_version": "s3-04.1",
+  "build_base": "918a93c",
+  "input_kind": "synthetic tests only; no real PC measurements",
+  "environment": {
+    "os": "Windows",
+    "os_version": "10.0.26300",
+    "architecture": "AMD64",
+    "python": "3.12.14"
+  },
+  "started_at_utc": "2026-11-19T10:21:05.011176+00:00",
+  "finished_at_utc": "2026-11-19T10:21:10.459013+00:00",
+  "reproduction": [
+    "python -m unittest discover -s tests -p test_temperature_model.py -v",
+    "python -m unittest discover -s tests -p test_ml_baselines.py -v",
+    "python -m compileall -q ml tests/test_temperature_model.py tests/test_ml_baselines.py",
+    "git diff --check"
+  ],
+  "expected": {
+    "unit_tests": 24,
+    "failures": 0,
+    "compile": true,
+    "whitespace": true
+  },
+  "actual": {
+    "unit_tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "compile": true,
+    "whitespace": true
+  },
+  "passed": true,
+  "real_pc_evaluation": "not performed",
+  "independent_reviewer": "pending",
+  "ci": "not yet verified for this commit"
+}
