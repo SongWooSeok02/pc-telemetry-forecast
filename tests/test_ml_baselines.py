@@ -25,6 +25,29 @@ class BaselinePipelineTests(unittest.TestCase):
         self.assertLess(examples[-1].target_time, split_end)
         self.assertAlmostEqual(examples[0].moving_average, sum(range(300, 600)) / 300)
 
+    def test_default_boundaries_have_exact_durations_and_include_latest_tick(self):
+        latest = self.start + timedelta(days=8) - timedelta(seconds=1)
+        boundaries = chronological_boundaries(latest)
+        for name, days in (("train", 5), ("validation", 1), ("test", 2)):
+            start, end = boundaries[name]
+            self.assertEqual(end - start, timedelta(days=days))
+        self.assertEqual(boundaries["test"], (self.start + timedelta(days=6), self.start + timedelta(days=8)))
+        self.assertEqual(boundaries["validation"][1], boundaries["test"][0])
+        self.assertEqual(boundaries["train"][1], boundaries["validation"][0])
+        self.assertLess(latest, boundaries["test"][1])
+
+    def test_exclusive_test_end_keeps_exact_candidate_count_and_latest_target(self):
+        timeline = self.timeline(2000)
+        latest = max(timeline)
+        boundaries = chronological_boundaries(latest, test_days=600 / 86400)
+        start, end = boundaries["test"]
+        self.assertEqual(end - start, timedelta(seconds=600))
+        examples, possible = build_examples(timeline, start, end)
+        self.assertEqual(possible, 600 - 299 - 60)
+        self.assertEqual(len(examples), possible)
+        self.assertEqual(examples[0].anchor - timedelta(seconds=299), start)
+        self.assertEqual(examples[-1].target_time, latest)
+
     def test_missing_or_bad_quality_value_excludes_windows_without_imputation(self):
         timeline = self.timeline(500)
         bad_time = self.start + timedelta(seconds=200)

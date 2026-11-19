@@ -102,13 +102,14 @@ def chronological_boundaries(
         raise ValueError("split durations must be finite and positive")
     if latest.tzinfo is None or latest.utcoffset() != timedelta(0):
         raise ValueError("latest timestamp must be UTC")
-    test_start = latest - timedelta(days=test_days)
+    test_end = latest + timedelta(seconds=1)
+    test_start = test_end - timedelta(days=test_days)
     validation_start = test_start - timedelta(days=validation_days)
     train_start = validation_start - timedelta(days=train_days)
     return {
         "train": (train_start, validation_start),
         "validation": (validation_start, test_start),
-        "test": (test_start, latest + timedelta(seconds=1)),
+        "test": (test_start, test_end),
     }
 
 
@@ -239,7 +240,7 @@ def evaluate(
         }
     return {
         "schema_version": "1.0",
-        "pipeline_version": "s2-07b.1",
+        "pipeline_version": "s2-07b.2",
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "input_sha256": input_sha256,
         "config": {
