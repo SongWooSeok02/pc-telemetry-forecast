@@ -179,7 +179,8 @@
     "cpuLoadStage": {
       "allOf": [
         { "$ref": "#/$defs/baseStage" },
-        { "properties": { "stage_id": { "const": "cpu_load" }, "task": { "const": "cpu_load" }, "target": { "const": "cpu" }, "workload_tool": { "type": "string", "minLength": 1 }, "workload_version": { "type": "string", "minLength": 1 }, "workload_profile": { "type": "string", "minLength": 1 } } }
+        { "properties": { "stage_id": { "const": "cpu_load" }, "task": { "const": "cpu_load" }, "target": { "const": "cpu" } } },
+        { "if": { "properties": { "stage_status": { "enum": ["completed", "aborted"] } }, "required": ["stage_status"] }, "then": { "properties": { "workload_tool": { "type": "string", "minLength": 1 }, "workload_version": { "type": "string", "minLength": 1 }, "workload_profile": { "type": "string", "minLength": 1 } } } }
       ]
     },
     "cpuCooldownStage": {
@@ -191,7 +192,8 @@
     "gpuLoadStage": {
       "allOf": [
         { "$ref": "#/$defs/baseStage" },
-        { "properties": { "stage_id": { "const": "gpu_load" }, "task": { "const": "gpu_load" }, "target": { "const": "gpu" }, "workload_tool": { "type": "string", "minLength": 1 }, "workload_version": { "type": "string", "minLength": 1 }, "workload_profile": { "type": "string", "minLength": 1 } } }
+        { "properties": { "stage_id": { "const": "gpu_load" }, "task": { "const": "gpu_load" }, "target": { "const": "gpu" } } },
+        { "if": { "properties": { "stage_status": { "enum": ["completed", "aborted"] } }, "required": ["stage_status"] }, "then": { "properties": { "workload_tool": { "type": "string", "minLength": 1 }, "workload_version": { "type": "string", "minLength": 1 }, "workload_profile": { "type": "string", "minLength": 1 } } } }
       ]
     },
     "gpuCooldownStage": {
