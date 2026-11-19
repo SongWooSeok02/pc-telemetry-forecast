@@ -1,3 +1,4 @@
+import { runQueryActivity } from '../src/queryActivity.ts'
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { bindDashboardVisibility, QueryScheduler, type SchedulerClock } from '../src/queryScheduler.ts'
@@ -266,4 +267,106 @@ test('document and WebView host visibility events gate requests', async () => {
     if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow)
     else Reflect.deleteProperty(globalThis, 'window')
   }
+})
+
+for (const surface of ['web', 'host'] as const) {
+  for (const query of ['current', 'history'] as const) {
+    test(`manual ${query} cancellation restores display on ${surface} hide without resume fetch`, async () => {
+      const scheduler = new QueryScheduler(new FakeClock())
+      const fakeDocument = new EventTarget() as Document
+      Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible', writable: true })
+      const webview = new EventTarget()
+      const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+      const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
+      Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+      Object.defineProperty(globalThis, 'window', { configurable: true, value: { chrome: { webview } } })
+      const blocked = deferred()
+      let calls = 0
+      let state: string | boolean = query === 'current' ? 'ready' : false
+      const previous = state
+      const busy = query === 'current' ? 'loading' : true
+      const lastData = { value: 42 }
+      let data = lastData
+      let error: string | null = 'previous error'
+      let unbind = () => {}
+      try {
+        scheduler.setPeriod('manual')
+        unbind = bindDashboardVisibility(scheduler)
+        scheduler.register(query, (signal) => runQueryActivity(signal, {
+          get: () => state, set: (value) => { state = value }, busy,
+          onCancel: () => { error = 'previous error' },
+        }, async () => {
+          calls += 1
+          error = null
+          await blocked.promise
+          if (!signal.aborted) data = { value: 99 }
+        }))
+        await flush()
+        assert.equal(state, busy)
+        const visibility = (visible: boolean) => {
+          if (surface === 'host') webview.dispatchEvent(new MessageEvent('message', { data: { type: 'pc-telemetry:host-visibility', visible } }))
+          else {
+            Object.defineProperty(fakeDocument, 'visibilityState', { value: visible ? 'visible' : 'hidden', writable: true })
+            fakeDocument.dispatchEvent(new Event('visibilitychange'))
+          }
+        }
+        visibility(false)
+        assert.equal(state, previous, 'clear busy immediately before aborted transport settles')
+        assert.equal(error, 'previous error')
+        visibility(true)
+        blocked.resolve()
+        await flush()
+        assert.equal(calls, 1, 'manual restore must not fetch')
+        assert.equal(state, previous)
+        assert.equal(data, lastData, 'cancelled response must not replace displayed data')
+        scheduler.refreshNow()
+        await flush()
+        assert.equal(calls, 2)
+      } finally {
+        unbind()
+        scheduler.dispose()
+        if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument)
+        else Reflect.deleteProperty(globalThis, 'document')
+        if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow)
+        else Reflect.deleteProperty(globalThis, 'window')
+      }
+    })
+  }
+}
+
+test('manual failure clears activity without automatic retry', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  let busy = false
+  let calls = 0
+  scheduler.setPeriod('manual')
+  scheduler.setVisible(true)
+  scheduler.register('history', (signal) => runQueryActivity(signal, {
+    get: () => busy, set: (value) => { busy = value }, busy: true,
+  }, async () => { calls += 1; throw new Error('server failure') }))
+  await flush()
+  assert.equal(busy, false)
+  await clock.advanceBy(60_000)
+  assert.equal(calls, 1)
+  assert.equal(clock.pendingCount(), 0)
+  scheduler.dispose()
+})
+
+test('late completion of cancelled activity cannot clear newer busy state', async () => {
+  let state = 'error'
+  const activity = { get: () => state, set: (value: string) => { state = value }, busy: 'loading' }
+  const old = new AbortController()
+  const blocked = deferred()
+  const pending = runQueryActivity(old.signal, activity, () => blocked.promise)
+  old.abort()
+  assert.equal(state, 'error')
+  const newer = new AbortController()
+  const newerBlocked = deferred()
+  const newerPending = runQueryActivity(newer.signal, activity, () => newerBlocked.promise)
+  blocked.resolve()
+  await pending
+  assert.equal(state, 'loading')
+  newerBlocked.resolve()
+  await newerPending
+  assert.equal(state, 'error')
 })
