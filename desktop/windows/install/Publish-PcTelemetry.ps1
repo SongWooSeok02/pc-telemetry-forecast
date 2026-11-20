@@ -2,6 +2,7 @@
 S1-06 배포 폴더 생성(개발 PC에서 실행, 관리자 불필요).
 
   .\Publish-PcTelemetry.ps1 [-Out <폴더>] [-NoWebView2Bootstrapper]
+  .\Publish-PcTelemetry.ps1 -ReleaseCandidate -Out <새 폴더> -SigningCertificate <인증서> -TimestampServer <HTTPS URL>
 
 결과(-Out, 기본 desktop/windows/publish — Git 제외):
   agent\   PcTelemetry.Agent (self-contained win-x64, LHM 0.9.6 고정)
@@ -15,18 +16,35 @@ S1-06 배포 폴더 생성(개발 PC에서 실행, 관리자 불필요).
 [CmdletBinding()]
 param(
     [string]$Out,
-    [switch]$NoWebView2Bootstrapper
+    [switch]$NoWebView2Bootstrapper,
+    [switch]$ReleaseCandidate,
+    [System.Security.Cryptography.X509Certificates.X509Certificate2]$SigningCertificate,
+    [uri]$TimestampServer
 )
 $ErrorActionPreference = 'Stop'
 # Windows PowerShell 5.1은 param 기본값에서 $PSScriptRoot가 비어 있다.
 if (-not $Out) { $Out = Join-Path $PSScriptRoot '..\publish' }
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $Out = [IO.Path]::GetFullPath($Out)
-if (Test-Path $Out) { Remove-Item -Recurse -Force $Out }
+$version = $null
+if ($ReleaseCandidate) {
+    $version = '0.1.0-rc1'
+    if (-not $SigningCertificate -or -not $SigningCertificate.HasPrivateKey -or
+        -not $TimestampServer -or -not $TimestampServer.IsAbsoluteUri -or $TimestampServer.Scheme -ne 'https') {
+        throw 'RC publishing requires a signing certificate with a private key and an HTTPS timestamp server.'
+    }
+    if (Test-Path -LiteralPath $Out) { throw 'RC output must be a new directory.' }
+    $sourceCommit = & git -C $repo rev-parse HEAD
+    if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the RC source commit.' }
+    $changes = & git -C $repo status --porcelain
+    if ($LASTEXITCODE -ne 0 -or $changes) { throw 'RC publishing requires a clean Git checkout.' }
+} elseif (Test-Path $Out) { Remove-Item -Recurse -Force $Out }
 New-Item -ItemType Directory -Force $Out | Out-Null
 
 function Publish-Project([string]$project, [string]$target) {
-    & dotnet publish (Join-Path $repo $project) -c Release -r win-x64 --self-contained true -o $target -nologo -v q
+    $properties = @()
+    if ($version) { $properties += "-p:Version=$version" }
+    & dotnet publish (Join-Path $repo $project) -c Release -r win-x64 --self-contained true -o $target -nologo -v q @properties
     if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed: $project" }
 }
 Publish-Project 'agents\windows\src\PcTelemetry.Agent' (Join-Path $Out 'agent')
@@ -50,38 +68,67 @@ if (-not $NoWebView2Bootstrapper) {
 
 Copy-Item (Join-Path $PSScriptRoot 'Install-PcTelemetry.ps1'), (Join-Path $PSScriptRoot 'Uninstall-PcTelemetry.ps1') $Out
 
+$firstPartyFiles = @(
+    'agent\PcTelemetry.Agent.exe'
+    'agent\PcTelemetry.Agent.dll'
+    'agent\PcTelemetry.Collector.dll'
+    'shell\PcTelemetry.Shell.exe'
+    'shell\PcTelemetry.Shell.dll'
+    'shell\PcTelemetry.Shell.Core.dll'
+    'Install-PcTelemetry.ps1'
+    'Uninstall-PcTelemetry.ps1'
+)
+if ($ReleaseCandidate) {
+    foreach ($relativePath in $firstPartyFiles) {
+        $file = Join-Path $Out $relativePath
+        $signature = Set-AuthenticodeSignature -LiteralPath $file -Certificate $SigningCertificate `
+            -HashAlgorithm SHA256 -TimestampServer $TimestampServer.AbsoluteUri
+        if ($signature.Status -ne 'Valid' -or -not $signature.TimeStamperCertificate -or
+            $signature.SignerCertificate.Thumbprint -ne $SigningCertificate.Thumbprint) {
+            throw "RC Authenticode verification failed: $relativePath ($($signature.Status))"
+        }
+    }
+}
+
 function Describe([string]$path) {
-    $item = Get-Item $path
+    $item = Get-Item -LiteralPath $path
     [ordered]@{
         path = $item.FullName.Substring($Out.Length + 1)
         version = $item.VersionInfo.FileVersion
-        sha256 = (Get-FileHash $path -Algorithm SHA256).Hash.ToLowerInvariant()
+        sha256 = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
         bytes = $item.Length
     }
 }
-$files = @(
-    # exe는 공통 실행 호스트라 코드 변경을 반영하지 않을 수 있어 코드가 든 dll도 기록한다.
-    Describe (Join-Path $Out 'agent\PcTelemetry.Agent.exe')
-    Describe (Join-Path $Out 'agent\PcTelemetry.Agent.dll')
-    Describe (Join-Path $Out 'shell\PcTelemetry.Shell.exe')
-    Describe (Join-Path $Out 'shell\PcTelemetry.Shell.dll')
-    Describe (Join-Path $Out 'shell\PcTelemetry.Shell.Core.dll')
-    Describe (Join-Path $Out 'Install-PcTelemetry.ps1')
-    Describe (Join-Path $Out 'Uninstall-PcTelemetry.ps1')
-)
-if ($bootstrapper) {
-    $d = Describe $bootstrapper
-    $d.signer = (Get-AuthenticodeSignature $bootstrapper).SignerCertificate.Subject
-    $files += $d
-}
-$commit = (& git -C $repo rev-parse HEAD).Trim()
+$commit = & git -C $repo rev-parse HEAD
+if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the source commit.' }
 $dirty = [bool](& git -C $repo status --porcelain)
-[ordered]@{
+if ($ReleaseCandidate -and ($LASTEXITCODE -ne 0 -or $dirty -or $commit -ne $sourceCommit)) {
+    throw 'RC source changed during publishing. Use a fresh output directory to retry.'
+}
+$sdkVersion = & dotnet --version
+if ($LASTEXITCODE -ne 0) { throw 'Could not resolve the .NET SDK version.' }
+$manifest = [ordered]@{
     task = 'S1-06'
     built_at_utc = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
     commit = $commit
     dirty = $dirty
-    dotnet_sdk = (& dotnet --version).Trim()
-    files = $files
-} | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $Out 'manifest.json') -Encoding UTF8
+    dotnet_sdk = $sdkVersion.Trim()
+}
+if ($ReleaseCandidate) {
+    $manifest.task = 'S4-08'
+    $manifest.release = "v$version"
+    $manifest.signer_thumbprint = $SigningCertificate.Thumbprint
+    $manifest.signed_paths = $firstPartyFiles
+    $manifest.files = @(Get-ChildItem -LiteralPath $Out -Recurse -File |
+        Sort-Object FullName | ForEach-Object { Describe $_.FullName })
+} else {
+    $manifest.files = @($firstPartyFiles | Where-Object { $_ -ne 'agent\PcTelemetry.Collector.dll' } |
+        ForEach-Object { Describe (Join-Path $Out $_) })
+    if ($bootstrapper) {
+        $entry = Describe $bootstrapper
+        $entry.signer = (Get-AuthenticodeSignature $bootstrapper).SignerCertificate.Subject
+        $manifest.files += $entry
+    }
+}
+$manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $Out 'manifest.json') -Encoding UTF8
 Write-Output "published: $Out"
