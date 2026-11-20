@@ -1,0 +1,36 @@
+{
+  "version": "s4-05.1",
+  "base": "f1b3662",
+  "started_at_utc": "2026-11-20T15:44:07.719058+00:00",
+  "finished_at_utc": "2026-11-20T15:44:15.863695+00:00",
+  "pc": "synthetic-pc",
+  "environment": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.12.14"
+  },
+  "data_kind": "synthetic fixtures",
+  "real_pc_evaluation": "not performed",
+  "commands": [
+    "python -m unittest discover -s tests -p test_final_evaluation.py -v",
+    "python -m unittest discover -s tests -p test_temperature_model.py -v",
+    "python -m unittest discover -s tests -p test_ml_baselines.py -v",
+    "python -m compileall -q ml",
+    "python -m ml.final_evaluation baseline-release --machine-id synthetic-pc --target gpu --output <unused-file>",
+    "git diff --check"
+  ],
+  "expected": {
+    "tests": 29,
+    "failures": 0,
+    "compile": true,
+    "persistence_artifact": true,
+    "diff": true
+  },
+  "actual": {
+    "tests": 29,
+    "failures": 0,
+    "compile": true,
+    "persistence_artifact": true,
+    "diff": true
+  },
+  "passed": true
+}

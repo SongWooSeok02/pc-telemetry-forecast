@@ -33,6 +33,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_temperature_model.py -v
       - name: Compile temperature pipeline
         run: python -m compileall -q ml/temperature_model.py tests/test_temperature_model.py
+      - name: Frozen model and fresh holdout evaluation
+        run: python -m unittest discover -s tests -p test_final_evaluation.py -v
       - name: Whitespace check
         run: git diff --check
       - uses: actions/upload-artifact@v4
