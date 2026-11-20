@@ -1,0 +1,5 @@
+{$TELEMETRY_DOMAIN} {
+	@health path /health /health/*
+	respond @health 404
+	reverse_proxy api:8000
+}
