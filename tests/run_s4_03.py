@@ -119,13 +119,16 @@ def benchmark(db, dsn, start, days, seconds):
     emit('rollup_size', bytes=db.execute(
         "SELECT pg_total_relation_size('measurement_aggregates')").fetchone()[0])
 
-    for label, query, params in [
-        ('raw_1m', RAW, (PC, SENSOR, end-timedelta(minutes=1), end, start, None, None, None)),
-        ('raw_6h', RAW, (PC, SENSOR, end-timedelta(hours=6), end, start, None, None, None)),
-        ('rollup_1m', ROLLUP, (PC, SENSOR, 60, start, end) * 2 + (60, None, None, None, None, 60)),
+    for label, query, params, expected in [
+        ('raw_1m', RAW, (PC, SENSOR, end-timedelta(minutes=1), end, start, None, None, None), 60),
+        ('raw_6h', RAW, (PC, SENSOR, end-timedelta(hours=6), end, start, None, None, None),
+         min(seconds, 21600)),
+        ('rollup_1m', ROLLUP, (PC, SENSOR, 60, start, end) * 2 + (60, None, None, None, None, 60),
+         days * seconds // 60),
     ]:
         plan = db.execute('EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ' + query, params).fetchone()[0][0]
-        emit('plan', query=label, plan=plan)
+        emit('plan', query=label, expected_rows=expected, plan=plan)
+        require(plan['Plan']['Actual Rows'] == expected, f'unexpected {label} plan row count')
 
     with TestClient(create_app(dsn, clock=lambda: end)) as client:
         def poll(machine, cursor):
@@ -214,7 +217,7 @@ def main():
              logical_cpus=os.cpu_count(), python=platform.python_version(), psycopg=psycopg.__version__,
              database=db.execute('SELECT version()').fetchone()[0],
              settings=dict(db.execute("""
-                 SELECT name, setting || coalesce(unit, '') FROM pg_settings
+                 SELECT name, current_setting(name) FROM pg_settings
                  WHERE name IN ('shared_buffers','work_mem','max_wal_size','synchronous_commit',
                                 'fsync','max_parallel_workers_per_gather')
              """).fetchall()), smoke=args.smoke, expected_rows=120 * days * seconds)
