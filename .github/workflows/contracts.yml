@@ -16,18 +16,18 @@ jobs:
     env:
       CONTRACT_REPORT: tests/results/ci/s1-01-contracts.json
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: '22'
       - name: Independent producer, HTTP API, transactions and clock state
         run: python tests/run_contracts.py
       - name: Whitespace check
         run: git diff --check
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: s1-01-evidence-${{ matrix.os }}

@@ -12,8 +12,8 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
       - name: Unit tests (synthetic sensors, shared hash vectors)
@@ -22,7 +22,7 @@ jobs:
         run: dotnet build agents/windows/src/PcTelemetry.Agent -c Release
       - name: Whitespace check
         run: git diff --check
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: s1-02b-collector-tests
