@@ -11,11 +11,43 @@ const timestamp = (value: unknown): value is string => typeof value === 'string'
 const numberOrNull = (value: unknown) => value === null || typeof value === 'number' && Number.isFinite(value)
 const abort = (signal: AbortSignal) => { if (signal.aborted) throw new DOMException('Query cancelled', 'AbortError') }
 
+type ParsedInstant = { seconds: number; fraction: string }
+
+function parseUtcInstant(value: string): ParsedInstant {
+  const match = /^(.*?)(?:\.(\d+))?(?:Z|[+]00:00)$/.exec(value)
+  if (!match) return { seconds: Math.floor(Date.parse(value) / 1000), fraction: '' }
+  return {
+    seconds: Math.floor(Date.parse(`${match[1]}Z`) / 1000),
+    fraction: (match[2] ?? '').replace(/0+$/, ''),
+  }
+}
+
+function instantFromMs(ms: number): ParsedInstant {
+  const seconds = Math.floor(ms / 1000)
+  const remMs = ((ms % 1000) + 1000) % 1000
+  return { seconds, fraction: remMs ? String(remMs).padStart(3, '0').replace(/0+$/, '') : '' }
+}
+
+function compareParsedInstants(a: ParsedInstant, b: ParsedInstant): number {
+  return a.seconds - b.seconds || (a.fraction < b.fraction ? -1 : a.fraction > b.fraction ? 1 : 0)
+}
+
+function compareInstants(a: string, b: string): number {
+  return compareParsedInstants(parseUtcInstant(a), parseUtcInstant(b))
+}
+
+export function observedTimestampKey(value: string): string {
+  const { seconds, fraction } = parseUtcInstant(value)
+  return fraction ? `${seconds}.${fraction}` : `${seconds}`
+}
+
 export function parsePredictions(body: unknown, expectedUnit: string): { items: Prediction[]; truncated: boolean } {
   if (!record(body) || !Array.isArray(body.items) || typeof body.truncated !== 'boolean') throw new Error('예측 응답 형식 오류')
   const items = body.items.map((item: unknown) => {
-    if (!record(item) || !timestamp(item.target_at) || !timestamp(item.generated_at) ||
-        Date.parse(item.target_at) - Date.parse(item.generated_at) !== 60_000 ||
+    if (!record(item) || !timestamp(item.target_at) || !timestamp(item.generated_at)) throw new Error('예측 시각·단위·모델·값 응답 오류')
+    const targetInstant = parseUtcInstant(item.target_at)
+    const generatedInstant = parseUtcInstant(item.generated_at)
+    if (targetInstant.seconds - generatedInstant.seconds !== 60 || targetInstant.fraction !== generatedInstant.fraction ||
         item.unit !== expectedUnit || typeof item.model_version !== 'string' || !item.model_version ||
         !['ok', 'fallback', 'unavailable'].includes(String(item.status)) || !numberOrNull(item.value) ||
         (item.status === 'unavailable' ? item.value !== null : item.value === null) ||
@@ -42,25 +74,32 @@ export function parseActuals(body: unknown, scope: ForecastScope) {
 
 /** Pure matching: never substitute an average or an earlier observation for the target. */
 export function matchActuals(predictions: Prediction[], actuals: Actual[], now: number): Comparison[] {
-  const sorted = [...actuals].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt))
+  const sorted = actuals
+    .map((actual) => ({ actual, instant: parseUtcInstant(actual.observedAt) }))
+    .sort((a, b) => compareParsedInstants(a.instant, b.instant))
+  const nowInstant = instantFromMs(now)
   return predictions.map((prediction) => {
-    const target = Date.parse(prediction.target_at)
-    if (target > now) return { prediction, actual: null, state: 'future' }
+    const target = parseUtcInstant(prediction.target_at)
+    if (compareParsedInstants(target, nowInstant) > 0) return { prediction, actual: null, state: 'future' }
     // Lower bound avoids O(predictions * one-second history) scans.
     let low = 0, high = sorted.length
     while (low < high) {
       const mid = (low + high) >>> 1
-      if (Date.parse(sorted[mid].observedAt) < target) low = mid + 1
+      if (compareParsedInstants(sorted[mid].instant, target) < 0) low = mid + 1
       else high = mid
     }
-    const actual = sorted[low]
-    if (!actual || Date.parse(actual.observedAt) >= target + 1000 || Date.parse(actual.observedAt) > now) return { prediction, actual: null, state: 'missing' }
+    const candidate = sorted[low]
+    const targetLimit: ParsedInstant = { seconds: target.seconds + 1, fraction: target.fraction }
+    if (!candidate || compareParsedInstants(candidate.instant, targetLimit) >= 0 || compareParsedInstants(candidate.instant, nowInstant) > 0) {
+      return { prediction, actual: null, state: 'missing' }
+    }
+    const { actual } = candidate
     return { prediction, actual, state: actual.quality === 'ok' ? 'ok' : actual.quality === 'unsupported' ? 'unsupported' : actual.quality === 'error' ? 'error' : 'missing' }
   })
 }
 
 export function predictionKey(point: Prediction) {
-  return JSON.stringify([Date.parse(point.target_at), Date.parse(point.generated_at), point.model_version])
+  return JSON.stringify([observedTimestampKey(point.target_at), observedTimestampKey(point.generated_at), point.model_version])
 }
 
 /** Split on gaps, unavailable points, status and version changes. Input is time ordered. */
@@ -71,7 +110,7 @@ export function predictionSegments(points: Prediction[]): Prediction[][] {
     const previous = segment[segment.length - 1]
     if (point.value === null || point.status === 'unavailable' || previous && (
       point.model_version !== previous.model_version || point.status !== previous.status ||
-      Date.parse(point.target_at) <= Date.parse(previous.target_at) || Date.parse(point.target_at) - Date.parse(previous.target_at) > 15_000)) {
+      compareInstants(point.target_at, previous.target_at) <= 0 || Date.parse(point.target_at) - Date.parse(previous.target_at) > 15_000)) {
       if (segment.length) segments.push(segment)
       segment = []
     }
@@ -96,7 +135,12 @@ export async function readForecastUpdate(fetcher: Fetcher, apiBase: string, scop
     if (!response.ok) throw new Error(`예측 조회 HTTP ${response.status}`)
     const page = parsePredictions(await response.json(), scope.unit)
     abort(signal)
-    if (page.items.some((point) => Date.parse(point.target_at) < start || Date.parse(point.target_at) >= stop)) throw new Error('예측 응답이 요청 기간을 벗어났습니다')
+    const startInstant = instantFromMs(start)
+    const stopInstant = instantFromMs(stop)
+    if (page.items.some((point) => {
+      const target = parseUtcInstant(point.target_at)
+      return compareParsedInstants(target, startInstant) < 0 || compareParsedInstants(target, stopInstant) >= 0
+    })) throw new Error('예측 응답이 요청 기간을 벗어났습니다')
     if (!page.truncated) return page.items
     if (stop - start <= 1) throw new Error('동일 시각 예측이 너무 많습니다')
     const middle = Math.floor((start + stop) / 2)
@@ -113,18 +157,26 @@ export async function readForecastUpdate(fetcher: Fetcher, apiBase: string, scop
   abort(signal)
   const predictionMap = new Map(cache.predictions.map((point) => [predictionKey(point), point]))
   for (const point of predictions) predictionMap.set(predictionKey(point), point)
-  const actualMap = new Map(cache.actuals.map((point) => [Date.parse(point.observedAt), point]))
-  const batch = new Map<number, Actual>()
+  const actualMap = new Map(cache.actuals.map((point) => [observedTimestampKey(point.observedAt), point]))
+  const batch = new Map<string, Actual>()
   for (const point of actualUpdate.actuals) {
-    const key = Date.parse(point.observedAt)
+    const key = observedTimestampKey(point.observedAt)
     const previous = batch.get(key)
     if (previous && (previous.value !== point.value || previous.quality !== point.quality)) throw new Error('같은 관측 시각의 실제값이 모호합니다')
     batch.set(key, point)
     actualMap.set(key, point)
   }
-  return { scope: cache.scope, predictions: [...predictionMap.values()].filter((point) => Date.parse(point.target_at) >= from && Date.parse(point.target_at) < end)
-      .sort((a, b) => Date.parse(a.target_at) - Date.parse(b.target_at) || Date.parse(a.generated_at) - Date.parse(b.generated_at) || a.model_version.localeCompare(b.model_version)),
-    actuals: [...actualMap.values()].filter((point) => Date.parse(point.observedAt) >= from && Date.parse(point.observedAt) <= now),
+  const fromInstant = instantFromMs(from)
+  const endInstant = instantFromMs(end)
+  const nowInstant = instantFromMs(now)
+  return { scope: cache.scope, predictions: [...predictionMap.values()].filter((point) => {
+      const target = parseUtcInstant(point.target_at)
+      return compareParsedInstants(target, fromInstant) >= 0 && compareParsedInstants(target, endInstant) < 0
+    }).sort((a, b) => compareInstants(a.target_at, b.target_at) || compareInstants(a.generated_at, b.generated_at) || a.model_version.localeCompare(b.model_version)),
+    actuals: [...actualMap.values()].filter((point) => {
+      const observed = parseUtcInstant(point.observedAt)
+      return compareParsedInstants(observed, fromInstant) >= 0 && compareParsedInstants(observed, nowInstant) <= 0
+    }).sort((a, b) => compareInstants(a.observedAt, b.observedAt)),
     actualCursor: actualUpdate.cursor, through: end, updatedAt: new Date(now).toISOString(),
     aggregationUpdatedAt: actualUpdate.updatedAt, aggregationPending: actualUpdate.pending }
 }
