@@ -131,7 +131,10 @@ export class QueryScheduler {
     task.controller = controller
     this.runningTask = task
     Promise.resolve()
-      .then(() => task.request(controller.signal))
+      .then(() => {
+        if (!task.active || controller.signal.aborted) return
+        return task.request(controller.signal)
+      })
       .catch(() => {})
       .finally(() => {
         task.running = false
