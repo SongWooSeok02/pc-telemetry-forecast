@@ -11,14 +11,14 @@
     "architecture": "AMD64",
     "node": "v26.13.0"
   },
-  "started_at_utc": "2026-11-19T10:39:09.8822081Z",
-  "build_base": "f1b3662",
+  "started_at_utc": "2026-11-27T15:35:44.9855615Z",
+  "build_base": "b1ec6c8",
   "limitations": [
     "S3-05 source prediction unit field is missing; adapter contract not yet agreed",
     "No live PC/server or WebView2 integration demonstration",
     "No interactive browser zoom/scroll demonstration"
   ],
-  "finished_at_utc": "2026-11-19T10:39:15.0753979Z",
+  "finished_at_utc": "2026-11-27T15:35:49.0069491Z",
   "actual": {
     "forecast_tests": "16",
     "forecast_exit": 0,
