@@ -1,6 +1,6 @@
 # S4-07 전력 예측 실험 이월 및 채택 기준
 
-**이번 출시 범위에서 전력 예측을 보류한다.** 2026-11-21 02:19 KST에 확인한 결과, P0인 S4-05의 실제 PC 최종 재평가는 진행 전이고 전력 센서 지원·수집 증거도 확보되지 않았다. S4-07의 이월 조건을 적용한다. CPU·GPU의 실측 전력과 전력 예측은 지표를 구분한다. [S4-07 #47](https://github.com/SongWooSeok02/pc-telemetry-forecast/issues/47) · [S4-05 평가 계획과 검증 상태 #48](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/48)
+**이번 출시 범위에서 전력 예측을 보류한다.** 2026-11-28 KST에 자료를 다시 확인한 결과, P0인 S4-05의 실제 PC 최종 재평가는 진행 전이고 전력 센서 지원·수집 증거도 확보되지 않았다. S4-07의 이월 조건을 적용한다. CPU·GPU의 실측 전력과 전력 예측은 지표를 구분한다. [S4-07 #47](https://github.com/SongWooSeok02/pc-telemetry-forecast/issues/47) · [S4-05 평가 계획과 검증 상태 #48](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/48)
 
 | 대상 | 계획된 측정 범위와 단위 | 실제 센서 확인 | 채택 상태 |
 | --- | --- | --- | --- |
@@ -26,7 +26,7 @@
 | 2026-11-28 KST, GitHub 작업 기록 | #41·#46 및 #48·#49 확인 | P0 실측 및 마감 판정 근거 | 실측 완료·11월 23일 판정 기록 미확인 | 이월 유지 |
 | 실제 PC·시험 빌드 미확보 | 독립 최종 평가 및 웹·앱·API 일치 검증 | PC별 MAE, 지원률, 데이터량, 운영 비용, 채택 근거 | 지표 미산출 | 미실행 |
 
-아래 명령으로 저장소 기준의 근거를 다시 확인할 수 있다.
+아래 명령은 11월 21일에 확인한 당시 기록을 재현한다. 현재 수정 내역과 실측 상태는 [S1-09 #15](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/15), [S4-05 #48](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/48), [S3-08 #42](https://github.com/SongWooSeok02/pc-telemetry-forecast/pull/42)에서 확인한다.
 
 ```powershell
 git show 455e8ea:docs/sensor-support.md
