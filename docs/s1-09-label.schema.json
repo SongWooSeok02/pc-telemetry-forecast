@@ -111,7 +111,13 @@
   "allOf": [
     {
       "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
-      "then": { "properties": { "stop_reason": { "const": "none" } } }
+      "then": {
+        "properties": {
+          "stop_reason": { "const": "none" },
+          "stages": { "items": { "properties": { "stage_status": { "const": "completed" } } } },
+          "transitions": { "items": { "properties": { "transition_status": { "const": "observed" } } } }
+        }
+      }
     },
     {
       "if": { "properties": { "status": { "const": "aborted" } }, "required": ["status"] },

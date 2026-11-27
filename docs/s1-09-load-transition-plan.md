@@ -38,6 +38,13 @@
 - 완료/중단 여부와 중단 사유를 필수로 기록한다. 예정 시간과 실제 시간이 다르면 실제 시각을 보존하고 사유를 남긴다.
 - 세션은 `completed` 또는 `aborted`로 기록한다. 중단된 세션도 5단계 배열을 유지하고 실행 전 단계는 `not_started`와 null 시작/종료 시각으로 표시한다. 실행을 시작한 단계는 실제 시작·종료 시각을 기록한다.
 
+완료 세션은 완료 단계 5개와 관측 전환 4개가 필요하다. 단계 순서·세션 범위·도착 단계 시작과 전환 시각의 일치는 스키마 검증에 이어 교차 필드 검증기로 확인한다. 수집 인덱스에 추가하기 전에 저장소 루트에서 다음을 실행한다.
+
+```powershell
+python -m pip install jsonschema
+python tests/validate_s109_label.py <label.json>
+```
+
 CPU/GPU 단계가 `not_started`이면 `workload_tool`, `workload_version`, `workload_profile` 키는 유지하고 모르는 값은 `null`로 기록한다. `completed` 또는 `aborted`로 실제 실행한 부하 단계에는 세 필드 모두 비어 있지 않은 문자열이 필요하다. 유휴 단계에서 중단한 경우에도 이후 부하 단계를 기록할 수 있다.
 
 규격은 `s1-09-label-v0.1-draft`다. 다른 작업과의 계약 합의 전까지 분석용 제안으로 취급한다.
