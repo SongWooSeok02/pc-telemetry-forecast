@@ -2,7 +2,7 @@
 
 S2-03 등록·회수 API와 역할 권한 변경은 [구현/검증 기록](../docs/s2-03-validation.md),
 Windows DPAPI/IPC는 [서비스 연동 안내](../agents/windows/README.md)를 따른다.
-신규 DB는 마이그레이션 001 다음 002를 적용한다. 아래 S1-03의 수동 토큰 발급/SELECT 전용
+신규 DB는 마이그레이션을 번호순으로 적용한다. 아래 S1-03의 수동 토큰 발급/SELECT 전용
 설명은 기존 수집 전용 역할에 대한 기록이며 새 관리 API 역할의 권한과 구분한다.
 
 상태: 구현 및 로컬 PostgreSQL 통합 검증 완료, **S1-01 계약 승인·다른 팀원 리뷰 전**.
@@ -18,7 +18,9 @@ python -m venv .venv
 # 환경에 맞게 가상환경 활성화
 python -m pip install -r backend/requirements.txt
 # DATABASE_URL은 배포 환경의 비밀 설정으로 주입한다.
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/001_ingestion.sql
+for migration in database/migrations/*.sql; do
+  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$migration" || exit 1
+done
 python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
 ```
 
@@ -45,18 +47,17 @@ component_id/kind/unit/source/scope/support를 포함한다. 계약의 ID·kind/
 ## 원자성과 중복 방지
 
 - `ingestion_batches(machine_id,batch_id)` 기본 키가 전체 배치 유일성을 보장한다.
-  서버가 계산한 내용 해시와 정규 본문·최초 성공 응답을 저장한다. 재전송은 정규 본문까지 비교한다.
+  서버가 계산한 내용 해시와 정규 본문·최초 성공 응답을 저장한다. 재전송은 보존 중인 정규 본문도 비교한다.
 - `ingestion_samples(machine_id,boot_session_id,sample_seq)` 기본 키는 다른 배치 ID의 중복도 막는다.
   측정 파티션의 UNIQUE에 전체 샘플 유일성을 의존하지 않는다.
 - 장비별 transaction advisory lock으로 동시 요청을 정렬한다. 원장·샘플 키·측정·10초/60초
   재집계 큐를 하나의 트랜잭션에서 커밋한다. 실패는 전부 롤백한다. 커밋 이후에만 200을 반환한다.
 - 응답 유실은 저장된 응답으로 복구한다. 동일 ID 변경은 BATCH_CONFLICT,
   다른 ID의 샘플 중복은 SAMPLE_CONFLICT이며 전체 409다.
-- 두 원장에는 자동 TTL/삭제 작업을 두지 않는다. **장비 등록 수명 전체** 보존이므로 24시간
-  로컬 버퍼보다 길며 오래된 observed_at도 수락한다. 최대 재전송 기간/거부 규칙 합의 전
-  원장 삭제를 금지한다. 측정의 7일 보존과 독립적이다. 원장 용량 측정·압축은 후속 검증 대상이다.
-- 재집계 작업자는 generation을 읽고 원시값으로 upsert한 뒤 같은 generation일 때만 큐를
-  삭제해야 한다. S3-03에서 작업자·집계 완료 확인·파티션 삭제를 구현한다. 현재 자동 삭제는 없다.
+- 배치 해시·최초 응답과 샘플 중복 방지 키는 **장비 등록 수명 전체** 보존한다.
+  유지보수 작업은 7일이 지난 배치의 정규 본문만 비우며 이후에는 수신 시 서버가 계산한 SHA-256으로 재전송을 비교한다.
+- 재집계 작업자는 현재 generation의 원시값 전체로 upsert한다. 작업 확인과 집계 게시를 한 트랜잭션으로
+  처리하고, 처리 중 변경된 generation은 다음 작업에 남긴다. 자세한 동작은 [S3-03 기록](../docs/s3-03-validation.md)을 참고한다.
 
 ## UTC 일별 파티션과 감시
 

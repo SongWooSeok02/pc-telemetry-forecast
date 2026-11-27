@@ -10,7 +10,12 @@ def main():
         with psycopg.connect(os.environ['DATABASE_URL'], connect_timeout=5) as db:
             db.execute("SET LOCAL lock_timeout = '5s'")
             db.execute("SET LOCAL statement_timeout = '30s'")
+            db.execute('SELECT prune_telemetry_metadata()')
+        with psycopg.connect(os.environ['DATABASE_URL'], connect_timeout=5) as db:
+            db.execute("SET LOCAL lock_timeout = '5s'")
+            db.execute("SET LOCAL statement_timeout = '30s'")
             db.execute('SELECT ensure_measurement_partitions()')
+            db.execute('SELECT prune_telemetry()')
         logging.info('partition_maintenance_success horizon_days=3')
     except Exception as exc:
         # Connection errors can include hosts/users/DSNs; keep diagnostics bounded.

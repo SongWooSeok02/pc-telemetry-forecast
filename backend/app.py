@@ -10,7 +10,7 @@ import psycopg
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
-from .contract import canonical, decode, digest, validate
+from .contract import canonical, decode, validate
 
 MAX_BODY = 1048576
 log = logging.getLogger(__name__)
@@ -30,6 +30,10 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
 
     from .registration import install
     install(app, connect, Rejected, clock)
+    from .history import install_history
+    install_history(app, connect, Rejected, clock)
+    from .dashboard_history import install_dashboard_history
+    install_dashboard_history(app, connect, Rejected, clock)
 
     @app.exception_handler(Rejected)
     async def rejected(request, exc):
@@ -83,7 +87,7 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
             raise Rejected(403, 'DEVICE_FORBIDDEN')
         try:
             content = canonical(body)
-            sha = digest(body)
+            sha = hashlib.sha256(content.encode('ascii')).hexdigest()
             # Guard UUID binds before SQL (do not map input errors to 503).
             for key in ('batch_id', 'sensor_config_id'):
                 if str(uuid.UUID(body[key])) != body[key]:
@@ -108,10 +112,10 @@ def create_app(dsn=None, *, clock=None, before_commit=None):
                     (hashlib.sha256(authorization[7:].encode()).hexdigest(),)).fetchone()
                 if credential is None:
                     raise Rejected(401, 'DEVICE_UNAUTHENTICATED')
-                prior = db.execute('SELECT canonical_body,response FROM ingestion_batches '
+                prior = db.execute('SELECT content_sha256,response,canonical_body FROM ingestion_batches '
                     'WHERE machine_id=%s AND batch_id=%s', (machine, body['batch_id'])).fetchone()
                 if prior:
-                    if prior[0] != content:
+                    if prior[0] != sha or (prior[2] and prior[2] != content):
                         raise Rejected(409, 'BATCH_CONFLICT')
                     return JSONResponse(prior[1])
                 config_row = db.execute('SELECT machine_id,config FROM sensor_configs WHERE sensor_config_id=%s',

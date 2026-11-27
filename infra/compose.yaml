@@ -36,7 +36,7 @@ services:
       PGDATABASE: ${POSTGRES_DB:?set POSTGRES_DB}
     volumes:
       - ../database/migrations:/migrations:ro
-    command: [psql, -v, ON_ERROR_STOP=1, -f, /migrations/001_ingestion.sql, -f, /migrations/002_registration.sql]
+    command: [psql, -v, ON_ERROR_STOP=1, -f, /migrations/001_ingestion.sql, -f, /migrations/002_registration.sql, -f, /migrations/004_aggregation.sql]
     restart: 'no'
   api:
     <<: *app
@@ -49,6 +49,13 @@ services:
       interval: 10s
       timeout: 6s
       retries: 6
+  aggregation:
+    <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: [python, -m, backend.aggregation]
+    restart: unless-stopped
   partitions:
     <<: *app
     profiles: [maintenance]

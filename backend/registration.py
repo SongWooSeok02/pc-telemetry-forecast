@@ -4,6 +4,7 @@ import re
 import secrets
 import uuid
 from datetime import timedelta, timezone
+from functools import partial
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -17,23 +18,34 @@ def sha(value):
 ONLINE_WINDOW = timedelta(minutes=2)
 
 
-def install(app, connect, rejected, clock):
-    def session(db, request):
-        header = request.headers.get('authorization', '')
-        row = None
-        if header.startswith('Bearer ') and 0 < len(header[7:]) <= 512:
-            row = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
-                'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
-        if row is None:
-            raise rejected(401, 'USER_UNAUTHENTICATED')
-        # Serialize owner operations: prevents issuing a replacement code racing deletion.
-        db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(row[0]),))
-        # Lock waits must not extend a user's session lifetime or bypass logout.
-        active = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
+def session(rejected, db, request):
+    header = request.headers.get('authorization', '')
+    row = None
+    if header.startswith('Bearer ') and 0 < len(header[7:]) <= 512:
+        row = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
             'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
-        if active is None:
-            raise rejected(401, 'USER_UNAUTHENTICATED')
-        return row[0]
+    if row is None:
+        raise rejected(401, 'USER_UNAUTHENTICATED')
+    # Serialize owner operations: prevents issuing a replacement code racing deletion.
+    db.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,1))', (str(row[0]),))
+    # Lock waits must not extend a user's session lifetime or bypass logout.
+    active = db.execute('SELECT user_id FROM user_sessions WHERE token_sha256=%s '
+        'AND NOT revoked AND expires_at>clock_timestamp()', (sha(header[7:]),)).fetchone()
+    if active is None:
+        raise rejected(401, 'USER_UNAUTHENTICATED')
+    return row[0]
+
+
+def owned(rejected, db, user, machine):
+    row = db.execute('SELECT machine_id FROM machines WHERE machine_id=%s '
+        'AND owner_id=%s AND NOT deleted FOR UPDATE', (machine, user)).fetchone()
+    if row is None:
+        raise rejected(404, 'MACHINE_NOT_FOUND')
+
+
+def install(app, connect, rejected, clock):
+    require_session = partial(session, rejected)
+    require_owner = partial(owned, rejected)
 
     async def body(request, fields):
         raw = bytearray()
@@ -52,12 +64,6 @@ def install(app, connect, rejected, clock):
         except (ValueError, UnicodeError, RecursionError):
             raise rejected(422, 'VALIDATION_ERROR')
 
-    def owned(db, user, machine):
-        row = db.execute('SELECT machine_id FROM machines WHERE machine_id=%s '
-            'AND owner_id=%s AND NOT deleted FOR UPDATE', (machine, user)).fetchone()
-        if row is None:
-            raise rejected(404, 'MACHINE_NOT_FOUND')
-
     def audit(db, user, machine, event):
         db.execute('INSERT INTO credential_audit(actor_id,machine_id,event) VALUES(%s,%s,%s)',
                    (user, machine, event))
@@ -73,7 +79,7 @@ def install(app, connect, rejected, clock):
 
     def summaries(request, machine=None):
         with connect() as db:
-            user = session(db, request)
+            user = require_session(db, request)
             query = """
                 SELECT m.machine_id, latest.received_at, temps.cpu, temps.gpu
                 FROM machines m
@@ -123,7 +129,7 @@ def install(app, connect, rejected, clock):
     @app.post('/v1/registration-codes')
     def issue(request: Request):
         with connect() as db:
-            user = session(db, request)
+            user = require_session(db, request)
             # Bound outstanding codes and issuance per owner; a proxy must also rate limit failures.
             limit(db, user)
             code = secrets.token_urlsafe(24)
@@ -153,7 +159,7 @@ def install(app, connect, rejected, clock):
                     raise rejected(401, 'REGISTRATION_INVALID')
                 user, machine = row
                 if machine:
-                    owned(db, user, machine)
+                    require_owner(db, user, machine)
                     db.execute('UPDATE device_credentials SET revoked=true WHERE machine_id=%s', (machine,))
                     event = 'reissued'
                 else:
@@ -174,8 +180,8 @@ def install(app, connect, rejected, clock):
         if action not in ('reissue', 'revoke', 'delete'):
             raise rejected(404, 'NOT_FOUND')
         with connect() as db:
-            user = session(db, request)
-            owned(db, user, machine_id)
+            user = require_session(db, request)
+            require_owner(db, user, machine_id)
             # Invalidate pending replacements for every lifecycle action.
             db.execute('UPDATE registration_codes SET consumed=true WHERE machine_id=%s', (machine_id,))
             if action == 'reissue':
