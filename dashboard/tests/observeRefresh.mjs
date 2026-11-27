@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { appendFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { setTimeout as sleep } from 'node:timers/promises'
@@ -10,6 +11,34 @@ if (address?.protocol !== 'http:' || address.hostname !== '127.0.0.1' || !addres
     !origin || new URL(origin).origin !== origin || !output ||
     !Number.isSafeInteger(duration) || !Number.isSafeInteger(interval) || interval < 1000 || duration < interval) {
   throw new Error('Usage: node observeRefresh.mjs http://127.0.0.1:PORT https://TEST_ORIGIN LOG.jsonl [durationSeconds] [sampleSeconds]')
+}
+
+async function readBundleBuildId(page) {
+  const asset = await page.evaluate(async () => {
+    const scripts = Array.from(document.scripts).filter((script) => {
+      if (!script.src) return false
+      try { return new URL(script.src).origin === location.origin } catch { return false }
+    })
+    const entry = scripts.find((script) => /\/index-[^/]+\.js$/.test(new URL(script.src).pathname))
+      ?? scripts.find((script) => script.type === 'module')
+      ?? scripts[0]
+    if (!entry) return null
+    const response = await fetch(entry.src, { credentials: 'same-origin' })
+    if (!response.ok) throw new Error(`Bundle HTTP ${response.status}`)
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    let binary = ''
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+      binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000))
+    }
+    const name = new URL(entry.src).pathname.split('/').at(-1) ?? ''
+    return {
+      bundle: /^[A-Za-z0-9._-]+$/.test(name) ? name : null,
+      base64: btoa(binary),
+    }
+  })
+  if (!asset) throw new Error('Dashboard bundle script missing')
+  const bundleSha256 = createHash('sha256').update(Buffer.from(asset.base64, 'base64')).digest('hex')
+  return { bundle: asset.bundle, bundleSha256 }
 }
 
 function installProbe() {
@@ -77,6 +106,7 @@ try {
     .filter((page) => new URL(page.url()).origin === origin)
   if (pages.length !== 1) throw new Error('Open exactly one page on the test origin before attaching')
   const [page] = pages
+  const buildId = await readBundleBuildId(page)
   const cdp = await page.context().newCDPSession(page)
   const active = { data: new Set(), auth: new Set() }
   const counter = () => ({ starts: 0, finished: 0, failed: 0, cancelled: 0, peakActive: 0, http401: 0, http429: 0, http5xx: 0 })
@@ -116,9 +146,18 @@ try {
     if (create) writeFileSync(output, line, { flag: 'wx' })
     else appendFileSync(output, line)
   }
-  write('start', { durationSeconds: duration / 1000, sampleSeconds: interval / 1000, runtime: browser.version() }, true)
+  write('start', {
+    durationSeconds: duration / 1000,
+    sampleSeconds: interval / 1000,
+    runtime: browser.version(),
+    ...buildId,
+  }, true)
   try {
     await page.reload({ waitUntil: 'domcontentloaded' })
+    const reloadedBuildId = await readBundleBuildId(page)
+    if (reloadedBuildId.bundleSha256 !== buildId.bundleSha256) {
+      throw new Error('Dashboard bundle changed on reload')
+    }
     const samplingStarted = performance.now()
     for (;;) {
       const { metrics } = await cdp.send('Performance.getMetrics')
