@@ -1,8 +1,8 @@
 {
   "version": "s4-05.1",
-  "base": "f9a5d18",
-  "started_at_utc": "2026-11-27T15:09:02.547923+00:00",
-  "finished_at_utc": "2026-11-27T15:09:12.251038+00:00",
+  "base": "b538b0a",
+  "started_at_utc": "2026-11-27T16:31:35.270515+00:00",
+  "finished_at_utc": "2026-11-27T16:31:45.061032+00:00",
   "pc": "synthetic-pc",
   "environment": {
     "platform": "Windows-11-10.0.26300-SP0",
@@ -14,23 +14,27 @@
     "python -m unittest discover -s tests -p test_final_evaluation.py -v",
     "python -m unittest discover -s tests -p test_temperature_model.py -v",
     "python -m unittest discover -s tests -p test_ml_baselines.py -v",
-    "python -m compileall -q ml",
+    "python -m compileall -q ml tests/test_final_evaluation.py tests/test_temperature_model.py tests/test_ml_baselines.py",
     "python -m ml.final_evaluation baseline-release --machine-id synthetic-pc --target gpu --output <unused-file>",
     "git diff --check"
   ],
   "expected": {
-    "tests": 38,
+    "tests": 42,
     "failures": 0,
+    "skipped_max": 1,
     "compile": true,
     "persistence_artifact": true,
     "diff": true
   },
   "actual": {
-    "tests": 38,
+    "tests": 42,
     "failures": 0,
+    "skipped": 1,
     "compile": true,
     "persistence_artifact": true,
     "diff": true
   },
-  "passed": true
+  "passed": true,
+  "skip_note": "test_real_dangling_symlink_is_not_treated_as_free skips when the OS denies symlink creation (Windows without Developer Mode); the simulated dangling-symlink test still runs",
+  "includes": "#48 head 7f7b274 + d158e70 + local sync of #37 review fixes (c9c31db, which contains review-fix/pr37 d4e3135 with #17/#20/#21 sync merges)"
 }
