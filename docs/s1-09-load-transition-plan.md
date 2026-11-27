@@ -41,7 +41,7 @@
 완료 세션은 완료 단계 5개와 관측 전환 4개가 필요하다. 단계 순서·세션 범위·도착 단계 시작과 전환 시각의 일치는 스키마 검증에 이어 교차 필드 검증기로 확인한다. 수집 인덱스에 추가하기 전에 저장소 루트에서 다음을 실행한다.
 
 ```powershell
-python -m pip install jsonschema
+python -m pip install "jsonschema[format]>=4,<5"
 python tests/validate_s109_label.py <label.json>
 ```
 

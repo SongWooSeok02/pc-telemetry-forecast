@@ -1,6 +1,7 @@
 """Validate the S1-09 label schema and chronological consistency."""
 import argparse
 import json
+import re
 from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
@@ -12,6 +13,8 @@ SCHEMA = Path(__file__).resolve().parents[1] / "docs/s1-09-label.schema.json"
 
 def utc_key(value):
     # Keep all fractional-second digits when comparing two UTC timestamps.
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt][0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?Z", value):
+        raise ValueError(f"Invalid UTC timestamp: {value}")
     whole, separator, fraction = value[:-1].partition(".")
     return datetime.fromisoformat(whole), Decimal("0." + fraction) if separator else Decimal(0)
 
