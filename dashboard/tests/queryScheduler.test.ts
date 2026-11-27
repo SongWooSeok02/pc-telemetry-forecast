@@ -623,3 +623,73 @@ for (const surface of ['web', 'host'] as const) {
     }
   })
 }
+
+for (const surface of ['web', 'host'] as const) {
+  for (const status of [429, 503] as const) {
+    test(`restoring hidden ${surface} view before retryAt preserves ${status} backoff deadline`, async () => {
+      const clock = new FakeClock()
+      const scheduler = new QueryScheduler(clock)
+      const fakeDocument = new EventTarget() as Document
+      Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible', writable: true })
+      const webview = new EventTarget()
+      const oldDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+      const oldWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
+      Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+      Object.defineProperty(globalThis, 'window', { configurable: true, value: { chrome: { webview } } })
+      let failingCalls = 0
+      let healthyCalls = 0
+      let unbind = () => {}
+      try {
+        unbind = bindDashboardVisibility(scheduler)
+        scheduler.register('current', async () => { healthyCalls++ })
+        scheduler.register('history', async () => {
+          failingCalls++
+          if (failingCalls <= 2) throw new QueryError(`HTTP ${status}`, status, `HTTP_${status}`, true)
+        })
+        await flush()
+        assert.equal(healthyCalls, 1)
+        assert.equal(failingCalls, 1)
+
+        // First retry fires at t=5000 and fails again -> second backoff scheduled for t=15000 (10s delay).
+        await clock.advanceBy(5000)
+        assert.equal(failingCalls, 2)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, 10000)
+
+        const visible = (value: boolean) => {
+          if (surface === 'host') webview.dispatchEvent(new MessageEvent('message', { data: { type: 'pc-telemetry:host-visibility', visible: value } }))
+          else {
+            Object.defineProperty(fakeDocument, 'visibilityState', { value: value ? 'visible' : 'hidden', writable: true })
+            fakeDocument.dispatchEvent(new Event('visibilitychange'))
+          }
+        }
+
+        await clock.advanceBy(1000) // t=6000
+        visible(false)
+        assert.equal(clock.pendingCount(), 0)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, null)
+
+        await clock.advanceBy(2000) // t=8000, still 7000ms before retryAt=15000
+        visible(true)
+        await flush()
+
+        assert.equal(healthyCalls, 3) // initial(0), scheduled(5000), resume(8000)
+        assert.equal(failingCalls, 2) // must NOT retry early on restore
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, 7000)
+
+        await clock.advanceBy(6999) // t=14999
+        assert.equal(failingCalls, 2)
+
+        await clock.advanceBy(1) // t=15000 -> exact preserved retryAt
+        assert.equal(failingCalls, 3)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.failures, 0)
+      } finally {
+        unbind()
+        scheduler.dispose()
+        if (oldDocument) Object.defineProperty(globalThis, 'document', oldDocument)
+        else Reflect.deleteProperty(globalThis, 'document')
+        if (oldWindow) Object.defineProperty(globalThis, 'window', oldWindow)
+        else Reflect.deleteProperty(globalThis, 'window')
+      }
+    })
+  }
+}

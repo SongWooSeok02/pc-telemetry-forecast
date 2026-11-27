@@ -88,8 +88,12 @@ export class QueryScheduler {
       return
     }
     if (this.period !== 'manual') {
-      for (const task of this.tasks.values()) if (!task.blocked) this.enqueue(task, 'resume')
+      const now = this.clock.now()
+      for (const task of this.tasks.values()) {
+        if (!task.blocked && (task.retryAt === null || task.retryAt <= now)) this.enqueue(task, 'resume')
+      }
     }
+    this.notify()
     this.drain()
   }
 
