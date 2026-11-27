@@ -181,6 +181,50 @@ class PairedOutputTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "distinct"):
             final.publish_evaluation(self.report_path, self.report, self.report_path, self.release)
 
+    def test_release_without_report_is_reported_as_orphaned_release(self):
+        self.release_path.write_text("stale release", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "orphaned release.*not a valid S4-05 release"):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertFalse(self.report_path.exists())
+        self.assertEqual(self.release_path.read_text(encoding="utf-8"), "stale release")
+        self.report_path.write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "already exist"):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+
+    def dangling(self, *paths):
+        # Portable stand-in for a symlink whose target is missing: exists() is False, lexists() True.
+        real_is_symlink, real_lexists = Path.is_symlink, os.path.lexists
+        names = {os.fspath(path) for path in paths}
+        return (patch.object(Path, "is_symlink", lambda path: os.fspath(path) in names or real_is_symlink(path)),
+                patch.object(final.os.path, "lexists", lambda path: os.fspath(path) in names or real_lexists(path)))
+
+    def test_dangling_symlink_destinations_are_detected_before_staging(self):
+        for occupied, expected in ((self.release_path, "orphaned release.*dangling symlink"),
+                                   (self.report_path, "incomplete previous run.*dangling symlink")):
+            with self.subTest(occupied=occupied.name):
+                symlink, lexists = self.dangling(occupied)
+                with symlink, lexists:
+                    self.assertFalse(occupied.exists())
+                    with self.assertRaisesRegex(ValueError, expected):
+                        final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+                    with self.assertRaisesRegex(FileExistsError, "dangling symlink"):
+                        final.write_new(occupied, self.release)
+                self.assertEqual(self.leftovers(), [])
+
+    def test_real_dangling_symlink_is_not_treated_as_free(self):
+        try:
+            os.symlink(self.root / "missing-target.json", self.release_path)
+        except (OSError, NotImplementedError) as error:
+            self.skipTest(f"symlinks unavailable: {error}")
+        self.assertFalse(self.release_path.exists())
+        self.assertEqual(final.describe_occupied(self.release_path), "dangling symlink")
+        with self.assertRaisesRegex(ValueError, "orphaned release.*dangling symlink"):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        with self.assertRaisesRegex(FileExistsError, "dangling symlink"):
+            final.write_new(self.release_path, self.release)
+        self.assertFalse((self.root / "missing-target.json").exists())
+        self.assertEqual(self.leftovers(), ["release-model.json"])
+
     def test_existing_destination_is_never_overwritten(self):
         self.release_path.write_text("original", encoding="utf-8")
         with self.assertRaises(FileExistsError):

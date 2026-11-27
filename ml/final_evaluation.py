@@ -79,6 +79,16 @@ def _stage(path: Path, data: bytes) -> Path:
     return staged
 
 
+def describe_occupied(path: Path) -> str | None:
+    """Describe what occupies path, including symlinks whose target is missing.
+
+    Path.exists() follows symlinks and reports a dangling link as free, so use lexists().
+    """
+    if path.is_symlink():
+        return "symlink" if path.exists() else "dangling symlink"
+    return "file" if os.path.lexists(path) else None
+
+
 def write_new_files(outputs: list[tuple[Path, bytes]]) -> None:
     """Publish all outputs or none of them, never overwriting an existing path.
 
@@ -90,8 +100,9 @@ def write_new_files(outputs: list[tuple[Path, bytes]]) -> None:
     if len(set(paths)) != len(paths):
         raise ValueError("output paths must be distinct")
     for path, _ in outputs:
-        if path.exists():
-            raise FileExistsError(f"output already exists: {path}")
+        occupied = describe_occupied(path)
+        if occupied:
+            raise FileExistsError(f"output already exists ({occupied}): {path}")
     staged: list[Path] = []
     published: list[Path] = []
     try:
@@ -297,11 +308,17 @@ def publish_evaluation(report_path: Path, report: dict, release_path: Path, rele
     """
     if report_path.resolve() == release_path.resolve():
         raise ValueError("report and release need distinct, unused output paths")
-    if report_path.exists() and not release_path.exists():
-        raise ValueError(f"incomplete previous run: {report_path} exists without {release_path}; "
-                         "inspect and remove it, then rerun")
-    if report_path.exists() or release_path.exists():
-        raise ValueError("report and release need distinct, unused output paths")
+    report_used, release_used = describe_occupied(report_path), describe_occupied(release_path)
+    if report_used and not release_used:
+        raise ValueError(f"incomplete previous run: {report_path} ({report_used}) exists without "
+                         f"{release_path}; inspect and remove it, then rerun")
+    if release_used and not report_used:
+        raise ValueError(f"orphaned release: {release_path} ({release_used}) exists without its report "
+                         f"{report_path}; it is not a valid S4-05 release, do not deploy it, inspect and "
+                         "remove it, then rerun")
+    if report_used and release_used:
+        raise ValueError(f"report and release need distinct, unused output paths: {report_path} "
+                         f"({report_used}) and {release_path} ({release_used}) already exist")
     report_bytes = encode(report)
     release = {**release, "s4_05": {**release["s4_05"], "evaluation_report_sha256": digest(report_bytes)}}
     write_new_files([(report_path, report_bytes), (release_path, encode(release))])
