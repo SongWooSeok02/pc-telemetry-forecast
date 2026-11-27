@@ -23,6 +23,15 @@ def validate_label(label):
     schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
     Draft202012Validator(schema, format_checker=FormatChecker()).validate(label)
 
+    limits = label["safety_limits"]
+    for target in ("cpu", "gpu"):
+        if limits[f"{target}_stop_threshold_celsius"] >= limits[f"{target}_manufacturer_limit_celsius"]:
+            raise ValueError(f"{target.upper()} stop threshold must be below its manufacturer limit")
+
+    transition_ids = {transition["transition_id"].lower() for transition in label["transitions"]}
+    if len(transition_ids) != len(label["transitions"]):
+        raise ValueError("Transition IDs must be unique within a session")
+
     previous_end = utc_key(label["run_started_at_utc"])
     run_end = utc_key(label["run_ended_at_utc"])
     if run_end < previous_end:

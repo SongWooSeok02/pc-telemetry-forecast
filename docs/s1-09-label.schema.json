@@ -121,7 +121,12 @@
     },
     {
       "if": { "properties": { "status": { "const": "aborted" } }, "required": ["status"] },
-      "then": { "properties": { "stop_reason": { "enum": ["temperature_limit", "sensor_error", "agent_error", "device_instability", "operator_request", "other"] } } }
+      "then": {
+        "properties": {
+          "stop_reason": { "enum": ["temperature_limit", "sensor_error", "agent_error", "device_instability", "operator_request", "other"] },
+          "stages": { "contains": { "properties": { "stage_status": { "enum": ["aborted", "not_started"] } } } }
+        }
+      }
     }
   ],
   "$defs": {
