@@ -1,12 +1,12 @@
 {
   "version": "s4-05.1",
-  "base": "f1b3662",
-  "started_at_utc": "2026-11-20T15:44:07.719058+00:00",
-  "finished_at_utc": "2026-11-20T15:44:15.863695+00:00",
+  "base": "f9a5d18",
+  "started_at_utc": "2026-11-27T15:09:02.547923+00:00",
+  "finished_at_utc": "2026-11-27T15:09:12.251038+00:00",
   "pc": "synthetic-pc",
   "environment": {
     "platform": "Windows-11-10.0.26300-SP0",
-    "python": "3.12.14"
+    "python": "3.15.2"
   },
   "data_kind": "synthetic fixtures",
   "real_pc_evaluation": "not performed",
@@ -19,14 +19,14 @@
     "git diff --check"
   ],
   "expected": {
-    "tests": 29,
+    "tests": 38,
     "failures": 0,
     "compile": true,
     "persistence_artifact": true,
     "diff": true
   },
   "actual": {
-    "tests": 29,
+    "tests": 38,
     "failures": 0,
     "compile": true,
     "persistence_artifact": true,

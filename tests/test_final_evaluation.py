@@ -1,6 +1,9 @@
 import json
+import os
+import tempfile
 import unittest
 from datetime import timedelta, timezone
+from pathlib import Path
 from unittest.mock import patch
 
 from ml import final_evaluation as final
@@ -98,6 +101,92 @@ class FinalEvaluationTests(unittest.TestCase):
         self.assertEqual(result["diagnostics"]["missing_rate"], 0)
         self.assertEqual(result["boundary_coverage"], {"input_5min": True, "horizon_60sec": True})
         self.assertEqual(len(samples), int((end - start).total_seconds()) + 360)
+
+
+class PairedOutputTests(unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.root = Path(self.directory.name)
+        self.report_path = self.root / "final-report.json"
+        self.release_path = self.root / "release-model.json"
+        decision = {"adopted": False, "reasons": ["missing_holdout_data"], "overall_improvement_fraction": None}
+        self.report = {"version": final.VERSION, "release_model": "persistence", "decision": decision,
+                       "freeze_manifest_sha256": "manifest"}
+        self.release = {"schema_version": 1, "pipeline_version": VERSION, "selected_model": "persistence",
+                        "candidate_model": None,
+                        "s4_05": {"freeze_manifest_sha256": "manifest", "decision": decision}}
+
+    def tearDown(self):
+        self.directory.cleanup()
+
+    def leftovers(self):
+        return sorted(path.name for path in self.root.iterdir())
+
+    def test_pair_is_published_together_and_release_links_report(self):
+        final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertEqual(self.leftovers(), ["final-report.json", "release-model.json"])
+        report_bytes = self.report_path.read_bytes()
+        release = json.loads(self.release_path.read_bytes())
+        self.assertEqual(release["s4_05"]["evaluation_report_sha256"], final.digest(report_bytes))
+        self.assertTrue(final.release_matches_report(self.release_path.read_bytes(), report_bytes))
+        self.assertFalse(final.release_matches_report(self.release_path.read_bytes(), report_bytes + b" "))
+        with self.assertRaisesRegex(ValueError, "unused output paths"):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+
+    def test_release_write_failure_rolls_back_report_and_allows_retry(self):
+        real_link = os.link
+        calls = []
+
+        def failing_link(source, destination):
+            calls.append(destination)
+            if len(calls) == 2:
+                raise OSError("disk full while publishing release")
+            real_link(source, destination)
+
+        with patch.object(final.os, "link", side_effect=failing_link):
+            with self.assertRaisesRegex(OSError, "disk full"):
+                final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertEqual(calls, [self.report_path, self.release_path])
+        # Neither a half pair nor staged temporaries remain to be mistaken for valid output.
+        self.assertEqual(self.leftovers(), [])
+        final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertTrue(final.release_matches_report(self.release_path.read_bytes(), self.report_path.read_bytes()))
+
+    def test_release_staging_failure_writes_nothing(self):
+        real_stage = final._stage
+
+        def failing_stage(path, data):
+            if path == self.release_path:
+                raise OSError("cannot stage release")
+            return real_stage(path, data)
+
+        with patch.object(final, "_stage", side_effect=failing_stage):
+            with self.assertRaisesRegex(OSError, "cannot stage release"):
+                final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertEqual(self.leftovers(), [])
+
+    def test_unserializable_payload_writes_nothing(self):
+        bad_release = {**self.release, "candidate_model": {"intercept": float("nan")}}
+        with self.assertRaises(ValueError):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, bad_release)
+        with self.assertRaises(ValueError):
+            final.write_new(self.release_path, bad_release)
+        self.assertEqual(self.leftovers(), [])
+
+    def test_report_without_release_is_reported_as_incomplete_run(self):
+        self.report_path.write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "incomplete previous run"):
+            final.publish_evaluation(self.report_path, self.report, self.release_path, self.release)
+        self.assertFalse(self.release_path.exists())
+        with self.assertRaisesRegex(ValueError, "distinct"):
+            final.publish_evaluation(self.report_path, self.report, self.report_path, self.release)
+
+    def test_existing_destination_is_never_overwritten(self):
+        self.release_path.write_text("original", encoding="utf-8")
+        with self.assertRaises(FileExistsError):
+            final.write_new(self.release_path, self.release)
+        self.assertEqual(self.release_path.read_text(encoding="utf-8"), "original")
+        self.assertEqual(self.leftovers(), ["release-model.json"])
 
 
 if __name__ == "__main__":

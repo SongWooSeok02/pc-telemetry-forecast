@@ -5,7 +5,9 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import platform
+import secrets
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -58,10 +60,57 @@ def date(value: str) -> datetime:
     return parsed
 
 
+def encode(payload: dict) -> bytes:
+    # Serialize fully before touching disk so invalid payloads never leave a truncated file.
+    return (json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8")
+
+
+def _stage(path: Path, data: bytes) -> Path:
+    """Write data to a unique, durable temporary file beside path."""
+    staged = path.with_name(f".{path.name}.{os.getpid()}.{secrets.token_hex(8)}.partial")
+    try:
+        with staged.open("xb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except BaseException:
+        staged.unlink(missing_ok=True)
+        raise
+    return staged
+
+
+def write_new_files(outputs: list[tuple[Path, bytes]]) -> None:
+    """Publish all outputs or none of them, never overwriting an existing path.
+
+    Each file is staged completely and then hard-linked into place, which fails if the
+    destination exists. If any step fails, files already published by this call are
+    removed so a retry with the same paths is not blocked by a half-written result.
+    """
+    paths = [path.resolve() for path, _ in outputs]
+    if len(set(paths)) != len(paths):
+        raise ValueError("output paths must be distinct")
+    for path, _ in outputs:
+        if path.exists():
+            raise FileExistsError(f"output already exists: {path}")
+    staged: list[Path] = []
+    published: list[Path] = []
+    try:
+        for path, data in outputs:
+            staged.append(_stage(path, data))
+        for (path, _), source in zip(outputs, staged):
+            os.link(source, path)
+            published.append(path)
+    except BaseException:
+        for path in reversed(published):
+            path.unlink(missing_ok=True)
+        raise
+    finally:
+        for source in staged:
+            source.unlink(missing_ok=True)
+
+
 def write_new(path: Path, payload: dict) -> None:
-    with path.open("x", encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2, allow_nan=False)
-        handle.write("\n")
+    write_new_files([(path, encode(payload))])
 
 
 def model_contract(artifact: dict) -> None:
@@ -239,6 +288,36 @@ def evaluate(freeze: dict, artifact_bytes: bytes, samples: dict, labels: list[di
     }
 
 
+def publish_evaluation(report_path: Path, report: dict, release_path: Path, release: dict) -> None:
+    """Write the evaluation report and release artifact as one all-or-nothing pair.
+
+    The release links to the exact report bytes and is published last, so a release file
+    only appears once its report is in place. A leftover report without a release (only
+    possible if the process is killed between the two links) is an incomplete run.
+    """
+    if report_path.resolve() == release_path.resolve():
+        raise ValueError("report and release need distinct, unused output paths")
+    if report_path.exists() and not release_path.exists():
+        raise ValueError(f"incomplete previous run: {report_path} exists without {release_path}; "
+                         "inspect and remove it, then rerun")
+    if report_path.exists() or release_path.exists():
+        raise ValueError("report and release need distinct, unused output paths")
+    report_bytes = encode(report)
+    release = {**release, "s4_05": {**release["s4_05"], "evaluation_report_sha256": digest(report_bytes)}}
+    write_new_files([(report_path, report_bytes), (release_path, encode(release))])
+
+
+def release_matches_report(release_bytes: bytes, report_bytes: bytes) -> bool:
+    """True only for a release produced together with exactly this evaluation report."""
+    release = json.loads(release_bytes)
+    report = json.loads(report_bytes)
+    s4_05 = release.get("s4_05") or {}
+    return (s4_05.get("evaluation_report_sha256") == digest(report_bytes)
+            and s4_05.get("freeze_manifest_sha256") == report.get("freeze_manifest_sha256")
+            and s4_05.get("decision") == report.get("decision")
+            and release.get("selected_model") == report.get("release_model"))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_subparsers(dest="mode", required=True)
@@ -306,10 +385,7 @@ def main() -> None:
     }
     if not report["decision"]["adopted"]:
         release["candidate_model"] = None
-    if args.output.resolve() == args.release_output.resolve() or args.output.exists() or args.release_output.exists():
-        raise ValueError("report and release need distinct, unused output paths")
-    write_new(args.output, report)
-    write_new(args.release_output, release)
+    publish_evaluation(args.output, report, args.release_output, release)
     print(json.dumps({"release_model": report["release_model"], "decision": report["decision"]}, ensure_ascii=False))
 
 
