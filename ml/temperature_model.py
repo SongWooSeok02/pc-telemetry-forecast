@@ -230,6 +230,37 @@ def adoption(baseline: dict, candidate: dict | None, data_reasons: list[str], un
     return {"adopted": not reasons, "reasons": reasons, "overall_improvement_fraction": improvement}
 
 
+def deployment_coverage(samples: dict[datetime, Sample], start: datetime, end: datetime,
+                        candidate_examples: list[Example], baseline: str, model: dict | None) -> dict:
+    """Score the served policy on every example the temperature-only baseline can predict.
+
+    The adoption decision compares candidate and baseline on the same full-signal examples.
+    In deployment the baseline also serves windows whose auxiliary signals are missing, so
+    report how often that happens and the MAE of the candidate-with-fallback policy.
+    """
+    baseline_examples, baseline_diagnostics = build_examples(samples, start, end, ["temperature"])
+    candidate_by_anchor = {example.anchor: example for example in candidate_examples}
+    fallback_count = sum(example.anchor not in candidate_by_anchor for example in baseline_examples)
+
+    def baseline_predict(example: Example) -> float:
+        return getattr(example, baseline)
+
+    def policy_predict(example: Example) -> float:
+        # Mirrors infer(): ridge only when every selected signal is present, otherwise baseline.
+        candidate = candidate_by_anchor.get(example.anchor)
+        return predict_model(model, candidate.features) if candidate else baseline_predict(example)
+
+    possible = baseline_diagnostics["possible_count"]
+    return {"possible_count": possible,
+            "baseline_predictable_count": len(baseline_examples),
+            "candidate_predictable_count": len(candidate_examples),
+            "fallback_count": fallback_count,
+            "fallback_fraction": fallback_count / len(baseline_examples) if baseline_examples else None,
+            "baseline_only": scores(baseline_examples, baseline_predict, baseline_diagnostics),
+            "candidate_with_fallback": (scores(baseline_examples, policy_predict, baseline_diagnostics)
+                                        if model is not None else None)}
+
+
 def label_source_period(labels: list[dict], machine: str, target: str) -> dict | None:
     times = []
     for session in labels:
@@ -333,6 +364,10 @@ def train(samples: dict[datetime, Sample], labels: list[dict], machine: str, tar
     comparisons = {name: {key: scores(split_examples[name], predict, diagnostics[name]) for key, predict in predictors.items()}
                    for name in split_examples}
     decision = adoption(comparisons["test"][baseline], comparisons["test"].get("ridge"), reasons)
+    coverage = {name: deployment_coverage(samples, start, end, split_examples[name], baseline, model)
+                for name, (start, end) in boundaries.items()}
+    for split in coverage.values():
+        split["served_policy"] = "candidate_with_fallback" if decision["adopted"] else "baseline_only"
     artifact = {"schema_version": 1, "pipeline_version": VERSION, "machine_id": machine, "target": target,
                 "unit": "Cel", "input_seconds": INPUT, "horizon_seconds": HORIZON,
                 "signals": signals, "baseline": baseline, "selected_model": "ridge" if decision["adopted"] else baseline,
@@ -344,7 +379,8 @@ def train(samples: dict[datetime, Sample], labels: list[dict], machine: str, tar
                          "stride_seconds": STRIDE, "minimum_coverage": MIN_COVERAGE, "alpha": alpha,
                          "preprocessing_fit_split": "train", "baseline_selection_split": "validation"},
               "boundaries_utc": {name: {"start_inclusive": start.isoformat(), "end_exclusive": end.isoformat()} for name, (start, end) in boundaries.items()},
-              "diagnostics": diagnostics, "metrics": comparisons, "valid_test_transitions": transition_count,
+              "diagnostics": diagnostics, "metrics": comparisons, "deployment_coverage": coverage,
+              "valid_test_transitions": transition_count,
               "data_period_utc": {"first_observed": min(samples).isoformat(), "last_observed": max(samples).isoformat()} if samples else None,
               "label_source_period_utc": label_source_period(labels, machine, target),
               "label_evaluation_period_utc": ({"start_inclusive": boundaries["test"][0].isoformat(),
@@ -389,6 +425,15 @@ def comparison_markdown(report: dict) -> str:
         for name, metric in models.items():
             values = [metric["mae"], *(metric["by_workload"][workload]["mae"] for workload in WORKLOADS), metric["missing_rate"]]
             lines.append(f"| {split} | {name} | " + " | ".join("미산출" if value is None else f"{value:.6f}" for value in values) + " |")
+    lines.extend(["", "## 배포 정책 기준 (보조 신호 결측 시 기준 모델 대체)", "",
+                  "| 구간 | 온도만 예측 가능 | 후보 예측 가능 | 대체 | 기준 단독 MAE °C | 후보+대체 MAE °C | 제공 정책 |",
+                  "|---|---:|---:|---:|---:|---:|---|"])
+    def mae_text(metric):
+        return "미산출" if metric is None or metric["mae"] is None else f"{metric['mae']:.6f}"
+    for split, coverage in report.get("deployment_coverage", {}).items():
+        lines.append(f"| {split} | {coverage['baseline_predictable_count']} | {coverage['candidate_predictable_count']} | "
+                     f"{coverage['fallback_count']} | {mae_text(coverage['baseline_only'])} | "
+                     f"{mae_text(coverage['candidate_with_fallback'])} | {coverage['served_policy']} |")
     return "\n".join(lines) + "\n"
 
 
