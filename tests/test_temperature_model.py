@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from ml.temperature_model import (
-    VERSION, Example, Sample, adoption, build_examples, comparison_markdown,
+    VERSION, Example, Sample, adoption, build_examples, comparison_markdown, deployment_coverage,
     features, fit_ridge, infer, load_samples, predict_model, select_signals,
     train, valid_transitions, window,
 )
@@ -137,6 +137,105 @@ class TemperatureModelTests(unittest.TestCase):
         samples[stamp] = Sample((None,) * 5, 'idle', 'boot', 'config')
         self.assertEqual(infer(artifact, samples)['status'], 'unavailable')
 
+    def test_deployment_coverage_scores_candidate_with_baseline_fallback(self):
+        samples = self.timeline(1000)
+        start, end = self.start, self.start + timedelta(seconds=1000)
+        signals = ['temperature', 'fan']
+        gap = self.start + timedelta(seconds=500)
+        row = samples[gap]
+        samples[gap] = Sample((*row.values[:-1], None), row.workload, row.boot, row.config)
+        candidates, _ = build_examples(samples, start, end, signals)
+        baseline_only, _ = build_examples(samples, start, end, ['temperature'])
+        model = fit_ridge(candidates, alpha=0.1)
+        coverage = deployment_coverage(samples, start, end, candidates, 'moving_average', model)
+        candidate_anchors = {example.anchor for example in candidates}
+        fallback = [example for example in baseline_only if example.anchor not in candidate_anchors]
+        self.assertEqual(coverage['baseline_predictable_count'], len(baseline_only))
+        self.assertEqual(coverage['candidate_predictable_count'], len(candidates))
+        self.assertTrue(fallback)
+        self.assertLess(len(candidates), len(baseline_only))
+        self.assertEqual(coverage['fallback_count'], len(fallback))
+        self.assertEqual(coverage['baseline_only']['sample_count'], len(baseline_only))
+        by_anchor = {example.anchor: example for example in candidates}
+        expected = [abs(example.actual - (predict_model(model, by_anchor[example.anchor].features)
+                                          if example.anchor in by_anchor else example.moving_average))
+                    for example in baseline_only]
+        self.assertAlmostEqual(coverage['candidate_with_fallback']['mae'], sum(expected) / len(expected))
+        self.assertEqual(coverage['candidate_with_fallback']['sample_count'], len(baseline_only))
+        # Each deployment prediction matches what infer() serves for the same history.
+        artifact = dict(schema_version=1, pipeline_version=VERSION, selected_model='ridge', baseline='moving_average',
+                        signals=signals, candidate_model=model)
+        for example in (fallback[0], candidates[-1]):
+            served = infer(artifact, {stamp: row for stamp, row in samples.items() if stamp <= example.anchor})
+            expected_value = (predict_model(model, by_anchor[example.anchor].features)
+                              if example.anchor in by_anchor else example.moving_average)
+            self.assertAlmostEqual(served['temperature_celsius'], expected_value)
+        self.assertIsNone(deployment_coverage(samples, start, end, candidates, 'persistence', None)['candidate_with_fallback'])
+
+    def test_deployment_coverage_counts_persistence_fallback_exactly_like_infer(self):
+        samples = self.timeline(2000)
+        start, end = self.start, self.start + timedelta(seconds=2000)
+        signals = ['temperature', 'fan']
+        clean_candidates, _ = build_examples(samples, start, end, signals)
+        model = fit_ridge(clean_candidates, alpha=0.1)
+
+        def edit(second, **changes):
+            stamp = self.start + timedelta(seconds=second)
+            row = samples[stamp]
+            values = changes.get('values', row.values)
+            samples[stamp] = Sample(values, row.workload, changes.get('boot', row.boot), row.config)
+
+        edit(700, values=(None, *self.timeline(1)[self.start].values[1:]))  # temperature gap inside windows
+        edit(1080, values=(None, None, None, None, None))  # anchor itself unavailable
+        for second in range(1300, 2000):
+            edit(second, boot='restarted')  # restart within the trailing window of later anchors
+        edit(1650, values=(*samples[self.start + timedelta(seconds=1650)].values[:-1], None))  # fan-only gap
+        candidates, _ = build_examples(samples, start, end, signals)
+        temperature_window, _ = build_examples(samples, start, end, ['temperature'])
+        by_candidate = {example.anchor: example for example in candidates}
+
+        for baseline in ('moving_average', 'persistence'):
+            with self.subTest(baseline=baseline):
+                coverage = deployment_coverage(samples, start, end, candidates, baseline, model)
+                served_artifacts = {
+                    'candidate_with_fallback': dict(schema_version=1, pipeline_version=VERSION, selected_model='ridge',
+                                                    baseline=baseline, signals=signals, candidate_model=model),
+                    'baseline_only': dict(schema_version=1, pipeline_version=VERSION, selected_model=baseline,
+                                          baseline=baseline, signals=signals, candidate_model=None),
+                }
+                expected = {name: [] for name in served_artifacts}
+                served_by = {'ridge': 0, 'moving_average': 0, 'persistence': 0}
+                possible = 0
+                anchor = self.start + timedelta(seconds=300)
+                while anchor + timedelta(seconds=60) < end:
+                    possible += 1
+                    target = samples.get(anchor + timedelta(seconds=60))
+                    history = {stamp: row for stamp, row in samples.items() if stamp <= anchor}
+                    for name, artifact in served_artifacts.items():
+                        result = infer(artifact, history)
+                        if result['status'] != 'predicted' or target.values[0] is None or \
+                                target.boot != samples[anchor].boot:
+                            continue
+                        expected[name].append(abs(target.values[0] - result['temperature_celsius']))
+                        if name == 'candidate_with_fallback':
+                            served_by[result['served_model']] += 1
+                    anchor += timedelta(seconds=60)
+                self.assertEqual(coverage['possible_count'], possible)
+                self.assertEqual(coverage['baseline_predictable_count'], len(expected['baseline_only']))
+                # Persistence-served anchors are included, not just complete 300-second windows.
+                self.assertGreater(coverage['baseline_predictable_count'], len(temperature_window))
+                self.assertEqual(coverage['temperature_window_count'], len(temperature_window))
+                self.assertEqual(coverage['candidate_predictable_count'], len(candidates))
+                self.assertEqual(coverage['fallback_count'], coverage['baseline_predictable_count'] - len(candidates))
+                self.assertEqual(coverage['candidate_policy_served_by'], served_by)
+                self.assertEqual(coverage['persistence_fallback_count'],
+                                 0 if baseline == 'persistence' else served_by['persistence'])
+                self.assertGreater(served_by['persistence'], 0)
+                for name, errors in expected.items():
+                    self.assertEqual(coverage[name]['sample_count'], len(errors))
+                    self.assertAlmostEqual(coverage[name]['mae'], sum(errors) / len(errors))
+                self.assertNotIn(self.start + timedelta(seconds=1080), by_candidate)
+
     def test_minimum_durations_are_not_overridable(self):
         with self.assertRaises(ValueError):
             train({}, [], 'pc', 'gpu', 'hash', None, test_days=1)
@@ -145,6 +244,7 @@ class TemperatureModelTests(unittest.TestCase):
         artifact, report = train({}, [], 'pc', 'gpu', 'hash', None)
         self.assertEqual(artifact['selected_model'], 'persistence')
         self.assertEqual(report['boundaries_utc'], {})
+        self.assertEqual(report['deployment_coverage'], {})
         self.assertIsNone(report['label_evaluation_period_utc'])
         self.assertIn('no_observations', report['decision']['reasons'])
         self.assertEqual(infer(artifact, {})['status'], 'unavailable')
@@ -172,6 +272,13 @@ class TemperatureModelTests(unittest.TestCase):
         for split in report['diagnostics'].values():
             self.assertEqual(split['missing_rate'], 0)
             self.assertEqual(split['temperature_coverage'], 1)
+        test_coverage = report['deployment_coverage']['test']
+        self.assertEqual(test_coverage['fallback_count'], 0)
+        self.assertEqual(test_coverage['baseline_predictable_count'], test_coverage['candidate_predictable_count'])
+        self.assertEqual(test_coverage['served_policy'], 'baseline_only')
+        self.assertEqual(test_coverage['baseline_only']['mae'], report['metrics']['test'][artifact['baseline']]['mae'])
+        self.assertIsNotNone(test_coverage['candidate_with_fallback'])
+        self.assertIn('후보+대체 MAE', comparison_markdown(report))
 
     def test_csv_quality_and_clock_anomalies_are_excluded(self):
         with tempfile.TemporaryDirectory() as directory:

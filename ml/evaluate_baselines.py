@@ -83,9 +83,8 @@ def read_input(
                         value = candidate
                 except ValueError:
                     pass
-            else:
-                invalid_rows += 1
-            if quality == "ok" and value is None:
+            if value is None:
+                # Count each unusable row once: non-ok quality, empty, unparsable or non-finite.
                 invalid_rows += 1
             workload = (row.get("workload") or "").strip().lower()
             if workload not in VALID_WORKLOADS:
@@ -240,7 +239,7 @@ def evaluate(
         }
     return {
         "schema_version": "1.0",
-        "pipeline_version": "s2-07b.2",
+        "pipeline_version": "s2-07b.3",
         "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "input_sha256": input_sha256,
         "config": {
