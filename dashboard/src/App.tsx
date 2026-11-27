@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
+import { fetchHistorySeries } from './historyQuery.ts'
 import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
 import { runQueryActivity } from './queryActivity'
 import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
@@ -31,7 +32,6 @@ const sensorDefaults = [
   { sensorId: 'cpu_power', label: 'CPU 전력', unit: 'W', quality: 'missing' as const },
   { sensorId: 'gpu_power', label: 'GPU 전력', unit: 'W', quality: 'missing' as const },
 ]
-const rangeMs: Record<string, number> = { '1h': 3600000, '6h': 21600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, '90d': 7776000000 }
 
 function useScheduledQuery(scheduler: QueryScheduler, key: string, identity: string, enabled: boolean, request: ScheduledRequest) {
   const requestRef = useRef(request)
@@ -172,35 +172,27 @@ export default function App() {
       onCancel: () => setHistoryError(previousError),
     }, async () => {
       setHistoryError(null)
-      const duration = rangeMs[historyRange] ?? rangeMs['24h']
-      const resolution = duration <= rangeMs['6h'] ? 'raw' : duration <= rangeMs['24h'] ? '10s' : duration <= rangeMs['7d'] ? '1m' : duration <= rangeMs['30d'] ? '5m' : '1h'
       const scope = historyIdentity
       const cache = historyCache.current.scope === scope ? historyCache.current : { scope, cursor: null, points: [] }
-      const to = new Date().toISOString()
-      const from = new Date(Date.now() - duration).toISOString()
-      const query = cache.cursor ? new URLSearchParams({ cursor: cache.cursor }) : new URLSearchParams({ from, to, resolution })
       try {
-        const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(currentIdentity)}/sensors/${encodeURIComponent(selectedSensor.sensorId)}/history?${query}`, { signal })
-        if (signal.aborted) return
-        if (response.status === 404) throw new Error('선택한 PC 또는 센서의 과거 조회를 지원하지 않습니다.')
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const data = await response.json() as HistoryResponse
-        const validPoints = Array.isArray(data.points) && data.points.every((point) =>
-          point && Number.isFinite(Date.parse(point.bucketStart)) && Number.isFinite(Date.parse(point.bucketEnd)) &&
-          (point.lastObservedAt === null || Number.isFinite(Date.parse(point.lastObservedAt))) &&
-          (point.receivedAt === null || Number.isFinite(Date.parse(point.receivedAt))) &&
-          ['ok', 'unsupported', 'missing', 'error'].includes(point.quality) &&
-          (point.value === null || (typeof point.value === 'number' && Number.isFinite(point.value))) &&
-          (point.quality === 'ok' ? typeof point.value === 'number' : point.value === null) &&
-          (point.max === null || (typeof point.max === 'number' && Number.isFinite(point.max))) &&
-          Number.isInteger(point.sampleCount) && point.sampleCount >= 0)
-        if (!validPoints || typeof data.aggregationPending !== 'boolean' || data.unit !== selectedSensor.unit || data.resolution !== resolution || typeof data.nextCursor !== 'string' || !data.nextCursor || data.machineId !== currentIdentity || data.sensorId !== selectedSensor.sensorId) throw new Error('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.')
+        const result = await fetchHistorySeries({
+          apiBase,
+          machineId: currentIdentity,
+          sensorId: selectedSensor.sensorId,
+          unit: selectedSensor.unit,
+          range: historyRange,
+          scope,
+          cache,
+          signal,
+          onCursorReset: () => {
+            if (!signal.aborted && historyCache.current.scope === scope) {
+              historyCache.current = { scope, cursor: null, points: [] }
+            }
+          },
+        })
         if (signal.aborted || historyCache.current.scope !== scope) return
-        const merged = new Map(cache.points.map((point) => [point.bucketStart, point]))
-        for (const point of data.points) merged.set(point.bucketStart, point)
-        const points = [...merged.values()].filter((point) => new Date(point.bucketEnd).getTime() >= Date.now() - duration).sort((a, b) => a.bucketStart.localeCompare(b.bucketStart))
-        historyCache.current = { scope, cursor: data.nextCursor, points }
-        setHistory({ ...data, points })
+        historyCache.current = result.cache
+        setHistory(result.response)
       } catch (error) {
         if (!signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
       }
