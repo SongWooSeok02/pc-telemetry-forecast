@@ -1,13 +1,13 @@
 {
   "input": "fixed fixtures, fake monotonic timer and document/WebView events",
   "expected": {
-    "forecast_tests": 15,
-    "scheduler_tests": 27,
+    "forecast_tests": 16,
+    "scheduler_tests": 31,
     "session_tests": 3,
-    "total_tests": 45,
+    "total_tests": 50,
     "all_exit_codes": 0
   },
-  "build_base": "45103c4",
+  "build_base": "e0a6616",
   "ci": "pending",
   "limitations": [
     "No live PC, deployed authentication API or WebView2 integrated demonstration",
@@ -16,15 +16,15 @@
   ],
   "version": "dashboard 0.1.0 / S3-08",
   "auth_source": "origin/codex/s3-07 e7cebae frontend files",
-  "finished_at_utc": "2026-11-19T11:12:54.7483484Z",
-  "started_at_utc": "2026-11-19T11:12:48.7091597Z",
+  "finished_at_utc": "2026-11-27T15:38:44.4549206Z",
+  "started_at_utc": "2026-11-27T15:38:40.7612250Z",
   "actual": {
     "scheduler_exit": 0,
-    "scheduler_tests": 27,
+    "scheduler_tests": 31,
     "session_tests": 3,
     "diff_exit": 0,
     "build_exit": 0,
-    "forecast_tests": 15,
+    "forecast_tests": 16,
     "forecast_exit": 0,
     "session_exit": 0
   },

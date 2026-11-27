@@ -115,6 +115,40 @@ test('truncated pages are split by time rather than skipping equal timestamps', 
 test('ambiguous raw observations at same timestamp are rejected', async () => {
   const fetcher: Fetcher = async (url) => response(url.includes('/predictions?') ? { items: [], truncated: false } : actualBody([actual(), { ...actual(), value: 99 }]))
   await assert.rejects(readForecastUpdate(fetcher, '', scope, emptyForecast(scope), new AbortController().signal, now), /모호/)
+
+  const subMsSameInstant: Actual[] = [
+    { observedAt: '2026-11-19T11:59:50.123100Z', receivedAt: iso(now), value: 49.1, quality: 'ok' },
+    { observedAt: '2026-11-19T11:59:50.1231+00:00', receivedAt: iso(now), value: 49.9, quality: 'ok' },
+  ]
+  const sameInstantFetcher: Fetcher = async (url) => response(url.includes('/predictions?') ? { items: [], truncated: false } : actualBody(subMsSameInstant))
+  await assert.rejects(readForecastUpdate(sameInstantFetcher, '', scope, emptyForecast(scope), new AbortController().signal, now), /모호/)
+})
+test('distinct microsecond observations within the same millisecond are preserved and matched in order', async () => {
+  const targetPrediction: Prediction = {
+    target_at: '2026-11-19T11:59:50.123500Z',
+    generated_at: '2026-11-19T11:58:50.123500Z',
+    value: 50.0,
+    unit: 'Cel',
+    model_version: 'temperature-v1',
+    status: 'ok',
+    reason: null,
+  }
+  const earlierSubMs: Actual = { observedAt: '2026-11-19T11:59:50.123100Z', receivedAt: iso(now), value: 48.2, quality: 'ok' }
+  const laterSubMs: Actual = { observedAt: '2026-11-19T11:59:50.123900Z', receivedAt: iso(now), value: 49.6, quality: 'ok' }
+  const fetcher: Fetcher = async (url) => response(
+    url.includes('/predictions?')
+      ? { items: [prediction(), targetPrediction], truncated: false }
+      : actualBody([laterSubMs, earlierSubMs]),
+  )
+  const data = await readForecastUpdate(fetcher, '', scope, emptyForecast(scope), new AbortController().signal, now)
+  assert.deepEqual(data.actuals.map((point) => point.observedAt), [earlierSubMs.observedAt, laterSubMs.observedAt])
+  assert.deepEqual(data.actuals.map((point) => point.value), [48.2, 49.6])
+
+  const comparisons = matchActuals(data.predictions, data.actuals, now)
+  assert.equal(comparisons[0].actual?.observedAt, earlierSubMs.observedAt)
+  assert.equal(comparisons[0].actual?.value, 48.2)
+  assert.equal(comparisons[1].actual?.observedAt, laterSubMs.observedAt)
+  assert.equal(comparisons[1].actual?.value, 49.6)
 })
 test('manual refresh shares single scheduler slot and restore does not refetch', async () => {
   const clock: SchedulerClock = { now: () => 0, setTimeout: () => { throw new Error('manual timer must not be set') }, clearTimeout: () => {} }
