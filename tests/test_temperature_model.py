@@ -172,6 +172,70 @@ class TemperatureModelTests(unittest.TestCase):
             self.assertAlmostEqual(served['temperature_celsius'], expected_value)
         self.assertIsNone(deployment_coverage(samples, start, end, candidates, 'persistence', None)['candidate_with_fallback'])
 
+    def test_deployment_coverage_counts_persistence_fallback_exactly_like_infer(self):
+        samples = self.timeline(2000)
+        start, end = self.start, self.start + timedelta(seconds=2000)
+        signals = ['temperature', 'fan']
+        clean_candidates, _ = build_examples(samples, start, end, signals)
+        model = fit_ridge(clean_candidates, alpha=0.1)
+
+        def edit(second, **changes):
+            stamp = self.start + timedelta(seconds=second)
+            row = samples[stamp]
+            values = changes.get('values', row.values)
+            samples[stamp] = Sample(values, row.workload, changes.get('boot', row.boot), row.config)
+
+        edit(700, values=(None, *self.timeline(1)[self.start].values[1:]))  # temperature gap inside windows
+        edit(1080, values=(None, None, None, None, None))  # anchor itself unavailable
+        for second in range(1300, 2000):
+            edit(second, boot='restarted')  # restart within the trailing window of later anchors
+        edit(1650, values=(*samples[self.start + timedelta(seconds=1650)].values[:-1], None))  # fan-only gap
+        candidates, _ = build_examples(samples, start, end, signals)
+        temperature_window, _ = build_examples(samples, start, end, ['temperature'])
+        by_candidate = {example.anchor: example for example in candidates}
+
+        for baseline in ('moving_average', 'persistence'):
+            with self.subTest(baseline=baseline):
+                coverage = deployment_coverage(samples, start, end, candidates, baseline, model)
+                served_artifacts = {
+                    'candidate_with_fallback': dict(schema_version=1, pipeline_version=VERSION, selected_model='ridge',
+                                                    baseline=baseline, signals=signals, candidate_model=model),
+                    'baseline_only': dict(schema_version=1, pipeline_version=VERSION, selected_model=baseline,
+                                          baseline=baseline, signals=signals, candidate_model=None),
+                }
+                expected = {name: [] for name in served_artifacts}
+                served_by = {'ridge': 0, 'moving_average': 0, 'persistence': 0}
+                possible = 0
+                anchor = self.start + timedelta(seconds=300)
+                while anchor + timedelta(seconds=60) < end:
+                    possible += 1
+                    target = samples.get(anchor + timedelta(seconds=60))
+                    history = {stamp: row for stamp, row in samples.items() if stamp <= anchor}
+                    for name, artifact in served_artifacts.items():
+                        result = infer(artifact, history)
+                        if result['status'] != 'predicted' or target.values[0] is None or \
+                                target.boot != samples[anchor].boot:
+                            continue
+                        expected[name].append(abs(target.values[0] - result['temperature_celsius']))
+                        if name == 'candidate_with_fallback':
+                            served_by[result['served_model']] += 1
+                    anchor += timedelta(seconds=60)
+                self.assertEqual(coverage['possible_count'], possible)
+                self.assertEqual(coverage['baseline_predictable_count'], len(expected['baseline_only']))
+                # Persistence-served anchors are included, not just complete 300-second windows.
+                self.assertGreater(coverage['baseline_predictable_count'], len(temperature_window))
+                self.assertEqual(coverage['temperature_window_count'], len(temperature_window))
+                self.assertEqual(coverage['candidate_predictable_count'], len(candidates))
+                self.assertEqual(coverage['fallback_count'], coverage['baseline_predictable_count'] - len(candidates))
+                self.assertEqual(coverage['candidate_policy_served_by'], served_by)
+                self.assertEqual(coverage['persistence_fallback_count'],
+                                 0 if baseline == 'persistence' else served_by['persistence'])
+                self.assertGreater(served_by['persistence'], 0)
+                for name, errors in expected.items():
+                    self.assertEqual(coverage[name]['sample_count'], len(errors))
+                    self.assertAlmostEqual(coverage[name]['mae'], sum(errors) / len(errors))
+                self.assertNotIn(self.start + timedelta(seconds=1080), by_candidate)
+
     def test_minimum_durations_are_not_overridable(self):
         with self.assertRaises(ValueError):
             train({}, [], 'pc', 'gpu', 'hash', None, test_days=1)
