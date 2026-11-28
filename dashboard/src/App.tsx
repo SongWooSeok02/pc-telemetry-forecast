@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
-import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
+import { fetchHistorySeries } from './historyQuery.ts'
+import { mountDashboardScheduler, type QueryScheduler, type ScheduledRequest } from './queryScheduler'
 import { runQueryActivity } from './queryActivity'
 import ForecastPanel from './ForecastPanel'
 import type { BrowserSession } from './browserSession'
@@ -35,7 +36,6 @@ const sensorDefaults = [
   { sensorId: 'cpu_power', label: 'CPU 전력', unit: 'W', quality: 'missing' as const },
   { sensorId: 'gpu_power', label: 'GPU 전력', unit: 'W', quality: 'missing' as const },
 ]
-const rangeMs: Record<string, number> = { '1h': 3600000, '6h': 21600000, '24h': 86400000, '7d': 604800000, '30d': 2592000000, '90d': 7776000000 }
 
 function useScheduledQuery(scheduler: QueryScheduler, key: string, identity: string, enabled: boolean, request: ScheduledRequest) {
   const requestRef = useRef({ identity, request })
@@ -84,14 +84,26 @@ function ReadingCard({ reading, receivedAt }: { reading: SensorReading; received
   )
 }
 
-export default function App({ machineId, setMachineId, session, onLogout }: { machineId: string; setMachineId: (value: string) => void; session: BrowserSession; onLogout: () => void }) {
+type DashboardProps = { machineId: string; setMachineId: (value: string) => void; session: BrowserSession; onLogout: () => void }
+
+export default function App(props: DashboardProps) {
+  const [scheduler, setScheduler] = useState<QueryScheduler | null>(null)
+  useEffect(() => {
+    // Each effect setup owns a fresh scheduler, including StrictMode replay.
+    const mounted = mountDashboardScheduler()
+    setScheduler(mounted.scheduler)
+    return mounted.dispose
+  }, [])
+  return scheduler && <Dashboard {...props} scheduler={scheduler} />
+}
+
+function Dashboard({ machineId, setMachineId, session, onLogout, scheduler }: DashboardProps & { scheduler: QueryScheduler }) {
   const [snapshot, setSnapshot] = useState<CurrentSnapshot | null>(null)
   const [state, updateState] = useState<LoadState>('idle')
   const stateRef = useRef<LoadState>('idle')
   const setState = (value: LoadState) => { stateRef.current = value; updateState(value) }
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
   const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
-  const [scheduler] = useState(() => new QueryScheduler())
   const [historyRange, setHistoryRange] = useState('24h')
   const [selectedSensorId, setSelectedSensorId] = useState('cpu_temperature')
   const [history, setHistory] = useState<HistoryResponse | null>(null)
@@ -133,10 +145,6 @@ export default function App({ machineId, setMachineId, session, onLogout }: { ma
     if (sensors.some((sensor) => sensor.sensorId === selectedSensorId)) return
     setSelectedSensorId(sensors[0]?.sensorId ?? 'cpu_temperature')
   }, [sensors, selectedSensorId])
-
-  useEffect(() => {
-    return bindDashboardVisibility(scheduler)
-  }, [scheduler])
 
   useEffect(() => { scheduler.setPeriod(period) }, [scheduler, period])
 
@@ -200,34 +208,28 @@ export default function App({ machineId, setMachineId, session, onLogout }: { ma
       get: () => historyBusyRef.current, set: setHistoryBusy, busy: true,
       onCancel: () => setHistoryError(previousError),
     }, async () => {
-      const duration = rangeMs[historyRange] ?? rangeMs['24h']
-      const resolution = duration <= rangeMs['6h'] ? 'raw' : duration <= rangeMs['24h'] ? '10s' : duration <= rangeMs['7d'] ? '1m' : duration <= rangeMs['30d'] ? '5m' : '1h'
       const scope = historyIdentity
       const cache = historyCache.current.scope === scope ? historyCache.current : { scope, cursor: null, points: [] }
-      const to = new Date().toISOString()
-      const from = new Date(Date.now() - duration).toISOString()
-      const query = cache.cursor ? new URLSearchParams({ cursor: cache.cursor }) : new URLSearchParams({ from, to, resolution })
       try {
-        const response = await session.request(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(currentIdentity)}/sensors/${encodeURIComponent(selectedSensor.sensorId)}/history?${query}`, signal)
-        if (!historyVersion.accepts(version, signal)) return
-        if (!response.ok) throw await responseError(response)
-        const data = await response.json() as HistoryResponse
-        const validPoints = Array.isArray(data.points) && data.points.every((point) =>
-          point && Number.isFinite(Date.parse(point.bucketStart)) && Number.isFinite(Date.parse(point.bucketEnd)) &&
-          (point.lastObservedAt === null || Number.isFinite(Date.parse(point.lastObservedAt))) &&
-          (point.receivedAt === null || Number.isFinite(Date.parse(point.receivedAt))) &&
-          ['ok', 'unsupported', 'missing', 'error'].includes(point.quality) &&
-          (point.value === null || (typeof point.value === 'number' && Number.isFinite(point.value))) &&
-          (point.quality === 'ok' ? typeof point.value === 'number' : point.value === null) &&
-          (point.max === null || (typeof point.max === 'number' && Number.isFinite(point.max))) &&
-          Number.isInteger(point.sampleCount) && point.sampleCount >= 0)
-        if (!validPoints || typeof data.aggregationPending !== 'boolean' || data.unit !== selectedSensor.unit || data.resolution !== resolution || typeof data.nextCursor !== 'string' || !data.nextCursor || data.machineId !== currentIdentity || data.sensorId !== selectedSensor.sensorId) throw new QueryError('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.', 422, 'INVALID_RESPONSE', false)
+        const result = await fetchHistorySeries({
+          apiBase,
+          machineId: currentIdentity,
+          sensorId: selectedSensor.sensorId,
+          unit: selectedSensor.unit,
+          range: historyRange,
+          scope,
+          cache,
+          signal,
+          fetcher: (url, init) => session.request(url, init.signal),
+          onCursorReset: () => {
+            if (historyVersion.accepts(version, signal) && historyCache.current.scope === scope) {
+              historyCache.current = { scope, cursor: null, points: [] }
+            }
+          },
+        })
         if (!historyVersion.accepts(version, signal) || historyCache.current.scope !== scope) return
-        const merged = new Map(cache.points.map((point) => [point.bucketStart, point]))
-        for (const point of data.points) merged.set(point.bucketStart, point)
-        const points = [...merged.values()].filter((point) => new Date(point.bucketEnd).getTime() >= Date.now() - duration).sort((a, b) => a.bucketStart.localeCompare(b.bucketStart))
-        historyCache.current = { scope, cursor: data.nextCursor, points }
-        setHistory({ ...data, points })
+        historyCache.current = result.cache
+        setHistory(result.response)
         setHistoryError(null)
       } catch (error) {
         if (!historyVersion.accepts(version, signal) || error instanceof DOMException && error.name === 'AbortError') return

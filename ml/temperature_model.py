@@ -230,6 +230,77 @@ def adoption(baseline: dict, candidate: dict | None, data_reasons: list[str], un
     return {"adopted": not reasons, "reasons": reasons, "overall_improvement_fraction": improvement}
 
 
+def deployment_coverage(samples: dict[datetime, Sample], start: datetime, end: datetime,
+                        candidate_examples: list[Example], baseline: str, model: dict | None) -> dict:
+    """Score the served policy on every anchor where infer() would return a prediction.
+
+    The adoption decision compares candidate and baseline on the same full-signal examples.
+    In deployment infer() also serves anchors whose auxiliary signals are missing (baseline)
+    and anchors whose 300-second temperature window is broken by a gap or a boot/sensor
+    change (persistence from the latest valid temperature). Report those counts and the MAE
+    of both served policies over the same set of anchors, on the same UTC grid as
+    build_examples() so the split boundaries stay identical.
+    """
+    candidate_by_anchor = {example.anchor: example for example in candidate_examples}
+    counts = {name: {"possible": 0, "valid": 0} for name in (*WORKLOADS, "unlabeled")}
+    served: list[tuple[Example, str, str | None]] = []
+    possible = temperature_window_count = 0
+    earliest = start + timedelta(seconds=INPUT - 1)
+    anchor = datetime.fromtimestamp(math.ceil(earliest.timestamp() / STRIDE) * STRIDE, timezone.utc)
+    while anchor + timedelta(seconds=HORIZON) < end:
+        possible += 1
+        latest = samples.get(anchor)
+        target = samples.get(anchor + timedelta(seconds=HORIZON))
+        label = target.workload if target else "unlabeled"
+        counts[label]["possible"] += 1
+        # infer() returns "unavailable" without a valid latest temperature; the target must be
+        # a valid temperature from the same boot/sensor configuration to be scored.
+        if (latest and latest.values[0] is not None and target and target.values[0] is not None
+                and (target.boot, target.config) == (latest.boot, latest.config)):
+            rows = window(samples, anchor, ["temperature"])
+            moving_average = sum(row.values[0] for row in rows) / INPUT if rows else None
+            temperature_window_count += rows is not None
+            example = Example(anchor, (), target.values[0], latest.values[0],
+                              moving_average if moving_average is not None else latest.values[0], label)
+            # Baseline policy exactly as infer() serves it.
+            baseline_served = "moving_average" if baseline == "moving_average" and rows else "persistence"
+            served.append((example, baseline_served, "ridge" if anchor in candidate_by_anchor else None))
+            counts[label]["valid"] += 1
+        anchor += timedelta(seconds=STRIDE)
+
+    examples = [example for example, _, _ in served]
+    diagnostics = {"missing_rate": 1 - len(examples) / possible if possible else None,
+                   "candidate_counts_by_workload": counts}
+    baseline_by_anchor = {example.anchor: name for example, name, _ in served}
+
+    def baseline_predict(example: Example) -> float:
+        return getattr(example, baseline_by_anchor[example.anchor])
+
+    def policy_predict(example: Example) -> float:
+        candidate = candidate_by_anchor.get(example.anchor)
+        return predict_model(model, candidate.features) if candidate else baseline_predict(example)
+
+    candidate_served = sum(name == "ridge" for _, _, name in served)
+    # Anchors without every selected signal, so the candidate cannot serve them.
+    fallback_count = len(served) - candidate_served
+    persistence_fallback = sum(name == "persistence" for _, name, _ in served if baseline == "moving_average")
+    policy_by_model = {"ridge": candidate_served if model is not None else 0, "moving_average": 0, "persistence": 0}
+    for _, baseline_name, candidate_name in served:
+        if candidate_name is None or model is None:
+            policy_by_model[baseline_name] += 1
+    return {"possible_count": possible,
+            "baseline_predictable_count": len(served),
+            "temperature_window_count": temperature_window_count,
+            "candidate_predictable_count": len(candidate_examples),
+            "fallback_count": fallback_count,
+            "fallback_fraction": fallback_count / len(served) if served else None,
+            "persistence_fallback_count": persistence_fallback,
+            "candidate_policy_served_by": policy_by_model if model is not None else None,
+            "baseline_only": scores(examples, baseline_predict, diagnostics),
+            "candidate_with_fallback": (scores(examples, policy_predict, diagnostics)
+                                        if model is not None else None)}
+
+
 def label_source_period(labels: list[dict], machine: str, target: str) -> dict | None:
     times = []
     for session in labels:
@@ -333,6 +404,10 @@ def train(samples: dict[datetime, Sample], labels: list[dict], machine: str, tar
     comparisons = {name: {key: scores(split_examples[name], predict, diagnostics[name]) for key, predict in predictors.items()}
                    for name in split_examples}
     decision = adoption(comparisons["test"][baseline], comparisons["test"].get("ridge"), reasons)
+    coverage = {name: deployment_coverage(samples, start, end, split_examples[name], baseline, model)
+                for name, (start, end) in boundaries.items()}
+    for split in coverage.values():
+        split["served_policy"] = "candidate_with_fallback" if decision["adopted"] else "baseline_only"
     artifact = {"schema_version": 1, "pipeline_version": VERSION, "machine_id": machine, "target": target,
                 "unit": "Cel", "input_seconds": INPUT, "horizon_seconds": HORIZON,
                 "signals": signals, "baseline": baseline, "selected_model": "ridge" if decision["adopted"] else baseline,
@@ -344,7 +419,8 @@ def train(samples: dict[datetime, Sample], labels: list[dict], machine: str, tar
                          "stride_seconds": STRIDE, "minimum_coverage": MIN_COVERAGE, "alpha": alpha,
                          "preprocessing_fit_split": "train", "baseline_selection_split": "validation"},
               "boundaries_utc": {name: {"start_inclusive": start.isoformat(), "end_exclusive": end.isoformat()} for name, (start, end) in boundaries.items()},
-              "diagnostics": diagnostics, "metrics": comparisons, "valid_test_transitions": transition_count,
+              "diagnostics": diagnostics, "metrics": comparisons, "deployment_coverage": coverage,
+              "valid_test_transitions": transition_count,
               "data_period_utc": {"first_observed": min(samples).isoformat(), "last_observed": max(samples).isoformat()} if samples else None,
               "label_source_period_utc": label_source_period(labels, machine, target),
               "label_evaluation_period_utc": ({"start_inclusive": boundaries["test"][0].isoformat(),
@@ -389,6 +465,16 @@ def comparison_markdown(report: dict) -> str:
         for name, metric in models.items():
             values = [metric["mae"], *(metric["by_workload"][workload]["mae"] for workload in WORKLOADS), metric["missing_rate"]]
             lines.append(f"| {split} | {name} | " + " | ".join("미산출" if value is None else f"{value:.6f}" for value in values) + " |")
+    lines.extend(["", "## 배포 정책 기준 (보조 신호 결측 시 기준 모델, 5분 온도 창 불완전 시 현재값 유지로 대체)", "",
+                  "| 구간 | 제공 가능 | 5분 온도 창 | 후보 예측 가능 | 기준 대체 | 현재값 유지 대체 | 기준 단독 MAE °C | 후보+대체 MAE °C | 제공 정책 |",
+                  "|---|---:|---:|---:|---:|---:|---:|---:|---|"])
+    def mae_text(metric):
+        return "미산출" if metric is None or metric["mae"] is None else f"{metric['mae']:.6f}"
+    for split, coverage in report.get("deployment_coverage", {}).items():
+        lines.append(f"| {split} | {coverage['baseline_predictable_count']} | {coverage['temperature_window_count']} | "
+                     f"{coverage['candidate_predictable_count']} | {coverage['fallback_count']} | "
+                     f"{coverage['persistence_fallback_count']} | {mae_text(coverage['baseline_only'])} | "
+                     f"{mae_text(coverage['candidate_with_fallback'])} | {coverage['served_policy']} |")
     return "\n".join(lines) + "\n"
 
 

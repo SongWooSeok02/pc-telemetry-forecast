@@ -39,9 +39,9 @@ reason: 문자열 또는 null
 
 `unavailable`은 null, `ok/fallback`은 유한 수치여야 합니다. `fallback` 또는 `builtin:` 버전은 기준 모델로 표시합니다. 단위 누락/불일치, 60초가 아닌 지평, 잘못된 모델/수치, 잘못된 PC·센서 실제값 응답은 반영하지 않습니다. `Cel`과 `°C`를 추정 변환해 조용히 연결하지 않습니다.
 
-### S3-05 연동 차단 사항
+### S3-05 연동 계약 및 구 레코드 처리
 
-현재 확인한 `origin/codex/s3-05`의 예측 조회는 `target_at, generated_at, value, model_version, status, reason`만 반환하며 예측 당시 단위를 포함하지 않습니다. 단위가 바뀐 과거 예측을 현재 센서의 단위라고 단정할 수 없으므로 이 화면은 **단위 없는 예측을 거부**합니다. 단위를 저장/반환하는 S3-05 계약 보강 및 담당자 합의가 필요하며, 현재 활성 대상 단위를 과거 예측에 일괄 덧붙이는 방식으로 해결하면 안 됩니다. 이 PR은 해당 담당자의 저장/조회 계약을 변경하지 않습니다.
+S3-05 후속 서버 패치(`database/migrations/006_prediction_unit.sql`, `backend/forecast.py`, `backend/history.py`)는 예측 생성 시점의 `forecast_targets.unit`을 `predictions.unit`에 저장하고 `GET /v1/machines/{machine_id}/predictions` 응답에 포함합니다. `006_prediction_unit.sql`은 `unit`을 nullable로 추가하며 구 레코드에 현재 대상 단위를 백필하지 않습니다. 이 화면은 구조가 정상인 `unit: null` 구 레코드를 현재 센서 단위로 추정하거나 차트에 그리지 않고 제외하며, 같은 페이지의 유효한 예측 행은 정상 렌더링합니다(제외된 구 레코드 구간의 15초 초과 공백은 선을 끊어 유지). 반면 `unit` 누락(`undefined`), 빈 문자열, 불일치 단위, 잘못된 지평·수치 등 형식 오류 레코드는 계속 엄격히 거부합니다. `dashboard/tests/forecastHttpIntegration.test.ts`에서 S3-05/S2-05 계약 픽스처 기반 로컬 HTTP 응답(정상, 혼합, 구 레코드 단독)이 `readForecastUpdate`와 `ForecastChart` 렌더링을 통과하는지 검증합니다(실제 FastAPI/PostgreSQL 서버 검증은 별도 백엔드 통합 환경에서 수행).
 
 `조회 기준`은 요청 시작 시각이고, 실제 수신 시각과 `aggregationUpdatedAt`/`aggregationPending`은 별도로 표시합니다. 이 차트는 집계 평균과 순간 예측의 혼동을 피하려고 원시 실제값만 매칭합니다. 긴 기간 집계 비교와 실제 서버 지연 재집계 검증은 별도 작업입니다. 커서 만료/조회 오류는 UI에 표시하며 사용자는 조건을 다시 선택해 초기화할 수 있습니다.
 

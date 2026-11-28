@@ -255,3 +255,15 @@ export function bindDashboardVisibility(scheduler: QueryScheduler) {
     scheduler.setVisible(false)
   }
 }
+
+export function mountDashboardScheduler(clock?: SchedulerClock) {
+  const scheduler = new QueryScheduler(clock)
+  const unbind = bindDashboardVisibility(scheduler)
+  return {
+    scheduler,
+    dispose() {
+      scheduler.dispose()
+      unbind()
+    },
+  }
+}

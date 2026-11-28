@@ -1,27 +1,7 @@
 import { useMemo, useState } from 'react'
+import type { HistoryPoint, HistoryResponse } from './historyQuery.ts'
 
-export type HistoryPoint = {
-  bucketStart: string
-  bucketEnd: string
-  lastObservedAt: string | null
-  receivedAt: string | null
-  value: number | null
-  max: number | null
-  sampleCount: number
-  quality: 'ok' | 'unsupported' | 'missing' | 'error'
-  aggregationUpdatedAt: string | null
-}
-
-export type HistoryResponse = {
-  machineId: string
-  sensorId: string
-  unit: string
-  resolution: 'raw' | '10s' | '1m' | '5m' | '1h'
-  points: HistoryPoint[]
-  nextCursor: string
-  aggregationUpdatedAt: string | null
-  aggregationPending: boolean
-}
+export type { HistoryPoint, HistoryResponse }
 
 function time(value?: string | null, date = false) {
   if (!value) return '—'
