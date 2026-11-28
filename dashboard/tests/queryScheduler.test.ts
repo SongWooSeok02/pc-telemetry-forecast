@@ -3,7 +3,7 @@ import { runQueryActivity } from '../src/queryActivity.ts'
 import { BrowserSession } from '../src/browserSession.ts'
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { bindDashboardVisibility, QueryScheduler, type SchedulerClock } from '../src/queryScheduler.ts'
+import { bindDashboardVisibility, mountDashboardScheduler, QueryScheduler, type SchedulerClock } from '../src/queryScheduler.ts'
 
 class FakeClock implements SchedulerClock {
   private time = 0
@@ -38,15 +38,24 @@ async function flush() {
   for (let index = 0; index < 12; index += 1) await Promise.resolve()
 }
 
-test('an expired session cancels another query’s pending retry', async (t) => {
+test('dashboard cleanup after session expiry cancels pending retries across effect replay', async (t) => {
+  const fakeDocument = new EventTarget()
+  Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible' })
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {} })
   const clock = new FakeClock()
-  const scheduler = new QueryScheduler(clock)
-  t.after(() => scheduler.dispose())
-  const reasons: string[] = []
-  const session = new BrowserSession('a'.repeat(64), (reason) => {
-    reasons.push(reason)
-    scheduler.dispose()
+  const first = mountDashboardScheduler(clock)
+  first.dispose()
+  const mounted = mountDashboardScheduler(clock)
+  t.after(() => {
+    mounted.dispose()
+    Reflect.deleteProperty(globalThis, 'window')
+    Reflect.deleteProperty(globalThis, 'document')
   })
+  const { scheduler } = mounted
+  assert.notEqual(scheduler, first.scheduler)
+  const reasons: string[] = []
+  const session = new BrowserSession('a'.repeat(64), (reason) => reasons.push(reason))
   const requests: string[] = []
   const statuses = [503, 401]
   t.mock.method(globalThis, 'fetch', (path: string) => {
@@ -60,14 +69,19 @@ test('an expired session cancels another query’s pending retry', async (t) => 
     if (!response.ok) throw await responseError(response)
   }
 
-  scheduler.setVisible(true)
   scheduler.register('current', query('/current'))
   await flush()
   assert.equal(scheduler.status()[0].retryInMs, 5000)
   scheduler.register('history', query('/history'))
   await flush()
   assert.deepEqual(reasons, ['expired'])
+  assert.equal(clock.pendingCount(), 1)
+  // SessionGate removes the dashboard, so React runs the scheduler owner's cleanup.
+  mounted.dispose()
   assert.equal(clock.pendingCount(), 0)
+  assert.deepEqual(scheduler.status(), [])
+  scheduler.setVisible(true)
+  scheduler.register('late', () => assert.fail('disposed scheduler accepted work'))
   await clock.advanceBy(60_000)
   assert.deepEqual(requests, ['/current', '/history'])
 })

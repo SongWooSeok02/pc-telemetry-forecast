@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
-import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
+import { mountDashboardScheduler, type QueryScheduler, type ScheduledRequest } from './queryScheduler'
 import { runQueryActivity } from './queryActivity'
 import ForecastPanel from './ForecastPanel'
 import type { BrowserSession } from './browserSession'
@@ -84,14 +84,26 @@ function ReadingCard({ reading, receivedAt }: { reading: SensorReading; received
   )
 }
 
-export default function App({ machineId, setMachineId, session, onLogout }: { machineId: string; setMachineId: (value: string) => void; session: BrowserSession; onLogout: () => void }) {
+type DashboardProps = { machineId: string; setMachineId: (value: string) => void; session: BrowserSession; onLogout: () => void }
+
+export default function App(props: DashboardProps) {
+  const [scheduler, setScheduler] = useState<QueryScheduler | null>(null)
+  useEffect(() => {
+    // Each effect setup owns a fresh scheduler, including StrictMode replay.
+    const mounted = mountDashboardScheduler()
+    setScheduler(mounted.scheduler)
+    return mounted.dispose
+  }, [])
+  return scheduler && <Dashboard {...props} scheduler={scheduler} />
+}
+
+function Dashboard({ machineId, setMachineId, session, onLogout, scheduler }: DashboardProps & { scheduler: QueryScheduler }) {
   const [snapshot, setSnapshot] = useState<CurrentSnapshot | null>(null)
   const [state, updateState] = useState<LoadState>('idle')
   const stateRef = useRef<LoadState>('idle')
   const setState = (value: LoadState) => { stateRef.current = value; updateState(value) }
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
   const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
-  const [scheduler] = useState(() => new QueryScheduler())
   const [historyRange, setHistoryRange] = useState('24h')
   const [selectedSensorId, setSelectedSensorId] = useState('cpu_temperature')
   const [history, setHistory] = useState<HistoryResponse | null>(null)
@@ -133,10 +145,6 @@ export default function App({ machineId, setMachineId, session, onLogout }: { ma
     if (sensors.some((sensor) => sensor.sensorId === selectedSensorId)) return
     setSelectedSensorId(sensors[0]?.sensorId ?? 'cpu_temperature')
   }, [sensors, selectedSensorId])
-
-  useEffect(() => {
-    return bindDashboardVisibility(scheduler)
-  }, [scheduler])
 
   useEffect(() => { scheduler.setPeriod(period) }, [scheduler, period])
 
