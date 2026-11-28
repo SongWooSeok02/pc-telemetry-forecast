@@ -1,6 +1,6 @@
 # S3-05 예측 작업자 운영 및 조회 계약
 
-S3-03의 PostgreSQL 저장소와 사용자 소유권 검증 위에서 동작한다. 새 DB에서는 Compose의 `migrate`가 005까지 적용한다. 이미 004를 설치한 환경에서는 005만 한 번 적용한 뒤 API와 작업자를 배포한다. 기존 예측은 그대로 조회되며 `status=ok`를 받는다.
+S3-03의 PostgreSQL 저장소와 사용자 소유권 검증 위에서 동작한다. 새 DB에서는 Compose의 `migrate`가 006까지 적용한다. 이미 005를 설치한 환경에서는 006만 한 번 적용한 뒤 API와 작업자를 배포한다. 기존 예측은 그대로 조회되며 `status=ok`를 받고, `006_prediction_unit.sql` 이전 레코드의 `unit`은 현재 대상 단위로 백필하지 않고 `null`로 유지된다.
 
 관리자는 `forecast_targets(machine_id, sensor_id, unit)`에 대상 PC·센서를 명시적으로 등록한다. 등록되지 않은 센서는 처리하지 않으며 삭제된 PC도 건너뛴다. 예측 작업자는 `python -m backend.forecast`로 실행한다. Compose에서는 `forecast`가 작업자를 실행하고 읽기 전용 `forecast-models` 볼륨을 `/models`에 연결한다. 직접 실행할 때는 `DATABASE_URL` 또는 libpq 환경 변수와 `FORECAST_MODEL_DIR`을 지정한다.
 
@@ -17,7 +17,7 @@ S3-03의 PostgreSQL 저장소와 사용자 소유권 검증 위에서 동작한�
 
 모델 입력은 해당 PC·센서의 최신 관측으로 구성한다. 최근 10초 이내의 정상 관측이 필요하다. 최신 관측의 품질 또는 단위가 틀리면 이전 정상값으로 대체하지 않는다. 다중 입력 창은 연속된 1초 값이어야 하며 중복 초, 결측, 품질 이상, 센서 구성·부팅 세션 변경은 창을 무효 처리한다. 이때 최신값이 정상이라면 현재값 유지 기준을 사용한다.
 
-`GET /v1/machines/{machine_id}/predictions?sensor_id=…&start=…&end=…`는 기존 대상 시각 반개구간과 페이지 형식을 유지한다. 세션과 PC 소유권을 검증한 뒤 저장값만 읽는다. 각 항목의 `target_at`은 새 예측의 `generated_at`에서 60초 뒤다. `model_version`은 실제로 사용한 모델을 나타내며, 예측 불가 시 `builtin:none`이다.
+`GET /v1/machines/{machine_id}/predictions?sensor_id=…&start=…&end=…`는 기존 대상 시각 반개구간과 페이지 형식을 유지한다. 세션과 PC 소유권을 검증한 뒤 저장값만 읽는다. 각 항목은 `target_at, generated_at, value, unit, model_version, status, reason`을 반환하며, 새 예측의 `target_at`은 `generated_at`에서 60초 뒤이고 `unit`은 예측 생성 시점의 `forecast_targets.unit`이다(`006_prediction_unit.sql` 이전 구 레코드는 `unit: null`). `model_version`은 실제로 사용한 모델을 나타내며, 예측 불가 시 `builtin:none`이다.
 
 별도 DB 역할을 사용하는 환경에서는 API에 `predictions` 읽기 권한을 준다. 작업자에는 `forecast_targets`, `forecast_models`, `machines`, `measurements` 읽기 권한, `forecast_cycle` 읽기·삽입·수정 권한, `predictions` 삽입 권한이 필요하다. 모델 등록과 활성화는 관리자 역할에서 실행한다.
 
