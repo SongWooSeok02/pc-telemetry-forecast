@@ -742,3 +742,26 @@ for (const surface of ['web', 'host'] as const) {
     })
   }
 }
+
+test('task registered and unregistered or disposed in the same tick is never invoked', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  let removedCalls = 0
+  let replacementCalls = 0
+  scheduler.setVisible(true)
+  const unregister = scheduler.register('current', () => { removedCalls += 1 })
+  unregister()
+  scheduler.register('current', () => { replacementCalls += 1 })
+  await flush()
+  assert.equal(removedCalls, 0)
+  assert.equal(replacementCalls, 1)
+  scheduler.dispose()
+
+  const disposedScheduler = new QueryScheduler(clock)
+  let disposedCalls = 0
+  disposedScheduler.setVisible(true)
+  disposedScheduler.register('current', () => { disposedCalls += 1 })
+  disposedScheduler.dispose()
+  await flush()
+  assert.equal(disposedCalls, 0)
+})

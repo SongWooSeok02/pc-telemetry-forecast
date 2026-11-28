@@ -1,7 +1,9 @@
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from ml.evaluate_baselines import Observation, build_examples, chronological_boundaries, evaluate
+from ml.evaluate_baselines import Observation, build_examples, chronological_boundaries, evaluate, read_input
 
 
 class BaselinePipelineTests(unittest.TestCase):
@@ -82,6 +84,35 @@ class BaselinePipelineTests(unittest.TestCase):
         for invalid in (0, -1, float("nan"), float("inf")):
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 chronological_boundaries(self.start, train_days=invalid)
+
+    def read_rows(self, rows):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "telemetry.csv"
+            lines = ["machine_id,sensor_id,observed_at,value,quality,workload"]
+            for second, (value, quality) in enumerate(rows):
+                lines.append(f"pc-a,cpu/temp,2026-01-01T00:00:{second:02d}Z,{value},{quality},idle")
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            return read_input(path)
+
+    def test_invalid_quality_rows_count_each_unusable_row_once(self):
+        cases = {
+            "ok_empty_value": [("", "ok")],
+            "ok_non_finite_value": [("nan", "ok")],
+            "ok_infinite_value": [("inf", "ok")],
+            "ok_unparsable_value": [("hot", "ok")],
+            "bad_quality_with_value": [("40.0", "stale")],
+            "bad_quality_empty_value": [("", "missing")],
+        }
+        for name, rows in cases.items():
+            with self.subTest(name):
+                groups, _, invalid_rows = self.read_rows(rows)
+                self.assertEqual(invalid_rows, 1)
+                observation = groups[("pc-a", "cpu/temp")][self.start]
+                self.assertIsNone(observation.value)
+
+    def test_invalid_quality_rows_ignore_valid_rows_and_sum_mixed_rows(self):
+        _, _, invalid_rows = self.read_rows([("40.0", "ok"), ("", "ok"), ("nan", "ok"), ("41.0", "stale"), ("42", "OK")])
+        self.assertEqual(invalid_rows, 3)
 
     def test_invalid_split_bounds_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "earlier"):
