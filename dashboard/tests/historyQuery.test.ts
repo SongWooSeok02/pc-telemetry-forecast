@@ -144,7 +144,7 @@ test('clears stored cursor before fallback so subsequent poll uses full range ev
         cache = { scope: cache.scope, cursor: null, points: [] }
       },
     }),
-    /HTTP 503/,
+    { status: 503, code: 'SERVICE_UNAVAILABLE', retryable: true },
   )
   assert.equal(cache.cursor, null)
   assert.equal(requests.length, 2)
@@ -204,6 +204,7 @@ test('preserves cursor and does not fall back to full query on non-cursor HTTP o
         now: () => fixedNow,
         onCursorReset: () => { resetCalled = true },
       }),
+      { status: testCase.status, code: testCase.body.error.code, retryable: testCase.body.error.retryable },
     )
     assert.equal(resetCalled, false)
     assert.equal(cache.cursor, 'valid-cursor')

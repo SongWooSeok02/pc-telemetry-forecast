@@ -1,7 +1,9 @@
+import { QueryError, QueryVersion, responseError } from '../src/queryErrors.ts'
 import { runQueryActivity } from '../src/queryActivity.ts'
+import { BrowserSession } from '../src/browserSession.ts'
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { bindDashboardVisibility, QueryScheduler, type SchedulerClock } from '../src/queryScheduler.ts'
+import { bindDashboardVisibility, mountDashboardScheduler, QueryScheduler, type SchedulerClock } from '../src/queryScheduler.ts'
 
 class FakeClock implements SchedulerClock {
   private time = 0
@@ -35,6 +37,54 @@ class FakeClock implements SchedulerClock {
 async function flush() {
   for (let index = 0; index < 12; index += 1) await Promise.resolve()
 }
+
+test('dashboard cleanup after session expiry cancels pending retries across effect replay', async (t) => {
+  const fakeDocument = new EventTarget()
+  Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible' })
+  Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+  Object.defineProperty(globalThis, 'window', { configurable: true, value: {} })
+  const clock = new FakeClock()
+  const first = mountDashboardScheduler(clock)
+  first.dispose()
+  const mounted = mountDashboardScheduler(clock)
+  t.after(() => {
+    mounted.dispose()
+    Reflect.deleteProperty(globalThis, 'window')
+    Reflect.deleteProperty(globalThis, 'document')
+  })
+  const { scheduler } = mounted
+  assert.notEqual(scheduler, first.scheduler)
+  const reasons: string[] = []
+  const session = new BrowserSession('a'.repeat(64), (reason) => reasons.push(reason))
+  const requests: string[] = []
+  const statuses = [503, 401]
+  t.mock.method(globalThis, 'fetch', (path: string) => {
+    requests.push(path)
+    const status = statuses.shift()
+    return Promise.resolve(Response.json({ error: { code: status === 503
+      ? 'SERVICE_UNAVAILABLE' : 'USER_SESSION_EXPIRED' } }, { status }))
+  })
+  const query = (path: string) => async (signal: AbortSignal) => {
+    const response = await session.request(path, signal)
+    if (!response.ok) throw await responseError(response)
+  }
+
+  scheduler.register('current', query('/current'))
+  await flush()
+  assert.equal(scheduler.status()[0].retryInMs, 5000)
+  scheduler.register('history', query('/history'))
+  await flush()
+  assert.deepEqual(reasons, ['expired'])
+  assert.equal(clock.pendingCount(), 1)
+  // SessionGate removes the dashboard, so React runs the scheduler owner's cleanup.
+  mounted.dispose()
+  assert.equal(clock.pendingCount(), 0)
+  assert.deepEqual(scheduler.status(), [])
+  scheduler.setVisible(true)
+  scheduler.register('late', () => assert.fail('disposed scheduler accepted work'))
+  await clock.advanceBy(60_000)
+  assert.deepEqual(requests, ['/current', '/history'])
+})
 
 function deferred() {
   let resolve!: () => void
@@ -370,6 +420,328 @@ test('late completion of cancelled activity cannot clear newer busy state', asyn
   await newerPending
   assert.equal(state, 'error')
 })
+
+test('automatic backoff grows 5/10/20/40/60 seconds and success restores 5 seconds', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  const starts: number[] = []
+  scheduler.setVisible(true)
+  scheduler.register('history', async () => {
+    starts.push(clock.now())
+    if (starts.length <= 6) throw new Error('temporary failure')
+  })
+  await flush()
+  for (const delay of [5000, 10000, 20000, 40000, 60000, 60000]) {
+    assert.equal(clock.pendingCount(), 1)
+    const count = starts.length
+    await clock.advanceBy(delay - 1)
+    assert.equal(starts.length, count)
+    await clock.advanceBy(1)
+    assert.equal(starts.length, count + 1)
+  }
+  assert.deepEqual(starts, [0, 5000, 15000, 35000, 75000, 135000, 195000])
+  assert.equal(scheduler.status()[0].failures, 0)
+  await clock.advanceBy(5000)
+  assert.equal(starts.at(-1), 200000)
+  scheduler.dispose()
+})
+
+test('slow failure starts retry delay after completion and does not accumulate requests', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  const waiting = deferred()
+  let calls = 0
+  scheduler.setVisible(true)
+  scheduler.register('current', async () => { calls++; if (calls === 1) { await waiting.promise; throw new Error('slow failure') } })
+  await flush()
+  await clock.advanceBy(30000)
+  assert.equal(calls, 1)
+  waiting.resolve()
+  await flush()
+  await clock.advanceBy(4999)
+  assert.equal(calls, 1)
+  await clock.advanceBy(1)
+  assert.equal(calls, 2)
+  scheduler.dispose()
+})
+
+test('manual selection cancels retry, and hidden period updates cannot leave an automatic initial request', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  let calls = 0
+  scheduler.setVisible(true)
+  scheduler.register('current', async () => { calls++; throw new Error('network') })
+  await flush()
+  scheduler.setPeriod('manual')
+  assert.equal(clock.pendingCount(), 0)
+  await clock.advanceBy(120000)
+  assert.equal(calls, 1)
+  scheduler.setVisible(false)
+  scheduler.setPeriod(10)
+  scheduler.setPeriod('manual')
+  scheduler.setVisible(true)
+  await flush()
+  assert.equal(calls, 1)
+  scheduler.refreshNow()
+  await flush()
+  assert.equal(calls, 2)
+  assert.equal(clock.pendingCount(), 0)
+  scheduler.dispose()
+})
+
+test('changing automatic period while retry waits respects new lower bound', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  let calls = 0
+  scheduler.setVisible(true)
+  scheduler.register('current', async () => { calls++; throw new Error('network') })
+  await flush()
+  scheduler.setPeriod(30)
+  await clock.advanceBy(29999)
+  assert.equal(calls, 1)
+  await clock.advanceBy(1)
+  assert.equal(calls, 2)
+  assert.equal(scheduler.status()[0].retryInMs, 60000)
+  scheduler.dispose()
+})
+
+test('permanent authentication/permission errors have no automatic polling or resume retry', async () => {
+  for (const status of [401, 403, 404, 422]) {
+    const clock = new FakeClock()
+    const scheduler = new QueryScheduler(clock)
+    let calls = 0
+    scheduler.setVisible(true)
+    scheduler.register('current', async () => { calls++; throw new QueryError('permanent', status, 'DENIED', false) })
+    await flush()
+    await clock.advanceBy(120000)
+    scheduler.setVisible(false)
+    scheduler.setPeriod(10)
+    scheduler.setVisible(true)
+    await flush()
+    assert.equal(calls, 1)
+    assert.equal(clock.pendingCount(), 0)
+    scheduler.refreshNow()
+    await flush()
+    assert.equal(calls, 2)
+    scheduler.dispose()
+  }
+})
+
+test('HTTP classification cannot be widened by retryable flag on authentication errors', async () => {
+  for (const status of [401, 403, 404, 422]) {
+    const error = await responseError({ status, json: async () => ({ error: { code: 'USER_SESSION_EXPIRED', retryable: true } }) })
+    assert.equal(error.retryable, false)
+  }
+  assert.equal((await responseError({ status: 503, json: async () => ({}) })).retryable, true)
+  assert.equal((await responseError({ status: 503, json: async () => ({ error: { retryable: false } }) })).retryable, false)
+})
+
+test('scope versions reject old PC responses including A to B to A and cancelled reads', () => {
+  const version = new QueryVersion()
+  const signal = new AbortController()
+  version.setScope('pc-a|sensor|range')
+  const old = version.capture('pc-a|sensor|range')
+  version.setScope('pc-b|sensor|range')
+  assert.equal(version.accepts(old, signal.signal), false)
+  version.setScope('pc-a|sensor|range')
+  assert.equal(version.accepts(old, signal.signal), false)
+  assert.equal(version.accepts(version.capture('wrong'), signal.signal), false)
+  const current = version.capture('pc-a|sensor|range')
+  assert.equal(version.accepts(current, signal.signal), true)
+  signal.abort()
+  assert.equal(version.accepts(current, signal.signal), false)
+})
+
+for (const surface of ['web', 'host'] as const) {
+  test(`retry wait, hidden period change and automatic restore on ${surface}`, async () => {
+    const clock = new FakeClock()
+    const scheduler = new QueryScheduler(clock)
+    const fakeDocument = new EventTarget() as Document
+    Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible', writable: true })
+    const webview = new EventTarget()
+    const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+    const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
+    Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+    Object.defineProperty(globalThis, 'window', { configurable: true, value: { chrome: { webview } } })
+    let unbind = () => {}
+    let calls = 0
+    try {
+      unbind = bindDashboardVisibility(scheduler)
+      scheduler.register('history', async () => { calls++; if (calls < 3) throw new Error('network') })
+      await flush()
+      const visible = (value: boolean) => {
+        if (surface === 'host') webview.dispatchEvent(new MessageEvent('message', { data: { type: 'pc-telemetry:host-visibility', visible: value } }))
+        else {
+          Object.defineProperty(fakeDocument, 'visibilityState', { value: value ? 'visible' : 'hidden', writable: true })
+          fakeDocument.dispatchEvent(new Event('visibilitychange'))
+        }
+      }
+      visible(false)
+      scheduler.setPeriod(10)
+      await clock.advanceBy(120000)
+      assert.equal(calls, 1)
+      assert.equal(clock.pendingCount(), 0)
+      visible(true)
+      await flush()
+      assert.equal(calls, 2)
+      await clock.advanceBy(20000)
+      assert.equal(calls, 3)
+      await clock.advanceBy(10000)
+      assert.equal(calls, 4)
+    } finally {
+      unbind()
+      scheduler.dispose()
+      if (originalDocument) Object.defineProperty(globalThis, 'document', originalDocument)
+      else Reflect.deleteProperty(globalThis, 'document')
+      if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow)
+      else Reflect.deleteProperty(globalThis, 'window')
+    }
+  })
+}
+
+test('PC replacement cancels old backoff and starts the new scope without inherited failures', async () => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  let oldCalls = 0, newCalls = 0
+  scheduler.setVisible(true)
+  const remove = scheduler.register('current', async () => { oldCalls++; throw new Error('offline A') })
+  await flush()
+  remove()
+  scheduler.register('current', async () => { newCalls++ })
+  await flush()
+  assert.equal(newCalls, 1)
+  assert.equal(scheduler.status()[0].failures, 0)
+  await clock.advanceBy(5000)
+  assert.equal(oldCalls, 1)
+  assert.equal(newCalls, 2)
+  scheduler.dispose()
+})
+
+for (const surface of ['web', 'host'] as const) {
+  test(`late PC response, hidden period update and restore reject old display on ${surface}`, async () => {
+    const clock = new FakeClock()
+    const scheduler = new QueryScheduler(clock)
+    const fakeDocument = new EventTarget() as Document
+    Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible', writable: true })
+    const webview = new EventTarget()
+    const oldDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+    const oldWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
+    Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+    Object.defineProperty(globalThis, 'window', { configurable: true, value: { chrome: { webview } } })
+    const version = new QueryVersion()
+    const waiting = deferred()
+    let shown = '', newCalls = 0
+    let unbind = () => {}
+    try {
+      unbind = bindDashboardVisibility(scheduler)
+      version.setScope('A')
+      const remove = scheduler.register('current', async (signal) => {
+        const token = version.capture('A')
+        await waiting.promise
+        if (version.accepts(token, signal)) shown = 'A'
+      })
+      await flush()
+      version.setScope('B')
+      remove()
+      scheduler.register('current', async () => { newCalls++; shown = 'B' })
+      const visible = (value: boolean) => {
+        if (surface === 'host') webview.dispatchEvent(new MessageEvent('message', { data: { type: 'pc-telemetry:host-visibility', visible: value } }))
+        else {
+          Object.defineProperty(fakeDocument, 'visibilityState', { value: value ? 'visible' : 'hidden', writable: true })
+          fakeDocument.dispatchEvent(new Event('visibilitychange'))
+        }
+      }
+      visible(false)
+      scheduler.setPeriod(10)
+      waiting.resolve()
+      await flush()
+      await clock.advanceBy(30000)
+      assert.equal(shown, '')
+      assert.equal(newCalls, 0)
+      visible(true)
+      await flush()
+      assert.equal(shown, 'B')
+      assert.equal(newCalls, 1)
+    } finally {
+      unbind()
+      scheduler.dispose()
+      if (oldDocument) Object.defineProperty(globalThis, 'document', oldDocument)
+      else Reflect.deleteProperty(globalThis, 'document')
+      if (oldWindow) Object.defineProperty(globalThis, 'window', oldWindow)
+      else Reflect.deleteProperty(globalThis, 'window')
+    }
+  })
+}
+
+for (const surface of ['web', 'host'] as const) {
+  for (const status of [429, 503] as const) {
+    test(`restoring hidden ${surface} view before retryAt preserves ${status} backoff deadline`, async () => {
+      const clock = new FakeClock()
+      const scheduler = new QueryScheduler(clock)
+      const fakeDocument = new EventTarget() as Document
+      Object.defineProperty(fakeDocument, 'visibilityState', { value: 'visible', writable: true })
+      const webview = new EventTarget()
+      const oldDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
+      const oldWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
+      Object.defineProperty(globalThis, 'document', { configurable: true, value: fakeDocument })
+      Object.defineProperty(globalThis, 'window', { configurable: true, value: { chrome: { webview } } })
+      let failingCalls = 0
+      let healthyCalls = 0
+      let unbind = () => {}
+      try {
+        unbind = bindDashboardVisibility(scheduler)
+        scheduler.register('current', async () => { healthyCalls++ })
+        scheduler.register('history', async () => {
+          failingCalls++
+          if (failingCalls <= 2) throw new QueryError(`HTTP ${status}`, status, `HTTP_${status}`, true)
+        })
+        await flush()
+        assert.equal(healthyCalls, 1)
+        assert.equal(failingCalls, 1)
+
+        // First retry fires at t=5000 and fails again -> second backoff scheduled for t=15000 (10s delay).
+        await clock.advanceBy(5000)
+        assert.equal(failingCalls, 2)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, 10000)
+
+        const visible = (value: boolean) => {
+          if (surface === 'host') webview.dispatchEvent(new MessageEvent('message', { data: { type: 'pc-telemetry:host-visibility', visible: value } }))
+          else {
+            Object.defineProperty(fakeDocument, 'visibilityState', { value: value ? 'visible' : 'hidden', writable: true })
+            fakeDocument.dispatchEvent(new Event('visibilitychange'))
+          }
+        }
+
+        await clock.advanceBy(1000) // t=6000
+        visible(false)
+        assert.equal(clock.pendingCount(), 0)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, null)
+
+        await clock.advanceBy(2000) // t=8000, still 7000ms before retryAt=15000
+        visible(true)
+        await flush()
+
+        assert.equal(healthyCalls, 3) // initial(0), scheduled(5000), resume(8000)
+        assert.equal(failingCalls, 2) // must NOT retry early on restore
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.retryInMs, 7000)
+
+        await clock.advanceBy(6999) // t=14999
+        assert.equal(failingCalls, 2)
+
+        await clock.advanceBy(1) // t=15000 -> exact preserved retryAt
+        assert.equal(failingCalls, 3)
+        assert.equal(scheduler.status().find((item) => item.key === 'history')?.failures, 0)
+      } finally {
+        unbind()
+        scheduler.dispose()
+        if (oldDocument) Object.defineProperty(globalThis, 'document', oldDocument)
+        else Reflect.deleteProperty(globalThis, 'document')
+        if (oldWindow) Object.defineProperty(globalThis, 'window', oldWindow)
+        else Reflect.deleteProperty(globalThis, 'window')
+      }
+    })
+  }
+}
 
 test('task registered and unregistered or disposed in the same tick is never invoked', async () => {
   const clock = new FakeClock()

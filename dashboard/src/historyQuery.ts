@@ -1,3 +1,5 @@
+import { QueryError, responseError } from './queryErrors.ts'
+
 export type HistoryResolution = 'raw' | '10s' | '1m' | '5m' | '1h'
 
 export type HistoryPoint = {
@@ -72,16 +74,6 @@ export function historyResolution(durationMs: number): HistoryResolution {
           : '1h'
 }
 
-export async function isHistoryCursorError(response: Pick<HistoryHttpResponse, 'status' | 'json'>): Promise<boolean> {
-  if (response.status !== 422) return false
-  try {
-    const body = await response.json() as { error?: { code?: unknown } }
-    return body?.error?.code === 'INVALID_HISTORY_CURSOR'
-  } catch {
-    return false
-  }
-}
-
 function throwIfAborted(signal: AbortSignal) {
   if (signal.aborted) throw new DOMException('Query cancelled', 'AbortError')
 }
@@ -104,7 +96,10 @@ export async function fetchHistorySeries(params: HistoryQueryParams): Promise<{ 
   let response = await fetcher(`${endpoint}?${initialQuery}`, { signal: params.signal })
   throwIfAborted(params.signal)
 
-  if (usedCursor !== null && !response.ok && await isHistoryCursorError(response)) {
+  if (!response.ok) {
+    const error = await responseError(response)
+    throwIfAborted(params.signal)
+    if (usedCursor === null || error.status !== 422 || error.code !== 'INVALID_HISTORY_CURSOR') throw error
     usedCursor = null
     params.onCursorReset?.()
     throwIfAborted(params.signal)
@@ -112,13 +107,12 @@ export async function fetchHistorySeries(params: HistoryQueryParams): Promise<{ 
     throwIfAborted(params.signal)
   }
 
-  if (response.status === 404) throw new Error('선택한 PC 또는 센서의 과거 조회를 지원하지 않습니다.')
-  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  if (!response.ok) throw await responseError(response)
 
   const data = await response.json() as HistoryResponse
   throwIfAborted(params.signal)
 
-  const validPoints = Array.isArray(data.points) && data.points.every((point) =>
+  const validPoints = Array.isArray(data?.points) && data.points.every((point) =>
     point && Number.isFinite(Date.parse(point.bucketStart)) && Number.isFinite(Date.parse(point.bucketEnd)) &&
     (point.lastObservedAt === null || Number.isFinite(Date.parse(point.lastObservedAt))) &&
     (point.receivedAt === null || Number.isFinite(Date.parse(point.receivedAt))) &&
@@ -130,7 +124,7 @@ export async function fetchHistorySeries(params: HistoryQueryParams): Promise<{ 
   if (!validPoints || typeof data.aggregationPending !== 'boolean' || data.unit !== params.unit ||
       data.resolution !== resolution || typeof data.nextCursor !== 'string' || !data.nextCursor ||
       data.machineId !== params.machineId || data.sensorId !== params.sensorId) {
-    throw new Error('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.')
+    throw new QueryError('조회 응답 형식 또는 센서·단위 매핑이 올바르지 않습니다.', 422, 'INVALID_RESPONSE', false)
   }
 
   const basePoints = usedCursor !== null ? params.cache.points : []

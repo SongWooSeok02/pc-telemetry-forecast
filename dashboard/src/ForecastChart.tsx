@@ -45,6 +45,8 @@ export default function ForecastChart({ data, busy, error, unsupported, label, u
   }
   if (segment.length) actualPaths.push(segment)
   const latest = all[all.length - 1]
+  const observedTimes = (data?.actuals ?? []).map((point) => Date.parse(point.observedAt))
+  const age = observedTimes.length ? Math.max(0, Math.floor((now - Math.max(...observedTimes)) / 1000)) : null
   const changeZoom = (factor: number) => {
     const width = Math.min(1, Math.max(.05, (zoom[1] - zoom[0]) * factor))
     const start = Math.max(0, Math.min(1 - width, (zoom[0] + zoom[1] - width) / 2))
@@ -61,6 +63,7 @@ export default function ForecastChart({ data, busy, error, unsupported, label, u
       </div>
     </div>
     <div className="history-meta"><strong>{label}</strong><span>{unit || '단위 대기'}</span><span>조회 갱신 {stamp(data?.updatedAt ?? null)}</span>
+      <span>실제값 경과 {age === null ? '—' : `${age}초`}</span>
       <span>집계 갱신 {stamp(data?.aggregationUpdatedAt ?? null)} {data?.aggregationPending ? '· 지연 갱신 대기' : '· 원시 실제값 비교'}</span>
       {latest && <><span>생성 {stamp(latest.prediction.generated_at)}</span><span>대상 {stamp(latest.prediction.target_at)}</span><span>{modelLabel(latest.prediction.model_version, latest.prediction.status)} · {latest.prediction.model_version} · {latest.prediction.status}</span></>}
     </div>

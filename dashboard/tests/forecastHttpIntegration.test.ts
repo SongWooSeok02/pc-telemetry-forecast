@@ -13,10 +13,10 @@ const dashboardRoot = fileURLToPath(new URL('..', import.meta.url))
 const tmpParent = join(dashboardRoot, 'node_modules', '.tmp')
 mkdirSync(tmpParent, { recursive: true })
 const output = mkdtempSync(join(tmpParent, 'forecast-http-integration-'))
-for (const [file, extension] of [['forecastData', 'ts'], ['ForecastChart', 'tsx']]) {
+for (const [file, extension] of [['queryErrors', 'ts'], ['forecastData', 'ts'], ['ForecastChart', 'tsx']]) {
   const source = readFileSync(join(dashboardRoot, 'src', `${file}.${extension}`), 'utf8')
   const result = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } })
-  writeFileSync(join(output, `${file}.mjs`), result.outputText.replace(/(['"])\.\/forecastData\1/g, "'./forecastData.mjs'"))
+  writeFileSync(join(output, `${file}.mjs`), result.outputText.replace(/(['"])\.\/(forecastData|queryErrors)(?:\.ts)?\1/g, "'./$2.mjs'"))
 }
 const Chart = (await import(pathToFileURL(join(output, 'ForecastChart.mjs')).href)).default
 

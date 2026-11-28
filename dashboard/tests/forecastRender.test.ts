@@ -13,10 +13,10 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const parent = join(root, 'node_modules', '.tmp')
 mkdirSync(parent, { recursive: true })
 const output = mkdtempSync(join(parent, 'forecast-render-'))
-for (const [file, extension] of [['forecastData', 'ts'], ['ForecastChart', 'tsx']]) {
+for (const [file, extension] of [['queryErrors', 'ts'], ['forecastData', 'ts'], ['ForecastChart', 'tsx']]) {
   const source = readFileSync(join(root, 'src', `${file}.${extension}`), 'utf8')
   const result = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } })
-  writeFileSync(join(output, `${file}.mjs`), result.outputText.replace(/(['"])\.\/forecastData\1/g, "'./forecastData.mjs'"))
+  writeFileSync(join(output, `${file}.mjs`), result.outputText.replace(/(['"])\.\/(forecastData|queryErrors)(?:\.ts)?\1/g, "'./$2.mjs'"))
 }
 const Chart = (await import(pathToFileURL(join(output, 'ForecastChart.mjs')).href)).default
 const now = Date.parse('2026-11-19T12:00:00Z')
