@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
 import { fetchHistorySeries } from './historyQuery.ts'
+import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
+import { runQueryActivity } from './queryActivity'
 import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
 
 type SensorReading = {
@@ -30,6 +32,15 @@ const sensorDefaults = [
   { sensorId: 'cpu_power', label: 'CPU 전력', unit: 'W', quality: 'missing' as const },
   { sensorId: 'gpu_power', label: 'GPU 전력', unit: 'W', quality: 'missing' as const },
 ]
+
+function useScheduledQuery(scheduler: QueryScheduler, key: string, identity: string, enabled: boolean, request: ScheduledRequest) {
+  const requestRef = useRef(request)
+  requestRef.current = request
+  useEffect(() => {
+    if (!enabled) return
+    return scheduler.register(key, (signal) => requestRef.current(signal))
+  }, [scheduler, key, identity, enabled])
+}
 
 function formatTime(value?: string) {
   if (!value) return '—'
@@ -71,14 +82,18 @@ export default function App() {
   const queryMachine = new URLSearchParams(window.location.search).get('machine_id') ?? ''
   const [machineId, setMachineId] = useState(queryMachine)
   const [snapshot, setSnapshot] = useState<CurrentSnapshot | null>(null)
-  const [state, setState] = useState<LoadState>('idle')
+  const [state, updateState] = useState<LoadState>('idle')
+  const stateRef = useRef<LoadState>('idle')
+  const setState = (value: LoadState) => { stateRef.current = value; updateState(value) }
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
   const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
-  const [requestKey, setRequestKey] = useState(0)
+  const [scheduler] = useState(() => new QueryScheduler())
   const [historyRange, setHistoryRange] = useState('24h')
   const [selectedSensorId, setSelectedSensorId] = useState('cpu_temperature')
   const [history, setHistory] = useState<HistoryResponse | null>(null)
-  const [historyBusy, setHistoryBusy] = useState(false)
+  const [historyBusy, updateHistoryBusy] = useState(false)
+  const historyBusyRef = useRef(false)
+  const setHistoryBusy = (value: boolean) => { historyBusyRef.current = value; updateHistoryBusy(value) }
   const [historyError, setHistoryError] = useState<string | null>(null)
   const historyCache = useRef<{ scope: string; cursor: string | null; points: HistoryPoint[] }>({ scope: '', cursor: null, points: [] })
 
@@ -99,107 +114,91 @@ export default function App() {
   }, [sensors, selectedSensorId])
 
   useEffect(() => {
+    return bindDashboardVisibility(scheduler)
+  }, [scheduler])
+
+  useEffect(() => { scheduler.setPeriod(period) }, [scheduler, period])
+
+  useEffect(() => {
     if (!machineId.trim()) {
       setState('idle')
       setSnapshot(null)
-      return
     }
-    let active = true
-    let timer: number | undefined
-    let controller: AbortController | undefined
+  }, [machineId])
 
-    let schedule: () => void = () => {}
-    const load = async () => {
-      controller = new AbortController()
-      setState('loading')
+  const currentIdentity = machineId.trim()
+  const loadCurrent: ScheduledRequest = async (signal) => {
+    if (!currentIdentity) return
+    return runQueryActivity(signal, { get: () => stateRef.current, set: setState, busy: 'loading' as LoadState }, async () => {
       try {
-        const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(machineId.trim())}/current`, { signal: controller.signal })
-        if (response.status === 404) {
-          if (active) { setSnapshot(null); setState('unavailable') }
-          return
-        }
+        const response = await fetch(`${apiBase}/v1/dashboard/machines/${encodeURIComponent(currentIdentity)}/current`, { signal })
+        if (signal.aborted) return
+        if (response.status === 404) { setSnapshot(null); setState('unavailable'); return }
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const data = await response.json() as CurrentSnapshot
-        if (active) {
-          setSnapshot(data)
-          setLastRefresh(new Date().toISOString())
-          setState('ready')
-        }
+        if (signal.aborted || data.machineId !== currentIdentity) return
+        setSnapshot(data)
+        setLastRefresh(new Date().toISOString())
+        setState('ready')
       } catch (error) {
-        if (active && !(error instanceof DOMException && error.name === 'AbortError')) setState('error')
-      } finally {
-        schedule()
+        if (!signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setState('error')
       }
-    }
-    schedule = () => {
-      if (active && period !== 'manual') timer = window.setTimeout(() => { void load() }, period * 1000)
-    }
+    })
+  }
+  useScheduledQuery(scheduler, 'current', currentIdentity, Boolean(currentIdentity), loadCurrent)
 
-    void load()
-    return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
-  }, [machineId, period, requestKey])
+  const historyIdentity = `${currentIdentity}|${selectedSensor?.sensorId ?? ''}|${historyRange}`
+  const historyEnabled = Boolean(currentIdentity && selectedSensor && selectedSensor.quality !== 'unsupported')
+  useEffect(() => {
+    if (historyCache.current.scope === historyIdentity) return
+    historyCache.current = { scope: historyIdentity, cursor: null, points: [] }
+    setHistory(null)
+    setHistoryError(null)
+    setHistoryBusy(false)
+  }, [historyIdentity])
 
   useEffect(() => {
-    if (!machineId.trim() || !selectedSensor) {
-      setHistory(null)
-      setHistoryBusy(false)
+    if (historyEnabled) return
+    setHistory(null)
+    setHistoryError(null)
+    setHistoryBusy(false)
+  }, [historyEnabled, historyIdentity])
+
+  const loadHistory: ScheduledRequest = async (signal) => {
+    if (!currentIdentity || !selectedSensor || selectedSensor.quality === 'unsupported') return
+    const previousError = historyError
+    return runQueryActivity(signal, {
+      get: () => historyBusyRef.current, set: setHistoryBusy, busy: true,
+      onCancel: () => setHistoryError(previousError),
+    }, async () => {
       setHistoryError(null)
-      return
-    }
-    if (selectedSensor.quality === 'unsupported') {
-      setHistory(null)
-      setHistoryBusy(false)
-      setHistoryError(null)
-      return
-    }
-    let active = true
-    let timer: number | undefined
-    let controller: AbortController | undefined
-    const scope = `${machineId.trim()}|${selectedSensor.sensorId}|${historyRange}`
-    if (historyCache.current.scope !== scope) {
-      historyCache.current = { scope, cursor: null, points: [] }
-      setHistory(null)
-    }
-    const loadHistory = async () => {
-      controller = new AbortController()
-      setHistoryBusy(true)
-      setHistoryError(null)
-      const currentCache = historyCache.current.scope === scope
-        ? historyCache.current
-        : { scope, cursor: null, points: [] }
+      const scope = historyIdentity
+      const cache = historyCache.current.scope === scope ? historyCache.current : { scope, cursor: null, points: [] }
       try {
         const result = await fetchHistorySeries({
           apiBase,
-          machineId: machineId.trim(),
+          machineId: currentIdentity,
           sensorId: selectedSensor.sensorId,
           unit: selectedSensor.unit,
           range: historyRange,
           scope,
-          cache: currentCache,
-          signal: controller.signal,
+          cache,
+          signal,
           onCursorReset: () => {
-            if (active && historyCache.current.scope === scope) {
+            if (!signal.aborted && historyCache.current.scope === scope) {
               historyCache.current = { scope, cursor: null, points: [] }
             }
           },
         })
-        if (active && historyCache.current.scope === scope) {
-          historyCache.current = result.cache
-          setHistory(result.response)
-          setHistoryBusy(false)
-        }
+        if (signal.aborted || historyCache.current.scope !== scope) return
+        historyCache.current = result.cache
+        setHistory(result.response)
       } catch (error) {
-        if (active && !(error instanceof DOMException && error.name === 'AbortError')) {
-          setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
-          setHistoryBusy(false)
-        }
-      } finally {
-        if (active && period !== 'manual') timer = window.setTimeout(() => { void loadHistory() }, period * 1000)
+        if (!signal.aborted && !(error instanceof DOMException && error.name === 'AbortError')) setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
       }
-    }
-    void loadHistory()
-    return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
-  }, [machineId, selectedSensor?.sensorId, selectedSensor?.quality, selectedSensor?.unit, historyRange, period, requestKey])
+    })
+  }
+  useScheduledQuery(scheduler, 'history', historyIdentity, historyEnabled, loadHistory)
 
   const choosePeriod = (value: RefreshPeriod) => {
     setPeriod(value)
@@ -229,7 +228,7 @@ export default function App() {
                 <option value="manual">수동</option>
               </select>
             </label>
-            <button className="refresh-button" onClick={() => setRequestKey((key) => key + 1)} aria-label="지금 갱신">↻ <span>지금 갱신</span></button>
+            <button className="refresh-button" onClick={() => scheduler.refreshNow()} aria-label="지금 갱신">↻ <span>지금 갱신</span></button>
           </div>
         </header>
 
