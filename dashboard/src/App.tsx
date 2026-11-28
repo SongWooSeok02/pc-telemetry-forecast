@@ -3,6 +3,7 @@ import HistoryChart, { type HistoryPoint, type HistoryResponse } from './History
 import { fetchHistorySeries } from './historyQuery.ts'
 import { bindDashboardVisibility, QueryScheduler, type ScheduledRequest } from './queryScheduler'
 import { runQueryActivity } from './queryActivity'
+import ForecastPanel from './ForecastPanel'
 import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
 
 type SensorReading = {
@@ -264,6 +265,8 @@ export default function App() {
             </select></label>
             <HistoryChart response={shownHistory} busy={historyBusy} error={historyError} sensorUnsupported={selectedSensor?.quality === 'unsupported'} selectedLabel={selectedSensor?.label ?? '센서'} rangeLabel={historyRange} onRangeChange={setHistoryRange} />
           </section>
+
+          <ForecastPanel machineId={currentIdentity} sensors={snapshot?.machineId === currentIdentity ? sensors : []} scheduler={scheduler} apiBase={apiBase}/>
 
           <section className="lower-grid">
             <article className="panel-placeholder"><div className="section-heading"><div><p className="eyebrow">COLLECTION</p><h2>수집 상태</h2></div><span className="mini-badge">준비 중</span></div><div className="empty-state"><span className="empty-state__icon">⌁</span><strong>수집 상태 데이터가 없습니다</strong><p>에이전트 상태 조회가 연결되면 여기에서 확인할 수 있습니다.</p></div></article>

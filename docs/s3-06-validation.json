@@ -1,0 +1,39 @@
+{
+  "reproduction": [
+    "npm --prefix dashboard run test:forecast",
+    "npm --prefix dashboard run test:scheduler",
+    "npm --prefix dashboard run build",
+    "git diff --check"
+  ],
+  "ci": "pending",
+  "environment": {
+    "os": "Windows",
+    "architecture": "AMD64",
+    "node": "v26.13.0"
+  },
+  "started_at_utc": "2026-11-27T15:35:44.9855615Z",
+  "build_base": "b1ec6c8",
+  "limitations": [
+    "S3-05 source prediction unit field is missing; adapter contract not yet agreed",
+    "No live PC/server or WebView2 integration demonstration",
+    "No interactive browser zoom/scroll demonstration"
+  ],
+  "finished_at_utc": "2026-11-27T15:35:49.0069491Z",
+  "actual": {
+    "forecast_tests": "16",
+    "forecast_exit": 0,
+    "scheduler_tests": "15",
+    "diff_exit": 0,
+    "scheduler_exit": 0,
+    "build_exit": 0
+  },
+  "expected": {
+    "diff_exit": 0,
+    "build_exit": 0,
+    "forecast_tests": 16,
+    "scheduler_tests": 15
+  },
+  "input": "fixed test fixtures only, no real PC telemetry",
+  "version": "dashboard 0.1.0 / S3-06",
+  "passed": true
+}
