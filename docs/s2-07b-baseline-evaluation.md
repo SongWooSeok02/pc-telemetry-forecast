@@ -12,9 +12,9 @@
 
 ## 재현 검증
 
-- 환경: GitHub Actions Ubuntu/Windows, Python 3.12로 실행하도록 설정했습니다. 현재 개발 셸은 WindowsApps Python 실행 별칭만 노출하고 실제 런타임 실행이 거부되어 로컬 실행은 미수행입니다.
+- 환경: GitHub Actions Ubuntu/Windows, Python 3.12로 실행하도록 설정했습니다. 로컬 재현은 2026-11-28 KST Windows x64(10.0.26300) / Python 3.15.2에서 수행했습니다. 초기 작성 당시의 WindowsApps 실행 별칭 문제는 더 이상 해당하지 않습니다.
 - 재현: `python -m unittest discover -s tests -p test_ml_baselines.py -v`
-- 고정 합성 시계열 단위 검증 3개 및 `compileall`을 두 OS CI에 추가했습니다. 이 변경의 CI 결과는 PR 확인란에 나타납니다.
+- 파이프라인 `s2-07b.3` 기준 고정 합성 시계열 단위 검증 10개(분할 경계·소수 초 앵커·정확한 48시간·결측 제외·검증 선택, `invalid_quality_rows` 행당 1회 집계 회귀 2개 포함)가 로컬에서 통과했고 `compileall`·`git diff --check`도 통과했습니다. 같은 검사를 두 OS CI에서 실행하며, 원격 CI 결과는 PR 확인란에서 별도로 확인합니다(최근 실행은 GitHub 계정 결제/지출 한도로 시작되지 못한 기록이 있습니다).
 - 실행 기록: 합성 검증 데이터. 실제 PC/센서·부하 라벨 입력은 저장소에서 제공되지 않아 실측 MAE/결측률은 미실행입니다.
 - 패키지 빌드: 별도 외부 패키지가 없는 순수 Python 모듈입니다.
 
