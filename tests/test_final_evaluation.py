@@ -9,9 +9,14 @@ from unittest.mock import patch
 from ml import final_evaluation as final
 from ml.temperature_model import Sample, VERSION
 
+# Synthetic test window only; real deadlines come from the team's recorded schedule.
+SCHEDULE = final.Schedule(final.date("2030-01-01T09:00+09:00"), final.date("2030-01-03T09:00+09:00"))
+for _name in ("freeze_deadline", "report_deadline", "data_start", "data_end", "core_start", "core_end"):
+    setattr(final, _name.upper(), getattr(SCHEDULE, _name))
+
 
 class FinalEvaluationTests(unittest.TestCase):
-    def fixture(self, frozen=final.DATA_START):
+    def fixture(self, frozen=final.DATA_START, schedule=SCHEDULE):
         artifact = {
             "schema_version": 1, "pipeline_version": VERSION,
             "machine_id": "synthetic-pc", "target": "cpu", "unit": "Cel",
@@ -30,13 +35,45 @@ class FinalEvaluationTests(unittest.TestCase):
             "data_period_utc": {"last_observed": (reviewed - final.SECOND).isoformat()},
         }
         data = json.dumps(artifact).encode()
-        return data, final.make_freeze(data, json.dumps(development).encode(), reviewed, frozen)
+        return data, final.make_freeze(data, json.dumps(development).encode(), reviewed, frozen, schedule)
 
     def test_schedule_reserves_separate_buffers_and_time_to_report(self):
         self.assertEqual(final.CORE_END - final.CORE_START, timedelta(hours=48))
         self.assertEqual(final.CORE_START - final.DATA_START, timedelta(minutes=5))
         self.assertEqual(final.DATA_END - final.CORE_END, timedelta(minutes=1))
         self.assertLess(final.DATA_END, final.REPORT_DEADLINE)
+
+    def test_schedule_is_configurable_and_frozen_into_manifest(self):
+        later = final.Schedule(final.date("2030-02-10T09:00+09:00"), final.date("2030-02-12T09:00+09:00"))
+        self.assertEqual(later.core_end - later.core_start, timedelta(hours=48))
+        model, freeze = self.fixture(later.data_start, later)
+        self.assertEqual(freeze["policy"]["report_deadline"], "2030-02-12T09:00:00+09:00")
+        self.assertEqual(freeze["policy"]["freeze_deadline"], "2030-02-10T09:00:00+09:00")
+        # On time for the new schedule even though it is long past the default fixture deadline.
+        result = final.evaluate(freeze, model, {}, [], None, None, later.data_end, "reviewed")
+        for reason in ("report_deadline_missed", "freeze_schedule_missed", "holdout_not_finished"):
+            self.assertNotIn(reason, result["decision"]["reasons"])
+        overrun = final.evaluate(freeze, model, {}, [], None, None, later.report_deadline + final.SECOND, "reviewed")
+        self.assertIn("report_deadline_missed", overrun["decision"]["reasons"])
+        self.assertFalse(overrun["decision"]["adopted"])
+        exact = final.evaluate(freeze, model, {}, [], None, None, later.report_deadline, "reviewed")
+        self.assertNotIn("report_deadline_missed", exact["decision"]["reasons"])
+
+    def test_edited_or_missing_schedule_invalidates_freeze(self):
+        model, freeze = self.fixture()
+        for edit in ({"report_deadline": "2030-01-04T09:00:00+09:00"}, {"core_start": "2030-01-01T00:00:00+00:00"}):
+            tampered = {**freeze, "policy": {**freeze["policy"], **edit}}
+            with self.assertRaisesRegex(ValueError, "freeze mismatch"):
+                final.evaluate(tampered, model, {}, [], None, None, final.DATA_END, "reviewed")
+        legacy = {**freeze, "policy": {k: v for k, v in freeze["policy"].items() if k != "freeze_deadline"}}
+        with self.assertRaisesRegex(ValueError, "freeze mismatch"):
+            final.evaluate(legacy, model, {}, [], None, None, final.DATA_END, "reviewed")
+
+    def test_schedule_requires_timezone_and_room_for_holdout(self):
+        with self.assertRaisesRegex(ValueError, "timezone"):
+            final.Schedule(final.date("2030-01-01T09:00+09:00").replace(tzinfo=None), SCHEDULE.report_deadline)
+        with self.assertRaisesRegex(ValueError, "before the holdout data end"):
+            final.Schedule(SCHEDULE.report_deadline, SCHEDULE.report_deadline)
 
     def test_incomplete_or_reused_inputs_hold_baseline(self):
         model, freeze = self.fixture()

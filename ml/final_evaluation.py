@@ -15,16 +15,9 @@ from ml import evaluate_baselines as baseline_pipeline
 from ml import temperature_model as model_pipeline
 
 VERSION = "s4-05.1"
-KST = timezone(timedelta(hours=9))
-FREEZE_DEADLINE = datetime(2026, 11, 21, 9, tzinfo=KST)
-REPORT_DEADLINE = datetime(2026, 11, 23, 9, tzinfo=KST)
 SECOND = timedelta(seconds=1)
-DATA_END = REPORT_DEADLINE - timedelta(minutes=1)
-CORE_END = DATA_END - timedelta(seconds=model_pipeline.HORIZON)
-CORE_START = CORE_END - timedelta(hours=48)
-DATA_START = CORE_START - timedelta(seconds=model_pipeline.INPUT)
 BASELINES = ("persistence", "moving_average")
-POLICY = {
+RULES = {
     "input_seconds": model_pipeline.INPUT,
     "horizon_seconds": model_pipeline.HORIZON,
     "stride_seconds": model_pipeline.STRIDE,
@@ -35,12 +28,51 @@ POLICY = {
     "maximum_subgroup_degradation": 0.05,
     "minimum_baseline_mae_celsius": 0.1,
     "quality_rule": "finite ok samples, ok clock, no imputation, same boot/sensor configuration",
-    "core_start": CORE_START.isoformat(),
-    "core_end_exclusive": CORE_END.isoformat(),
-    "data_start": DATA_START.isoformat(),
-    "data_end_exclusive": DATA_END.isoformat(),
-    "report_deadline": REPORT_DEADLINE.isoformat(),
 }
+
+
+class Schedule:
+    """One 48h holdout window derived from an explicitly supplied freeze and report deadline.
+
+    No calendar date is built in: the team records the agreed deadlines, passes them to
+    `freeze`, and the manifest carries them so `evaluate` scores exactly that window.
+    """
+
+    def __init__(self, freeze_deadline: datetime, report_deadline: datetime):
+        for value in (freeze_deadline, report_deadline):
+            if value.tzinfo is None or value.utcoffset() is None:
+                raise ValueError("schedule deadlines must include timezone")
+        self.freeze_deadline, self.report_deadline = freeze_deadline, report_deadline
+        self.data_end = report_deadline - timedelta(minutes=1)
+        self.core_end = self.data_end - timedelta(seconds=model_pipeline.HORIZON)
+        self.core_start = self.core_end - timedelta(hours=48)
+        self.data_start = self.core_start - timedelta(seconds=model_pipeline.INPUT)
+        # The freeze itself must still precede data_start (checked in evaluate); the deadline
+        # only has to leave room for a holdout, as the original card's 09:00 cap did.
+        if freeze_deadline >= self.data_end:
+            raise ValueError("freeze deadline must be before the holdout data end "
+                             f"{self.data_end.isoformat()}")
+
+    def policy(self) -> dict:
+        return RULES | {
+            "freeze_deadline": self.freeze_deadline.isoformat(),
+            "core_start": self.core_start.isoformat(),
+            "core_end_exclusive": self.core_end.isoformat(),
+            "data_start": self.data_start.isoformat(),
+            "data_end_exclusive": self.data_end.isoformat(),
+            "report_deadline": self.report_deadline.isoformat(),
+        }
+
+    @classmethod
+    def from_policy(cls, policy: dict) -> "Schedule":
+        """Rebuild the frozen schedule and reject a manifest whose policy was edited."""
+        try:
+            schedule = cls(date(policy["freeze_deadline"]), date(policy["report_deadline"]))
+        except (KeyError, TypeError) as error:
+            raise ValueError("freeze mismatch: manifest has no schedule; a new freeze is required") from error
+        if policy != schedule.policy():
+            raise ValueError("freeze mismatch: model or evaluation changed; a new holdout is required")
+        return schedule
 
 
 def digest(data: bytes) -> str:
@@ -147,7 +179,7 @@ def model_contract(artifact: dict) -> None:
 
 
 def make_freeze(artifact_bytes: bytes, development_bytes: bytes, reviewed_through: datetime,
-                now: datetime) -> dict:
+                now: datetime, schedule: Schedule) -> dict:
     artifact = json.loads(artifact_bytes)
     development = json.loads(development_bytes)
     model_contract(artifact)
@@ -180,7 +212,7 @@ def make_freeze(artifact_bytes: bytes, development_bytes: bytes, reviewed_throug
         "artifact_sha256": digest(artifact_bytes), "development_report_sha256": digest(development_bytes),
         "development_input_sha256": artifact.get("input_sha256"),
         "development_labels_sha256": artifact.get("labels_sha256"),
-        "source_sha256": source_hashes(), "policy": POLICY,
+        "source_sha256": source_hashes(), "policy": schedule.policy(),
     }
 
 
@@ -214,8 +246,13 @@ def evaluate(freeze: dict, artifact_bytes: bytes, samples: dict, labels: list[di
              freeze_evidence: str | None) -> dict:
     artifact = json.loads(artifact_bytes)
     model_contract(artifact)
-    if (freeze["version"] != VERSION or freeze["policy"] != POLICY
-            or freeze["source_sha256"] != source_hashes()
+    if freeze["version"] != VERSION:
+        raise ValueError("freeze mismatch: model or evaluation changed; a new holdout is required")
+    schedule = Schedule.from_policy(freeze["policy"])
+    FREEZE_DEADLINE, REPORT_DEADLINE = schedule.freeze_deadline, schedule.report_deadline
+    DATA_START, DATA_END = schedule.data_start, schedule.data_end
+    CORE_START, CORE_END = schedule.core_start, schedule.core_end
+    if (freeze["source_sha256"] != source_hashes()
             or freeze["artifact_sha256"] != digest(artifact_bytes)
             or any(freeze[key] != artifact[key] for key in ("machine_id", "target", "baseline"))
             or freeze["features"] != artifact["signals"]):
@@ -252,7 +289,7 @@ def evaluate(freeze: dict, artifact_bytes: bytes, samples: dict, labels: list[di
 
     machine, target = artifact["machine_id"], artifact["target"]
     daily = session_counts(labels, machine, CORE_START, CORE_END)
-    if min(daily) < POLICY["minimum_sessions_per_day"]:
+    if min(daily) < RULES["minimum_sessions_per_day"]:
         reasons.append("insufficient_daily_sessions")
     signals = artifact["signals"]
     target_labels = []
@@ -267,7 +304,7 @@ def evaluate(freeze: dict, artifact_bytes: bytes, samples: dict, labels: list[di
                         raise ValueError("observed transition outside its scenario")
             target_labels.append(label)
     transitions = model_pipeline.valid_transitions(target_labels, machine, target, samples, CORE_START, CORE_END, signals)
-    if transitions < POLICY["minimum_independent_transitions"]:
+    if transitions < RULES["minimum_independent_transitions"]:
         reasons.append("insufficient_valid_independent_transitions")
 
     examples, diagnostics = model_pipeline.build_examples(samples, CORE_START, CORE_END, signals)
@@ -341,6 +378,10 @@ def main() -> None:
     freeze = modes.add_parser("freeze")
     freeze.add_argument("--development-report", type=Path, required=True)
     freeze.add_argument("--reviewed-through", type=date, required=True)
+    freeze.add_argument("--freeze-deadline", type=date, required=True,
+                        help="agreed latest freeze time, with timezone (format YYYY-MM-DDTHH:MM+09:00)")
+    freeze.add_argument("--report-deadline", type=date, required=True,
+                        help="agreed report deadline, with timezone; the 48h holdout ends 2 minutes before it")
     score = modes.add_parser("evaluate")
     score.add_argument("--freeze", type=Path, required=True)
     score.add_argument("--input", type=Path)
@@ -368,7 +409,8 @@ def main() -> None:
     artifact = args.model.read_bytes()
     now = datetime.now(timezone.utc)
     if args.mode == "freeze":
-        manifest = make_freeze(artifact, args.development_report.read_bytes(), args.reviewed_through, now)
+        manifest = make_freeze(artifact, args.development_report.read_bytes(), args.reviewed_through, now,
+                               Schedule(args.freeze_deadline, args.report_deadline))
         write_new(args.output, manifest)
         print(f"Freeze manifest SHA-256 {model_pipeline.sha256(args.output)}")
         return
@@ -387,7 +429,7 @@ def main() -> None:
                       model_pipeline.sha256(args.input) if args.input else None,
                       model_pipeline.sha256(args.labels) if args.labels else None, datetime.now(timezone.utc),
                       args.freeze_evidence if args.expected_freeze_sha256 else None)
-    if datetime.now(timezone.utc) > REPORT_DEADLINE and "report_deadline_missed" not in report["decision"]["reasons"]:
+    if datetime.now(timezone.utc) > Schedule.from_policy(manifest["policy"]).report_deadline and "report_deadline_missed" not in report["decision"]["reasons"]:
         report["decision"]["reasons"].append("report_deadline_missed")
         report["decision"]["adopted"] = False
         report["release_model"] = manifest["baseline"]
