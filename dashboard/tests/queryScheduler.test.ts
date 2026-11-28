@@ -8,12 +8,14 @@ import { bindDashboardVisibility, mountDashboardScheduler, QueryScheduler, type 
 class FakeClock implements SchedulerClock {
   private time = 0
   private nextId = 0
+  peakTimers = 0
   private readonly jobs = new Map<number, { due: number; callback: () => void }>()
 
   now() { return this.time }
   setTimeout(callback: () => void, delayMs: number) {
     const id = ++this.nextId
     this.jobs.set(id, { due: this.time + delayMs, callback })
+    this.peakTimers = Math.max(this.peakTimers, this.jobs.size)
     return id as unknown as ReturnType<typeof setTimeout>
   }
   clearTimeout(timer: ReturnType<typeof setTimeout>) { this.jobs.delete(timer as unknown as number) }
@@ -35,8 +37,104 @@ class FakeClock implements SchedulerClock {
 }
 
 async function flush() {
-  for (let index = 0; index < 12; index += 1) await Promise.resolve()
+  // Allow all three serialized query callbacks and their settlement handlers to run.
+  for (let index = 0; index < 32; index += 1) await Promise.resolve()
 }
+
+test('72 virtual hours bound timers, requests and tasks across repeated refresh changes', async (context) => {
+  const clock = new FakeClock()
+  const scheduler = new QueryScheduler(clock)
+  const hour = 3_600_000
+  let started = 0
+  let running = 0
+  let peakRunning = 0
+  let failures = 0
+  let discarded = 0
+  let holdNext = false
+  let failNext = false
+  let pending = deferred()
+  const read = async (signal: AbortSignal) => {
+    started++
+    running++
+    peakRunning = Math.max(peakRunning, running)
+    try {
+      if (holdNext) {
+        holdNext = false
+        await pending.promise
+        if (signal.aborted) discarded++
+      } else if (failNext) {
+        failNext = false
+        failures++
+        throw new Error('fixture: HTTP 503')
+      }
+    } finally {
+      running--
+    }
+  }
+  scheduler.setVisible(true)
+  for (const key of ['current', 'history', 'forecast']) scheduler.register(key, read)
+  await flush()
+
+  for (let cycle = 0; cycle < 72; cycle++) {
+    const end = (cycle + 1) * hour
+    scheduler.setPeriod(3)
+    await clock.advanceBy(9_000)
+    scheduler.setPeriod(10)
+    await clock.advanceBy(10_000)
+    scheduler.setPeriod('manual')
+    const manualBaseline = started
+    scheduler.setVisible(false)
+    scheduler.setVisible(true)
+    await clock.advanceBy(20_000)
+    assert.equal(started, manualBaseline)
+    assert.equal(clock.pendingCount(), 0)
+
+    pending = deferred()
+    holdNext = true
+    scheduler.refreshNow()
+    await flush()
+    assert.equal(running, 1)
+    scheduler.register('current', read)
+    scheduler.register('current', read)
+    scheduler.setVisible(false)
+    scheduler.setPeriod(5)
+    const hiddenBaseline = started
+    await clock.advanceBy(31_000)
+    assert.equal(started, hiddenBaseline)
+    assert.equal(clock.pendingCount(), 0)
+    scheduler.setVisible(true)
+    assert.equal(started, hiddenBaseline)
+    if (cycle === 71) {
+      scheduler.dispose()
+      assert.equal(clock.pendingCount(), 0)
+      assert.deepEqual(scheduler.status(), [])
+    } else {
+      failNext = true
+    }
+    pending.resolve()
+    await flush()
+    if (cycle < 71) {
+      assert.equal(scheduler.status().length, 3)
+      const failure = scheduler.status().find((task) => task.failures === 1)
+      assert.equal(failure?.retryInMs, 5_000)
+      await clock.advanceBy(5_000)
+      assert.ok(scheduler.status().every((task) => task.failures === 0 && !task.running),
+        JSON.stringify({ cycle, now: clock.now(), status: scheduler.status() }))
+    }
+    await clock.advanceBy(end - clock.now())
+  }
+
+  assert.equal(clock.now(), 72 * hour)
+  assert.equal(clock.peakTimers, 1)
+  assert.equal(peakRunning, 1)
+  assert.equal(failures, 71)
+  assert.equal(discarded, 72)
+  assert.equal(running, 0)
+  assert.equal(clock.pendingCount(), 0)
+  assert.deepEqual(scheduler.status(), [])
+  context.diagnostic(JSON.stringify({ virtualHours: 72, started, peakTimers: clock.peakTimers, peakRunning,
+    failures, discarded, finalTimers: clock.pendingCount(), finalRunning: running }))
+})
 
 test('dashboard cleanup after session expiry cancels pending retries across effect replay', async (t) => {
   const fakeDocument = new EventTarget()

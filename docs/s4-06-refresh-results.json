@@ -1,0 +1,516 @@
+{
+  "issue": 46,
+  "dashboardCommit": "1ab21a370555057080d91411dcc57e7a297abf15",
+  "desktopCommit": "455e8ea",
+  "environment": {
+    "pc": "개발 PC 1대 및 테스트 PC A/B 응답",
+    "os": "Windows x64 26300.9974",
+    "zone": "Asia/Seoul",
+    "dashboard": "0.1.0",
+    "vite": "6.4.5",
+    "sdk": "10.0.403",
+    "shell": "0.1.0",
+    "webView2Sdk": "1.0.4314.35",
+    "playwrightCore": "1.56.1"
+  },
+  "automated": {
+    "startUtc": "2026-11-20T16:48:02.3609463Z",
+    "endUtc": "2026-11-20T16:48:12.3673357Z",
+    "status": "pass",
+    "scheduler": 28,
+    "forecast": 15,
+    "session": 3,
+    "build": "pass",
+    "virtualSoak": {
+      "expectation": "72시간 가상 단조 시계에서 조회 타이머와 진행 작업 각각 최대 1개, 종료 시 0개",
+      "virtualHours": 72,
+      "starts": 151098,
+      "peakTimers": 1,
+      "peakRunning": 1,
+      "retryableFailures": 71,
+      "discardedOnCancel": 72,
+      "finalTimers": 0,
+      "finalRunning": 0
+    }
+  },
+  "surfaceRuns": [
+    {
+      "beginUtc": "2026-11-20T16:53:07.206Z",
+      "endUtc": "2026-11-20T16:53:35.495Z",
+      "browser": "157.0.4341.60",
+      "node": "v26.13.0",
+      "platform": "win32-x64",
+      "bundle": "index-B7E3KJ6Y.js",
+      "bundleSha256": "09016e9ecc4e5480707516422a749a610e72028fdd957e789c7ec8b1ce49ad0e",
+      "surface": "Edge",
+      "fixture": true,
+      "currentStarts": 20,
+      "authChecks": 5,
+      "peakRequests": 2,
+      "overlaps": [
+        {
+          "started": "B/current",
+          "pending": "A/current",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 2
+        },
+        {
+          "started": "A/current",
+          "pending": "B/predictions",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 1
+        },
+        {
+          "started": "B/current",
+          "pending": "A/predictions",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 1
+        }
+      ],
+      "pageErrors": 0,
+      "results": [
+        {
+          "scenario": "갱신 주기 변경과 저장 복원",
+          "actual": {
+            "periods": [
+              "3",
+              "10",
+              "manual",
+              "5"
+            ],
+            "zoomPoints": 7,
+            "allPoints": 9,
+            "scrollY": 350,
+            "restored": "manual"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:07.962Z"
+        },
+        {
+          "scenario": "두 주기 이상 걸린 응답",
+          "actual": {
+            "delayMs": 6500,
+            "periodMs": 3000,
+            "startsBeforeResponse": 1,
+            "peakRequests": 1
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:14.930Z"
+        },
+        {
+          "scenario": "지연 응답 중 빠른 PC 변경",
+          "actual": {
+            "selection": "A→B→A→B",
+            "displayed": "B (60°C)",
+            "staleAVisible": false
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:16.578Z"
+        },
+        {
+          "scenario": "수동 실패와 값 유지",
+          "actual": {
+            "status": 503,
+            "automaticStartsAfter5300ms": 0,
+            "retained": "60°C"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:21.927Z"
+        },
+        {
+          "scenario": "자동 실패·재시도·증분 조회",
+          "actual": {
+            "retryMs": 5006,
+            "recoveredPeriodMs": 5004,
+            "recovered": "연결됨",
+            "cursorSeenForB": true
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:31.996Z"
+        },
+        {
+          "scenario": "수동 중 숨김·복원",
+          "actual": {
+            "source": "synthetic visibilitychange",
+            "retained": "연결됨",
+            "automaticStarts": 0,
+            "minimized": {
+              "document": "hidden",
+              "hostVisible": null,
+              "effective": "hidden"
+            },
+            "restored": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            },
+            "cancelledBeforeRestore": 1
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:33.219Z"
+        },
+        {
+          "scenario": "숨김 중 주기 변경과 자동 복원",
+          "actual": {
+            "source": "synthetic visibilitychange",
+            "hiddenStarts": 0,
+            "restoreStarts": 1,
+            "minimized": {
+              "document": "hidden",
+              "hostVisible": null,
+              "effective": "hidden"
+            },
+            "restored": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            }
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:34.272Z"
+        },
+        {
+          "scenario": "인증 만료 정리",
+          "actual": {
+            "status": 401,
+            "protectedScreenMounted": false,
+            "additionalStarts": 0
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:35.495Z"
+        }
+      ]
+    },
+    {
+      "beginUtc": "2026-11-20T16:52:09.196Z",
+      "endUtc": "2026-11-20T16:52:44.377Z",
+      "browser": "157.0.4341.60",
+      "node": "v26.13.0",
+      "platform": "win32-x64",
+      "bundle": "index-B7E3KJ6Y.js",
+      "bundleSha256": "09016e9ecc4e5480707516422a749a610e72028fdd957e789c7ec8b1ce49ad0e",
+      "surface": "Edge",
+      "fixture": true,
+      "currentStarts": 20,
+      "authChecks": 4,
+      "peakRequests": 2,
+      "overlaps": [
+        {
+          "started": "B/current",
+          "pending": "A/current",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 6
+        },
+        {
+          "started": "A/current",
+          "pending": "B/history",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 3
+        }
+      ],
+      "pageErrors": 0,
+      "results": [
+        {
+          "scenario": "갱신 주기 변경과 저장 복원",
+          "actual": {
+            "periods": [
+              "3",
+              "10",
+              "manual",
+              "5"
+            ],
+            "zoomPoints": 7,
+            "allPoints": 9,
+            "scrollY": 350,
+            "restored": "manual"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:10.529Z"
+        },
+        {
+          "scenario": "두 주기 이상 걸린 응답",
+          "actual": {
+            "delayMs": 6500,
+            "periodMs": 3000,
+            "startsBeforeResponse": 1,
+            "peakRequests": 1
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:17.587Z"
+        },
+        {
+          "scenario": "지연 응답 중 빠른 PC 변경",
+          "actual": {
+            "selection": "A→B→A→B",
+            "displayed": "B (60°C)",
+            "staleAVisible": false
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:19.391Z"
+        },
+        {
+          "scenario": "수동 실패와 값 유지",
+          "actual": {
+            "status": 503,
+            "automaticStartsAfter5300ms": 0,
+            "retained": "60°C"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:24.752Z"
+        },
+        {
+          "scenario": "자동 실패·재시도·증분 조회",
+          "actual": {
+            "retryMs": 5015,
+            "recoveredPeriodMs": 5020,
+            "recovered": "연결됨",
+            "cursorSeenForB": true
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:34.900Z"
+        },
+        {
+          "scenario": "수동 중 숨김·복원",
+          "actual": {
+            "source": "native Edge tab",
+            "retained": "연결됨",
+            "automaticStarts": 0,
+            "minimized": "visible",
+            "restored": "visible",
+            "cancelledBeforeRestore": 0
+          },
+          "status": "fail",
+          "checkedAtUtc": "2026-11-20T16:52:40.511Z"
+        },
+        {
+          "scenario": "숨김 중 주기 변경과 자동 복원",
+          "actual": {
+            "source": "native Edge tab",
+            "hiddenStarts": 1,
+            "restoreStarts": 0,
+            "minimized": "visible",
+            "restored": "visible"
+          },
+          "status": "fail",
+          "checkedAtUtc": "2026-11-20T16:52:43.139Z"
+        },
+        {
+          "scenario": "인증 만료 정리",
+          "actual": {
+            "status": 401,
+            "protectedScreenMounted": false,
+            "additionalStarts": 0
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:52:44.377Z"
+        }
+      ]
+    },
+    {
+      "beginUtc": "2026-11-20T16:53:05.730Z",
+      "endUtc": "2026-11-20T16:53:44.084Z",
+      "browser": "157.0.4341.60",
+      "node": "v26.13.0",
+      "platform": "win32-x64",
+      "bundle": "index-B7E3KJ6Y.js",
+      "bundleSha256": "09016e9ecc4e5480707516422a749a610e72028fdd957e789c7ec8b1ce49ad0e",
+      "surface": "WebView2",
+      "fixture": true,
+      "currentStarts": 20,
+      "authChecks": 4,
+      "peakRequests": 2,
+      "overlaps": [
+        {
+          "started": "B/current",
+          "pending": "A/current",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 1
+        },
+        {
+          "started": "A/current",
+          "pending": "B/predictions",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 1
+        },
+        {
+          "started": "B/current",
+          "pending": "A/history",
+          "outcome": "net::ERR_ABORTED",
+          "overlapMs": 1
+        }
+      ],
+      "pageErrors": 0,
+      "results": [
+        {
+          "scenario": "갱신 주기 변경과 저장 복원",
+          "actual": {
+            "periods": [
+              "3",
+              "10",
+              "manual",
+              "5"
+            ],
+            "zoomPoints": 7,
+            "allPoints": 9,
+            "scrollY": 350,
+            "restored": "manual"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:07.194Z"
+        },
+        {
+          "scenario": "두 주기 이상 걸린 응답",
+          "actual": {
+            "delayMs": 6500,
+            "periodMs": 3000,
+            "startsBeforeResponse": 1,
+            "peakRequests": 1
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:14.155Z"
+        },
+        {
+          "scenario": "지연 응답 중 빠른 PC 변경",
+          "actual": {
+            "selection": "A→B→A→B",
+            "displayed": "B (60°C)",
+            "staleAVisible": false
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:15.799Z"
+        },
+        {
+          "scenario": "수동 실패와 값 유지",
+          "actual": {
+            "status": 503,
+            "automaticStartsAfter5300ms": 0,
+            "retained": "60°C"
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:21.150Z"
+        },
+        {
+          "scenario": "자동 실패·재시도·증분 조회",
+          "actual": {
+            "retryMs": 5010,
+            "recoveredPeriodMs": 5005,
+            "recovered": "연결됨",
+            "cursorSeenForB": true
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:31.240Z"
+        },
+        {
+          "scenario": "수동 중 숨김·복원",
+          "actual": {
+            "source": "native WebView2 window",
+            "retained": "연결됨",
+            "automaticStarts": 0,
+            "minimized": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            },
+            "restored": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            },
+            "cancelledBeforeRestore": 0
+          },
+          "status": "fail",
+          "checkedAtUtc": "2026-11-20T16:53:38.030Z"
+        },
+        {
+          "scenario": "숨김 중 주기 변경과 자동 복원",
+          "actual": {
+            "source": "native WebView2 window",
+            "hiddenStarts": 1,
+            "restoreStarts": 0,
+            "minimized": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            },
+            "restored": {
+              "document": "visible",
+              "hostVisible": null,
+              "effective": "visible"
+            }
+          },
+          "status": "fail",
+          "checkedAtUtc": "2026-11-20T16:53:42.788Z"
+        },
+        {
+          "scenario": "인증 만료 정리",
+          "actual": {
+            "status": 401,
+            "protectedScreenMounted": false,
+            "additionalStarts": 0
+          },
+          "status": "pass",
+          "checkedAtUtc": "2026-11-20T16:53:44.084Z"
+        }
+      ]
+    }
+  ],
+  "observerSmoke": {
+    "status": "pass",
+    "expectation": "독립 테스트 문서에서 메모리·타이머·요청·렌더 계측과 분리 종료를 확인",
+    "actual": {
+      "samples": 5,
+      "final": {
+        "type": "sample",
+        "utc": "2026-11-20T16:44:23.432Z",
+        "elapsedMs": 4001,
+        "jsHeapUsedBytes": 1341112,
+        "jsHeapTotalBytes": 2359296,
+        "nodes": 42,
+        "layoutCount": 14,
+        "documentStartedUtc": "2026-11-20T16:44:19.439Z",
+        "visibility": "visible",
+        "dashboardMounted": true,
+        "timeouts": 1,
+        "intervals": 1,
+        "peakTimeouts": 1,
+        "peakIntervals": 1,
+        "renderBatches": 13,
+        "lastRenderUtc": "2026-11-20T16:44:23.356Z",
+        "data": {
+          "starts": 13,
+          "finished": 13,
+          "failed": 0,
+          "cancelled": 0,
+          "peakActive": 1,
+          "http401": 0,
+          "http429": 0,
+          "http5xx": 0,
+          "active": 0
+        },
+        "auth": {
+          "starts": 1,
+          "finished": 1,
+          "failed": 0,
+          "cancelled": 0,
+          "peakActive": 1,
+          "http401": 0,
+          "http429": 0,
+          "http5xx": 0,
+          "active": 0
+        }
+      }
+    }
+  },
+  "real72h": {
+    "status": "pending",
+    "elapsedHours": 0,
+    "blocker": "S4-04 운영 빌드·테스트 계정·실제 PC/API 필요",
+    "owners": [
+      "C",
+      "S4-04 배포 담당",
+      "A",
+      "B"
+    ],
+    "nextCheck": "운영 빌드와 스테이징 접근 준비 시점"
+  }
+}
