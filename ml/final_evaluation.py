@@ -42,10 +42,10 @@ class Schedule:
         for value in (freeze_deadline, report_deadline):
             if value.tzinfo is None or value.utcoffset() is None:
                 raise ValueError("schedule deadlines must include timezone")
-            if value.microsecond:
-                # Telemetry rows sit on whole seconds; a fractional deadline would shift every
-                # boundary off that grid and make complete buffers look incomplete.
-                raise ValueError("schedule deadlines must be whole seconds")
+        freeze_deadline = freeze_deadline.astimezone(timezone.utc)
+        report_deadline = report_deadline.astimezone(timezone.utc)
+        if freeze_deadline.microsecond or report_deadline.microsecond:
+            raise ValueError("schedule deadlines must be whole seconds in UTC")
         self.freeze_deadline, self.report_deadline = freeze_deadline, report_deadline
         self.data_end = report_deadline - timedelta(minutes=1)
         self.core_end = self.data_end - timedelta(seconds=model_pipeline.HORIZON)

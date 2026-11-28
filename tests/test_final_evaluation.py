@@ -47,13 +47,16 @@ class FinalEvaluationTests(unittest.TestCase):
         later = final.Schedule(final.date("2030-02-10T09:00+09:00"), final.date("2030-02-12T09:00+09:00"))
         self.assertEqual(later.core_end - later.core_start, timedelta(hours=48))
         model, freeze = self.fixture(later.data_start, later)
-        self.assertEqual(freeze["policy"]["report_deadline"], "2030-02-12T09:00:00+09:00")
-        self.assertEqual(freeze["policy"]["freeze_deadline"], "2030-02-10T09:00:00+09:00")
+        self.assertEqual(freeze["policy"]["report_deadline"], "2030-02-12T00:00:00+00:00")
+        self.assertEqual(freeze["policy"]["freeze_deadline"], "2030-02-10T00:00:00+00:00")
+        self.assertEqual(freeze["policy"]["data_start"], "2030-02-09T23:53:00+00:00")
+        self.assertEqual(freeze["policy"]["data_end_exclusive"], "2030-02-11T23:59:00+00:00")
         # On time for the new schedule even though it is long past the default fixture deadline.
         result = final.evaluate(freeze, model, {}, [], None, None, later.data_end, "reviewed")
         for reason in ("report_deadline_missed", "freeze_schedule_missed", "holdout_not_finished"):
             self.assertNotIn(reason, result["decision"]["reasons"])
-        overrun = final.evaluate(freeze, model, {}, [], None, None, later.report_deadline + final.SECOND, "reviewed")
+        overrun = final.evaluate(freeze, model, {}, [], None, None,
+                                 later.report_deadline + timedelta(microseconds=1), "reviewed")
         self.assertIn("report_deadline_missed", overrun["decision"]["reasons"])
         self.assertFalse(overrun["decision"]["adopted"])
         exact = final.evaluate(freeze, model, {}, [], None, None, later.report_deadline, "reviewed")
@@ -73,11 +76,20 @@ class FinalEvaluationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "timezone"):
             final.Schedule(final.date("2030-01-01T09:00+09:00").replace(tzinfo=None), SCHEDULE.report_deadline)
         with self.assertRaisesRegex(ValueError, "before the holdout data end"):
-            final.Schedule(SCHEDULE.report_deadline, SCHEDULE.report_deadline)
+            final.Schedule(SCHEDULE.data_end, SCHEDULE.report_deadline)
+        final.Schedule(SCHEDULE.data_end - final.SECOND, SCHEDULE.report_deadline)
+
+    def test_schedule_requires_whole_utc_seconds(self):
         with self.assertRaisesRegex(ValueError, "whole seconds"):
             final.Schedule(SCHEDULE.freeze_deadline, final.date("2030-01-03T09:00:00.5+09:00"))
+        with self.assertRaisesRegex(ValueError, "whole seconds"):
+            final.Schedule(SCHEDULE.freeze_deadline, final.date("2030-01-03T09:00:00+09:00:00.5"))
+        with self.assertRaisesRegex(ValueError, "whole seconds"):
+            final.Schedule(final.date("2030-01-01T09:00:00+09:00:00.5"), SCHEDULE.report_deadline)
+        equivalent = final.Schedule(SCHEDULE.freeze_deadline, final.date("2030-01-03T09:00:00.5+09:00:00.5"))
+        self.assertEqual(equivalent.policy(), SCHEDULE.policy())
         model, freeze = self.fixture()
-        fractional = {**freeze, "policy": {**freeze["policy"], "report_deadline": "2030-01-03T09:00:00.500000+09:00"}}
+        fractional = {**freeze, "policy": {**freeze["policy"], "report_deadline": "2030-01-03T09:00:00+09:00:00.5"}}
         with self.assertRaisesRegex(ValueError, "whole seconds"):
             final.evaluate(fractional, model, {}, [], None, None, final.DATA_END, "reviewed")
 
