@@ -47,7 +47,9 @@ zoom, observation/receipt/aggregation timestamps, quality gaps, and cursor-based
 It calls the proposed `GET /v1/dashboard/machines/{machine_id}/sensors/{sensor_id}/history`
 route. The current backend does not yet provide dashboard read authorization, history
 queries, or S3-03 aggregates; until those dependencies land, requests show an error and
-retain any previous successful chart data. The full response and cursor contract is in
+retain any previous successful chart data. On `HTTP 422` `INVALID_HISTORY_CURSOR`, the
+client clears the cursor and re-queries the full `[from, to)` window for the same PC,
+sensor, and range (`npm run test:history`). The full response and cursor contract is in
 [`docs/s2-05-history-read-contract.md`](../docs/s2-05-history-read-contract.md).
 
 ## Shared query scheduler (S2-06)
