@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import HistoryChart, { type HistoryPoint, type HistoryResponse } from './HistoryChart'
+import { fetchHistorySeries } from './historyQuery.ts'
 import { readRefreshPeriod, REFRESH_SECONDS, saveRefreshPeriod, type RefreshPeriod } from './refreshSettings'
 
 type SensorReading = {
+  sensorId?: string
   label: string
   value: number | null
   unit: string
@@ -19,6 +22,14 @@ type CurrentSnapshot = {
 type LoadState = 'idle' | 'loading' | 'ready' | 'unavailable' | 'error'
 
 const apiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? ''
+const sensorDefaults = [
+  { sensorId: 'cpu_temperature', label: 'CPU 온도', unit: '°C', quality: 'missing' as const },
+  { sensorId: 'gpu_temperature', label: 'GPU 온도', unit: '°C', quality: 'missing' as const },
+  { sensorId: 'cpu_usage', label: 'CPU 사용률', unit: '%', quality: 'missing' as const },
+  { sensorId: 'gpu_usage', label: 'GPU 사용률', unit: '%', quality: 'missing' as const },
+  { sensorId: 'cpu_power', label: 'CPU 전력', unit: 'W', quality: 'missing' as const },
+  { sensorId: 'gpu_power', label: 'GPU 전력', unit: 'W', quality: 'missing' as const },
+]
 
 function formatTime(value?: string) {
   if (!value) return '—'
@@ -28,7 +39,21 @@ function formatTime(value?: string) {
     : new Intl.DateTimeFormat('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(date)
 }
 
-function ReadingCard({ reading }: { reading: SensorReading }) {
+function formatAge(value?: string) {
+  if (!value) return '—'
+  const seconds = Math.floor((Date.now() - new Date(value).getTime()) / 1000)
+  if (!Number.isFinite(seconds) || seconds < 0) return '시각 확인 필요'
+  return seconds < 60 ? `${seconds}초` : seconds < 3600 ? `${Math.floor(seconds / 60)}분` : `${Math.floor(seconds / 3600)}시간`
+}
+
+function formatLag(observedAt?: string, receivedAt?: string) {
+  if (!observedAt || !receivedAt) return '—'
+  const seconds = Math.floor((new Date(receivedAt).getTime() - new Date(observedAt).getTime()) / 1000)
+  if (!Number.isFinite(seconds) || seconds < 0) return '시각 확인 필요'
+  return `${seconds}초`
+}
+
+function ReadingCard({ reading, receivedAt }: { reading: SensorReading; receivedAt?: string }) {
   const unavailable = reading.quality !== 'ok' || reading.value === null
   const status = reading.quality === 'unsupported' ? '미지원' : reading.quality === 'error' ? '오류' : reading.quality === 'missing' ? '측정 대기' : '데이터 없음'
   return (
@@ -37,7 +62,7 @@ function ReadingCard({ reading }: { reading: SensorReading }) {
       <div className={`reading-card__value${unavailable ? ' is-muted' : ''}`}>
         {unavailable ? <span className="reading-card__empty">{status}</span> : <>{reading.value}<small>{reading.unit}</small></>}
       </div>
-      <div className="reading-card__foot">관측 {formatTime(reading.observedAt)}</div>
+      <div className="reading-card__foot">관측 {formatTime(reading.observedAt)} · 경과 {formatAge(reading.observedAt)} · 수신 지연 {formatLag(reading.observedAt, receivedAt)}</div>
     </article>
   )
 }
@@ -50,6 +75,28 @@ export default function App() {
   const [lastRefresh, setLastRefresh] = useState<string | undefined>()
   const [period, setPeriod] = useState<RefreshPeriod>(() => readRefreshPeriod())
   const [requestKey, setRequestKey] = useState(0)
+  const [historyRange, setHistoryRange] = useState('24h')
+  const [selectedSensorId, setSelectedSensorId] = useState('cpu_temperature')
+  const [history, setHistory] = useState<HistoryResponse | null>(null)
+  const [historyBusy, setHistoryBusy] = useState(false)
+  const [historyError, setHistoryError] = useState<string | null>(null)
+  const historyCache = useRef<{ scope: string; cursor: string | null; points: HistoryPoint[] }>({ scope: '', cursor: null, points: [] })
+
+  const sensors = useMemo(() => {
+    if (!snapshot?.readings.length) return sensorDefaults
+    return snapshot.readings.map((reading) => ({
+      sensorId: reading.sensorId ?? sensorDefaults.find((sensor) => sensor.label === reading.label)?.sensorId ?? reading.label,
+      label: reading.label,
+      unit: reading.unit,
+      quality: reading.quality,
+    }))
+  }, [snapshot])
+  const selectedSensor = sensors.find((sensor) => sensor.sensorId === selectedSensorId) ?? sensors[0]
+
+  useEffect(() => {
+    if (sensors.some((sensor) => sensor.sensorId === selectedSensorId)) return
+    setSelectedSensorId(sensors[0]?.sensorId ?? 'cpu_temperature')
+  }, [sensors, selectedSensorId])
 
   useEffect(() => {
     if (!machineId.trim()) {
@@ -92,12 +139,75 @@ export default function App() {
     return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
   }, [machineId, period, requestKey])
 
+  useEffect(() => {
+    if (!machineId.trim() || !selectedSensor) {
+      setHistory(null)
+      setHistoryBusy(false)
+      setHistoryError(null)
+      return
+    }
+    if (selectedSensor.quality === 'unsupported') {
+      setHistory(null)
+      setHistoryBusy(false)
+      setHistoryError(null)
+      return
+    }
+    let active = true
+    let timer: number | undefined
+    let controller: AbortController | undefined
+    const scope = `${machineId.trim()}|${selectedSensor.sensorId}|${historyRange}`
+    if (historyCache.current.scope !== scope) {
+      historyCache.current = { scope, cursor: null, points: [] }
+      setHistory(null)
+    }
+    const loadHistory = async () => {
+      controller = new AbortController()
+      setHistoryBusy(true)
+      setHistoryError(null)
+      const currentCache = historyCache.current.scope === scope
+        ? historyCache.current
+        : { scope, cursor: null, points: [] }
+      try {
+        const result = await fetchHistorySeries({
+          apiBase,
+          machineId: machineId.trim(),
+          sensorId: selectedSensor.sensorId,
+          unit: selectedSensor.unit,
+          range: historyRange,
+          scope,
+          cache: currentCache,
+          signal: controller.signal,
+          onCursorReset: () => {
+            if (active && historyCache.current.scope === scope) {
+              historyCache.current = { scope, cursor: null, points: [] }
+            }
+          },
+        })
+        if (active && historyCache.current.scope === scope) {
+          historyCache.current = result.cache
+          setHistory(result.response)
+          setHistoryBusy(false)
+        }
+      } catch (error) {
+        if (active && !(error instanceof DOMException && error.name === 'AbortError')) {
+          setHistoryError(error instanceof Error ? error.message : '알 수 없는 오류')
+          setHistoryBusy(false)
+        }
+      } finally {
+        if (active && period !== 'manual') timer = window.setTimeout(() => { void loadHistory() }, period * 1000)
+      }
+    }
+    void loadHistory()
+    return () => { active = false; controller?.abort(); if (timer !== undefined) window.clearTimeout(timer) }
+  }, [machineId, selectedSensor?.sensorId, selectedSensor?.quality, selectedSensor?.unit, historyRange, period, requestKey])
+
   const choosePeriod = (value: RefreshPeriod) => {
     setPeriod(value)
     saveRefreshPeriod(value)
   }
   const statusText = state === 'ready' ? '연결됨' : state === 'loading' ? '조회 중' : state === 'error' ? '연결 오류' : state === 'unavailable' ? '데이터 없음' : 'PC 선택 필요'
   const statusClass = state === 'ready' ? 'is-connected' : state === 'error' ? 'is-error' : ''
+  const shownHistory = history?.machineId === machineId.trim() && history.sensorId === selectedSensor?.sensorId ? history : null
 
   return (
     <main className="app-shell">
@@ -132,7 +242,7 @@ export default function App() {
           <section className="machine-panel">
             <div className="machine-panel__title"><div className="machine-icon">▰</div><div><span className="section-label">모니터링 대상</span><strong>{snapshot?.machineName ?? 'PC 선택'}</strong></div></div>
             <label className="machine-input">Machine ID<input value={machineId} onChange={(event) => setMachineId(event.target.value)} placeholder="등록된 PC ID 입력" /></label>
-            <div className="machine-panel__meta"><span>마지막 수신</span><strong>{formatTime(snapshot?.receivedAt)}</strong><i /> <span>화면 갱신</span><strong>{formatTime(lastRefresh)}</strong></div>
+            <div className="machine-panel__meta"><span>마지막 수신</span><strong>{formatTime(snapshot?.receivedAt)}</strong><small>{formatAge(snapshot?.receivedAt)} 전</small><i /> <span>화면 갱신</span><strong>{formatTime(lastRefresh)}</strong></div>
           </section>
 
           <section className="section-block">
@@ -145,8 +255,15 @@ export default function App() {
                 { label: 'GPU 사용률', value: null, unit: '%', quality: 'missing' as const },
                 { label: 'CPU 전력', value: null, unit: 'W', quality: 'missing' as const },
                 { label: 'GPU 전력', value: null, unit: 'W', quality: 'missing' as const },
-              ]).map((reading) => <ReadingCard key={reading.label} reading={reading} />)}
+              ]).map((reading) => <ReadingCard key={reading.label} reading={reading} receivedAt={snapshot?.receivedAt} />)}
             </div>
+          </section>
+
+          <section className="section-block">
+            <label className="history-sensor">센서<select value={selectedSensor?.sensorId ?? ''} onChange={(event) => setSelectedSensorId(event.target.value)} aria-label="차트 센서">
+              {sensors.map((sensor) => <option key={sensor.sensorId} value={sensor.sensorId}>{sensor.label} · {sensor.unit}</option>)}
+            </select></label>
+            <HistoryChart response={shownHistory} busy={historyBusy} error={historyError} sensorUnsupported={selectedSensor?.quality === 'unsupported'} selectedLabel={selectedSensor?.label ?? '센서'} rangeLabel={historyRange} onRangeChange={setHistoryRange} />
           </section>
 
           <section className="lower-grid">

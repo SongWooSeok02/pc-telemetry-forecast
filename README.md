@@ -7,6 +7,7 @@
 - [S1-03 로컬 통합 검증 결과](tests/results/s1-03-backend.json)
 - [S1-09 부하 전환 수집 계획·라벨 규격](docs/s1-09-load-transition-plan.md)
 - [S1-04 공통 대시보드 개발 안내](dashboard/README.md)
+- [S2-05 과거 조회 화면·API 연결 계약](docs/s2-05-history-read-contract.md)
 
 - [S1-01 수집·시각 API 계약 초안](contracts/README.md) — 공동 검토 대기
 - [S1-01 계약 검증 안내](tests/README.md)

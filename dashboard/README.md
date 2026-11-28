@@ -39,3 +39,15 @@ frontend interface, not an approved API contract.
 주기를 선택하면 이전 예약과 진행 중 요청을 정리하고 새 설정으로 즉시 조회합니다. 자동 모드에서는 요청이 끝난 뒤 선택한 간격을 예약하며, 수동 모드에서는 예약하지 않습니다. `지금 갱신`은 모드와 관계없이 조회를 즉시 요청합니다. 주기 변경은 페이지를 다시 불러오지 않으며 선택 PC와 화면 위치 등 대시보드 상태를 유지합니다. 화면 주기는 센서 수집·전송·예측 주기와 분리되어 있습니다.
 
 공통 스케줄러의 가시성 감지, 호스트 상태 연동, 요청 경합의 통합 관리는 S2-06 범위입니다.
+
+## Historical chart (S2-05)
+
+The dashboard offers sensor and time-range selection, resolution-aware charting, viewport
+zoom, observation/receipt/aggregation timestamps, quality gaps, and cursor-based updates.
+It calls the proposed `GET /v1/dashboard/machines/{machine_id}/sensors/{sensor_id}/history`
+route. The current backend does not yet provide dashboard read authorization, history
+queries, or S3-03 aggregates; until those dependencies land, requests show an error and
+retain any previous successful chart data. On `HTTP 422` `INVALID_HISTORY_CURSOR`, the
+client clears the cursor and re-queries the full `[from, to)` window for the same PC,
+sensor, and range (`npm run test:history`). The full response and cursor contract is in
+[`docs/s2-05-history-read-contract.md`](../docs/s2-05-history-read-contract.md).
