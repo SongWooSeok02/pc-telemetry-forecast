@@ -1,0 +1,41 @@
+{
+  "version": "s4-05.1",
+  "base": "f86bafa",
+  "started_at_utc": "2026-11-28T15:01:30.530961+00:00",
+  "finished_at_utc": "2026-11-28T15:01:30.530961+00:00",
+  "pc": "synthetic-pc",
+  "environment": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "python": "3.15.2"
+  },
+  "data_kind": "synthetic fixtures",
+  "real_pc_evaluation": "not performed",
+  "commands": [
+    "python -m unittest discover -s tests -p test_final_evaluation.py -v",
+    "python -m unittest discover -s tests -p test_temperature_model.py -v",
+    "python -m unittest discover -s tests -p test_ml_baselines.py -v",
+    "python -m compileall -q ml tests/test_final_evaluation.py tests/test_temperature_model.py tests/test_ml_baselines.py",
+    "python -m ml.final_evaluation baseline-release --machine-id synthetic-pc --target gpu --output <unused-file>",
+    "git diff --check"
+  ],
+  "expected": {
+    "tests": 45,
+    "failures": 0,
+    "skipped_max": 1,
+    "compile": true,
+    "persistence_artifact": true,
+    "diff": true
+  },
+  "actual": {
+    "tests": 45,
+    "failures": 0,
+    "skipped": 1,
+    "compile": true,
+    "persistence_artifact": true,
+    "diff": true
+  },
+  "passed": true,
+  "skip_note": "test_real_dangling_symlink_is_not_treated_as_free skips when the OS denies symlink creation (Windows without Developer Mode); the simulated dangling-symlink test still runs",
+  "includes": "#48 head f86bafa + configurable 48h schedule (owner comment 2026-11-27) + whole-second deadline check",
+  "schedule": "configurable via freeze --freeze-deadline/--report-deadline; no agreed new dates recorded yet; tests use synthetic 2030 windows"
+}
