@@ -1,30 +1,45 @@
 """Forecast integration against a disposable PostgreSQL schema."""
 import hashlib
 import os
+import re
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import uuid4
 
-import psycopg
-from fastapi.testclient import TestClient
-from psycopg import sql
-from psycopg.conninfo import make_conninfo
-from psycopg.types.json import Jsonb
-
-from backend.app import create_app
-from backend.forecast import BASELINE, NO_MODEL, run_cycle
-from backend.registration import sha
-
 SENSOR = 'cpu/package/temp'
 UNIT = 'C'
-MIGRATIONS = Path(__file__).resolve().parents[1] / 'database/migrations'
+REPO_ROOT = Path(__file__).resolve().parents[1]
+MIGRATIONS = REPO_ROOT / 'database/migrations'
+
+
+class ForecastMigrationOrderTests(unittest.TestCase):
+    def test_compose_migrate_applies_all_migrations_in_order(self):
+        compose = (REPO_ROOT / 'infra/compose.yaml').read_text(encoding='utf-8')
+        applied = re.findall(r'/migrations/(\d+_[a-z0-9_]+\.sql)', compose)
+        expected = [path.name for path in sorted(MIGRATIONS.glob('*.sql'))]
+        self.assertEqual(applied, expected)
+        self.assertEqual(applied[-1], '006_prediction_unit.sql')
+
+    def test_006_migration_is_alter_only_without_backfill(self):
+        sql_text = (MIGRATIONS / '006_prediction_unit.sql').read_text(encoding='utf-8')
+        self.assertIn('ALTER TABLE predictions ADD COLUMN unit text', sql_text)
+        self.assertNotIn('CREATE TABLE', sql_text)
+        self.assertNotIn('UPDATE predictions', sql_text)
 
 
 @unittest.skipUnless(os.environ.get('TEST_DATABASE_URL'), 'requires PostgreSQL')
 class ForecastIntegration(unittest.TestCase):
     def setUp(self):
+        import psycopg
+        from fastapi.testclient import TestClient
+        from psycopg import sql
+        from psycopg.conninfo import make_conninfo
+        from backend.app import create_app
+
+        self.psycopg = psycopg
+        self.sql = sql
         self.base = os.environ['TEST_DATABASE_URL']
         self.schema = 's305_' + uuid4().hex
         self.dsn = make_conninfo(self.base, options=f'-c search_path={self.schema}')
@@ -36,6 +51,7 @@ class ForecastIntegration(unittest.TestCase):
         self.root = Path(tmp.name)
         self.now = datetime.now(timezone.utc).replace(second=30, microsecond=0)
         self.machine, self.other, self.owner, self.boot, self.config = (uuid4() for _ in range(5))
+        from backend.registration import sha
         with self.connect() as db:
             for path in sorted(MIGRATIONS.glob('*.sql')):
                 db.execute(path.read_text(encoding='utf-8-sig'))
@@ -48,11 +64,11 @@ class ForecastIntegration(unittest.TestCase):
         self.addCleanup(self.client.close)
 
     def drop_schema(self):
-        with psycopg.connect(self.base) as db:
-            db.execute(sql.SQL('DROP SCHEMA {} CASCADE').format(sql.Identifier(self.schema)))
+        with self.psycopg.connect(self.base) as db:
+            db.execute(self.sql.SQL('DROP SCHEMA {} CASCADE').format(self.sql.Identifier(self.schema)))
 
     def connect(self):
-        return psycopg.connect(self.dsn)
+        return self.psycopg.connect(self.dsn)
 
     def measure(self, machine, at, value, quality='ok'):
         with self.connect() as db:
@@ -64,6 +80,7 @@ class ForecastIntegration(unittest.TestCase):
             """, (at, machine, self.boot, uuid4(), self.config, SENSOR, at, UNIT, quality, value))
 
     def model(self, version, weight):
+        from psycopg.types.json import Jsonb
         blob = f'{{"kind":"linear","weights":[{weight},1],"bias":0}}'.encode()
         path = self.root / f'{version}.json'
         path.write_bytes(blob)
@@ -81,6 +98,7 @@ class ForecastIntegration(unittest.TestCase):
         return path
 
     def cycle(self):
+        from backend.forecast import run_cycle
         with self.connect() as db:
             return run_cycle(db, self.root, clock=lambda: self.now)
 
@@ -91,6 +109,7 @@ class ForecastIntegration(unittest.TestCase):
                                        'end': (self.now+timedelta(minutes=2)).isoformat()})
 
     def test_restart_model_switch_gap_and_owner_scope(self):
+        from backend.forecast import BASELINE, NO_MODEL
         self.model('v1', 2)
         self.measure(self.machine, self.now-timedelta(seconds=1), 10)
         self.measure(self.machine, self.now, 20)
@@ -124,6 +143,7 @@ class ForecastIntegration(unittest.TestCase):
                           (NO_MODEL, None, 'unavailable', 'invalid_latest_input'),
                           (NO_MODEL, None, 'unavailable', 'stale_or_missing_input')])
         for row in items:
+            self.assertEqual(row['unit'], UNIT)
             self.assertEqual(datetime.fromisoformat(row['target_at']) - datetime.fromisoformat(row['generated_at']),
                              timedelta(seconds=60))
         self.assertEqual(self.read().json()['items'], items)
@@ -132,14 +152,15 @@ class ForecastIntegration(unittest.TestCase):
             self.assertEqual(db.execute('SELECT value, status FROM predictions WHERE machine_id=%s ORDER BY slot_at',
                                         (self.other,)).fetchall()[0], (900, 'fallback'))
             self.assertEqual(db.execute('SELECT version FROM forecast_models WHERE active').fetchall(), [('v2',)])
-        with self.assertRaises(psycopg.errors.RaiseException), self.connect() as db:
+        with self.assertRaises(self.psycopg.errors.RaiseException), self.connect() as db:
             db.execute('SELECT activate_forecast_model(%s,%s,%s)', (self.machine, SENSOR, 'unknown'))
-        with self.assertRaises(psycopg.errors.RaiseException), self.connect() as db:
+        with self.assertRaises(self.psycopg.errors.RaiseException), self.connect() as db:
             db.execute("UPDATE forecast_models SET artifact_path='replacement.json' WHERE version='v2'")
         with self.connect() as db:
             self.assertEqual(db.execute('SELECT version FROM forecast_models WHERE active').fetchall(), [('v2',)])
 
     def test_slow_worker_excludes_overlap_and_failed_transaction_can_retry(self):
+        from backend.forecast import run_cycle
         self.measure(self.machine, self.now, 42)
         with self.connect() as db:
             db.execute('SELECT pg_advisory_xact_lock(1030501)')
@@ -153,3 +174,25 @@ class ForecastIntegration(unittest.TestCase):
         self.assertEqual(self.read().json()['items'], [])
         self.assertTrue(self.cycle())
         self.assertEqual(self.read().json()['items'][0]['value'], 42)
+        self.assertEqual(self.read().json()['items'][0]['unit'], UNIT)
+
+    def test_legacy_prediction_without_unit_is_returned_as_none(self):
+        from backend.forecast import BASELINE
+        legacy_gen = self.now - timedelta(seconds=90)
+        legacy_target = legacy_gen + timedelta(seconds=60)
+        with self.connect() as db:
+            db.execute("""
+                INSERT INTO predictions
+                    (machine_id,sensor_id,target_at,generated_at,value,model_version,status,reason)
+                VALUES (%s,%s,%s,%s,%s,%s,'ok',NULL)
+            """, (self.machine, SENSOR, legacy_target, legacy_gen, 38.5, 'legacy-v0'))
+            db.execute('UPDATE forecast_targets SET unit=%s WHERE machine_id=%s AND sensor_id=%s',
+                       ('K', self.machine, SENSOR))
+        self.measure(self.machine, self.now, 315.15)
+        with self.connect() as db:
+            db.execute('UPDATE measurements SET unit=%s WHERE machine_id=%s AND sensor_id=%s',
+                       ('K', self.machine, SENSOR))
+        self.assertTrue(self.cycle())
+        items = self.read().json()['items']
+        self.assertEqual([(r['model_version'], r['unit']) for r in items],
+                         [('legacy-v0', None), (BASELINE, 'K')])

@@ -9,7 +9,7 @@ S1-02a의 버전·드라이버 관측 자료는 아직 저장소에 없다.
 | 구성 | 개발 기준 | 현재 실행/검사 |
 |---|---|---|
 | API | Python 3.12, backend/requirements.txt 고정 직접 의존성 | FastAPI 이미지 빌드, Ruff 치명 오류 검사, PostgreSQL 통합 검사 |
-| DB | PostgreSQL 16, 빈 전용 DB | Compose에서 001·002·004·005를 1회 적용 |
+| DB | PostgreSQL 16, 빈 전용 DB | Compose에서 001·002·004·005·006을 1회 적용 |
 | 작업자 | API와 같은 Python 이미지 | 파티션 관리, 집계, [예측](../docs/s3-05-forecast.md) |
 | Windows 에이전트 | Windows 11 x64 목표, .NET/LHM 버전은 A의 S1-02a 결과로 확정 | 소스·프로젝트 없음. .NET 빌드/센서 검증 미연결 |
 | 대시보드 | React/TypeScript 계획, Node.js 22는 현재 계약 생산자 검사에 사용 | package.json·UI 소스 없음. UI 빌드/정적 검사 미연결 |

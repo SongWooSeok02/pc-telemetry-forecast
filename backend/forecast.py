@@ -127,9 +127,9 @@ def run_cycle(db, artifact_root, *, clock=None):
             generated = clock()
             db.execute("""
                 INSERT INTO predictions
-                    (machine_id,sensor_id,slot_at,target_at,generated_at,value,model_version,status,reason)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            """, (machine, sensor, slot, generated + HORIZON, generated, value, version, status, reason))
+                    (machine_id,sensor_id,slot_at,target_at,generated_at,value,unit,model_version,status,reason)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """, (machine, sensor, slot, generated + HORIZON, generated, value, unit, version, status, reason))
     return True
 
 

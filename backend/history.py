@@ -71,7 +71,7 @@ def install_history(app, connect, rejected, clock):
     def predictions(machine_id: UUID, request: Request, sensor_id: str,
                     start: AwareDatetime, end: AwareDatetime, limit: int = Query(1000, ge=1, le=5000)):
         return read(request, machine_id, start, end, limit, '''
-            SELECT target_at,generated_at,value,model_version,status,reason FROM predictions
+            SELECT target_at,generated_at,value,unit,model_version,status,reason FROM predictions
             WHERE machine_id=%s AND sensor_id=%s AND target_at >= %s AND target_at < %s
             ORDER BY target_at,generated_at,model_version LIMIT %s
         ''', (machine_id, sensor_id, start, end))
