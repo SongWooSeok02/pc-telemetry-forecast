@@ -1,0 +1,470 @@
+{
+  "task": "S2-02",
+  "phase": "install",
+  "pc_label": "pc-a",
+  "started_at_utc": "2026-11-13T04:52:18.539082Z",
+  "scenarios": [
+    {
+      "name": "install",
+      "started_at_utc": "2026-11-13T04:52:18.588095Z",
+      "steps": [
+        "Install-PcTelemetry.ps1 -SkipWebView2 -ServerUrl http://127.0.0.1:<port> -MachineId <synthetic> -TokenFile <synthetic>",
+        "read back service configuration, wait until collecting"
+      ],
+      "expected": "LocalSystem, Automatic, quoted path, recovery restart 60s/60s/300s, failure flag on, event source, Running+collecting",
+      "actual": {
+        "installer_exit": 0,
+        "installer_success": true,
+        "service": {
+          "name": "PcTelemetryAgent",
+          "account": "LocalSystem",
+          "start_mode": "Auto",
+          "path_quoted": true,
+          "upload_configured": true,
+          "recovery": [
+            60000,
+            60000,
+            300000
+          ],
+          "recovery_reset_s": 86400,
+          "recovery_on_error_exit": true,
+          "service_sid_type": 1,
+          "required_privileges": [
+            "SeChangeNotifyPrivilege"
+          ],
+          "event_source": true
+        },
+        "sc": {
+          "state": "RUNNING",
+          "pid": 27524,
+          "win32_exit_code": 0,
+          "service_exit_code": 0
+        },
+        "process_session_id": 0
+      },
+      "checks": {
+        "installer_ok": true,
+        "local_system": true,
+        "automatic": true,
+        "path_quoted": true,
+        "recovery": true,
+        "recovery_on_error_exit": true,
+        "event_source": true,
+        "least_privilege": true,
+        "collecting": true,
+        "session0": true,
+        "installed_dll_matches_manifest": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:52:29.875045Z"
+    },
+    {
+      "name": "access_check",
+      "started_at_utc": "2026-11-13T04:52:29.875201Z",
+      "steps": [
+        "wait for service_access_check event (after sensor warm-up)"
+      ],
+      "expected": "account local_system, state dir and buffer ok, token file ok, no driver_unavailable sensors",
+      "actual": {
+        "ok": true,
+        "mode": "service",
+        "account": "local_system",
+        "account_expected": "local_system",
+        "state_dir": "ok",
+        "buffer": "ok",
+        "token_file": "ok",
+        "sensors_total": 15,
+        "sensors_supported": 13,
+        "driver_sensors": 6,
+        "driver_sensors_supported": 5,
+        "driver_unavailable": 0,
+        "privileges": [
+          "SeChangeNotifyPrivilege"
+        ]
+      },
+      "checks": {
+        "event": true,
+        "ok": true,
+        "account": true,
+        "token": true,
+        "buffer": true,
+        "driver_sensors_supported": true,
+        "token_privileges_reduced": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:52:38.882997Z"
+    },
+    {
+      "name": "graceful_stop_start",
+      "started_at_utc": "2026-11-13T04:52:58.884284Z",
+      "steps": [
+        "sc stop",
+        "inspect state folder",
+        "sc start"
+      ],
+      "expected": "stops < 5 s (OS shutdown wait limit on this PC), run marker removed, WAL checkpointed, collecting=false; restart keeps boot session, seq continues above previous max, no unclean flag",
+      "actual": {
+        "stop": {
+          "sc_stop_exit": 0,
+          "stopped": true,
+          "stop_s": 1.38
+        },
+        "closed": {
+          "run_marker_removed": true,
+          "wal_removed_or_empty": true,
+          "status_collecting_false": true
+        },
+        "server_max_seq_before": 26,
+        "next_seq_after": 600,
+        "boot_session_same": true
+      },
+      "checks": {
+        "stopped": true,
+        "stop_under_5s": true,
+        "run_marker_removed": true,
+        "wal_removed_or_empty": true,
+        "status_collecting_false": true,
+        "agent_stopped_event": true,
+        "restarted": true,
+        "same_boot_session": true,
+        "seq_not_reused": true,
+        "no_unclean_flag": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:53:01.549083Z"
+    },
+    {
+      "name": "graceful_stop_server_down",
+      "started_at_utc": "2026-11-13T04:53:01.549978Z",
+      "steps": [
+        "stop reference API",
+        "collect 30s",
+        "sc stop",
+        "sc start",
+        "start reference API"
+      ],
+      "expected": "stop still < 5 s with pending batches, nothing lost: pending batches resent after restart",
+      "actual": {
+        "stop": {
+          "sc_stop_exit": 0,
+          "stopped": true,
+          "stop_s": 2.35
+        },
+        "closed": {
+          "run_marker_removed": true,
+          "wal_removed_or_empty": true,
+          "status_collecting_false": true
+        },
+        "pending_before_stop": 9,
+        "pending_after_stop": 10,
+        "drained_after_restart": true
+      },
+      "checks": {
+        "stopped": true,
+        "stop_under_5s": true,
+        "run_marker_removed": true,
+        "wal_removed_or_empty": true,
+        "status_collecting_false": true,
+        "restarted": true,
+        "had_pending": true,
+        "drained": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:53:37.246458Z"
+    },
+    {
+      "name": "forced_kill_recovery",
+      "started_at_utc": "2026-11-13T04:53:37.246558Z",
+      "steps": [
+        "taskkill /F the service process",
+        "wait for SCM recovery restart"
+      ],
+      "expected": "SCM restarts the service by itself (first recovery delay 60 s), unclean shutdown recorded, open samples restored, same boot session, seq not reused",
+      "actual": {
+        "killed_pid_gone": true,
+        "restart_after_s": 60.8,
+        "unclean": {
+          "previous_mode": "service",
+          "previous_started_at_utc": "2026-11-13T04:53:34.166527Z"
+        },
+        "buffer_opened": {
+          "file": "buffer.sqlite3",
+          "pending_batches": 1,
+          "quarantined_batches": 0,
+          "restored_open_samples": 1,
+          "restored_batches_frozen": 1,
+          "quarantined_machine_changed": 0,
+          "max_age_hours": 24,
+          "max_bytes": 524288000
+        },
+        "next_seq_after": 1800,
+        "server_max_seq_before": 628
+      },
+      "checks": {
+        "scm_restarted": true,
+        "restart_by_recovery_delay": true,
+        "collecting": true,
+        "unclean_recorded": true,
+        "buffer_restored": true,
+        "same_boot_session": true,
+        "seq_not_reused": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:54:42.129059Z"
+    },
+    {
+      "name": "ui_close",
+      "started_at_utc": "2026-11-13T04:54:42.129147Z",
+      "steps": [
+        "start installed shell",
+        "close its window",
+        "check service"
+      ],
+      "expected": "shell exits, service PID unchanged, status keeps updating",
+      "actual": {
+        "shell_exit": 0,
+        "close_cmd_exit": 0,
+        "status_updated_after_close": true
+      },
+      "checks": {
+        "shell_exited": true,
+        "service_pid_unchanged": true,
+        "status_fresh": true,
+        "collecting": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:55:02.727108Z"
+    },
+    {
+      "name": "token_unreadable",
+      "started_at_utc": "2026-11-13T04:55:02.727214Z",
+      "steps": [
+        "rename state\\device.token",
+        "wait",
+        "restore it"
+      ],
+      "expected": "upload_paused_auth(TOKEN_FILE_UNREADABLE), collection continues (pending grows), upload_auth_recovered within the 60 s pause, buffer drains",
+      "actual": {
+        "paused": {
+          "status": 401,
+          "code": "TOKEN_FILE_UNREADABLE"
+        },
+        "pending_while_paused": 6,
+        "recovered": true,
+        "drained": true
+      },
+      "checks": {
+        "paused": true,
+        "kept_collecting": true,
+        "recovered": true,
+        "drained": true,
+        "service_pid_unchanged": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:56:06.840644Z"
+    },
+    {
+      "name": "upload_fault",
+      "started_at_utc": "2026-11-13T04:56:06.840725Z",
+      "steps": [
+        "stop reference API until batches are pending",
+        "hold an exclusive write lock on state\\buffer.sqlite3 (uploader RecordAttempt/MarkSent fails after busy_timeout 5 s)",
+        "release the lock and restart the API as soon as upload_failed is emitted",
+        "wait for SCM recovery restart (no manual start)"
+      ],
+      "expected": "upload_failed (Event 1019) and Event 1005, collection stopped cleanly (agent_stopped, run marker removed), service exits with code 1, SCM restarts it, no unclean_shutdown_detected, same boot session, seq not reused, buffer drains",
+      "actual": {
+        "pending_before_lock": 2,
+        "upload_failed": {
+          "error": "SqliteException",
+          "message": "SQLite Error 5: 'database is locked'."
+        },
+        "upload_failed_after_s": 106.9,
+        "sc_after_exit": {
+          "state": "STOPPED",
+          "pid": 0,
+          "win32_exit_code": 1,
+          "service_exit_code": 0
+        },
+        "restart_after_s": 167.4,
+        "events": [
+          {
+            "id": 1019,
+            "time_utc": "2026-11-13T04:57:53.7402207Z",
+            "message": "upload_failed {\"error\":\"SqliteException\",\"message\":\"SQLite Error 5: \\u0027database is locked\\u0027.\"}"
+          },
+          {
+            "id": 1005,
+            "time_utc": "2026-11-13T04:57:53.9076608Z",
+            "message": "Collection failed: upload failed: SqliteException: SQLite Error 5: 'database is locked'.. Exiting with code 1; the service recovery action restarts the service."
+          }
+        ],
+        "next_seq_after": 2400,
+        "server_max_seq_before": 1883,
+        "drained": true
+      },
+      "checks": {
+        "upload_failed": true,
+        "logged_1019": true,
+        "logged_1005": true,
+        "collection_stopped_cleanly": true,
+        "process_exited": true,
+        "exit_code_1": true,
+        "scm_restarted": true,
+        "collecting": true,
+        "same_boot_session": true,
+        "seq_not_reused": true,
+        "drained": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T04:58:58.857141Z"
+    },
+    {
+      "name": "state_write_denied",
+      "started_at_utc": "2026-11-13T04:58:58.857265Z",
+      "steps": [
+        "sc stop",
+        "icacls state /deny SYSTEM:(OI)(CI)(W)",
+        "sc start (fails)",
+        "wait for a recovery attempt",
+        "icacls state /remove:d SYSTEM",
+        "wait (no manual start)"
+      ],
+      "expected": "Event 1002 start failure with the cause, service stops with exit code 1, SCM retries on its own; after the ACL is fixed the next recovery attempt runs and collects",
+      "actual": {
+        "stop": {
+          "sc_stop_exit": 0,
+          "stopped": true,
+          "stop_s": 1.37
+        },
+        "sc_after_failure": {
+          "state": "STOPPED",
+          "pid": 0,
+          "win32_exit_code": 1,
+          "service_exit_code": 0
+        },
+        "start_failed_events": [
+          {
+            "time_utc": "2026-11-13T04:59:00.4967916Z",
+            "message": "Start failed: UnauthorizedAccessException: Access to the path 'C:\\ProgramData\\PcTelemetry\\state\\agent.running.tmp' is denied.. Exiting with code 1; the service recovery action restarts the service."
+          },
+          {
+            "time_utc": "2026-11-13T05:04:00.7173514Z",
+            "message": "Start failed: UnauthorizedAccessException: Access to the path 'C:\\ProgramData\\PcTelemetry\\state\\agent.running.tmp' is denied.. Exiting with code 1; the service recovery action restarts the service."
+          }
+        ],
+        "scm_events": [
+          {
+            "id": 7023,
+            "time_utc": "2026-11-13T04:59:00.5012346Z"
+          },
+          {
+            "id": 7031,
+            "time_utc": "2026-11-13T04:59:00.5022353Z"
+          },
+          {
+            "id": 7031,
+            "time_utc": "2026-11-13T05:04:00.7228772Z"
+          },
+          {
+            "id": 7023,
+            "time_utc": "2026-11-13T05:04:00.7228772Z"
+          }
+        ],
+        "recovered_after_fix_s": 297.2
+      },
+      "checks": {
+        "start_failed": true,
+        "exit_code_1": true,
+        "failure_logged": true,
+        "scm_retried": true,
+        "recovered_without_manual_start": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T05:09:03.362177Z"
+    },
+    {
+      "name": "ledger_and_logs",
+      "started_at_utc": "2026-11-13T05:09:03.386218Z",
+      "steps": [
+        "compare server ledger with buffer",
+        "collect Windows event IDs"
+      ],
+      "expected": "no duplicate or conflicting samples, nothing pending/quarantined, seq unique per boot session",
+      "actual": {
+        "server_batches": 53,
+        "server_sample_rows": 152,
+        "boot_sessions": {
+          "97297a0c…": {
+            "samples": 152,
+            "first_seq": 0,
+            "last_seq": 2401
+          }
+        },
+        "buffer": {
+          "pending": 0,
+          "quarantined": 0,
+          "sent": 53,
+          "open_samples": 0,
+          "gaps": 0
+        },
+        "replays": 0,
+        "event_log_app_counts": {
+          "1014": 2,
+          "1001": 4,
+          "0": 15,
+          "1000": 8,
+          "1010": 1,
+          "1004": 4,
+          "1012": 2,
+          "1003": 1,
+          "1015": 1,
+          "1019": 1,
+          "1005": 1,
+          "1002": 2
+        },
+        "event_log_scm_ids": [
+          7045,
+          7031,
+          7031,
+          7023,
+          7023,
+          7031,
+          7031,
+          7023
+        ]
+      },
+      "checks": {
+        "no_duplicate_samples": true,
+        "nothing_pending": true,
+        "nothing_quarantined": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-13T05:09:04.272005Z"
+    }
+  ],
+  "build": {
+    "commit": "016b2fce24b0dd8cdfb9a445f160f97aadd98211",
+    "dirty": false,
+    "built_at_utc": "2026-11-13T04:33:20Z",
+    "dotnet_sdk": "10.0.300",
+    "agent_dll_sha256": "ca4e9e28499a2a9dc6e3c2cd017f08e708bd73a9e48e7af631ff380c4bab8d79",
+    "installed_agent_dll_sha256": "ca4e9e28499a2a9dc6e3c2cd017f08e708bd73a9e48e7af631ff380c4bab8d79",
+    "runner_commit": "016b2fce24b0dd8cdfb9a445f160f97aadd98211"
+  },
+  "checkpoint": {
+    "at_utc": "2026-11-13T05:09:04.657585Z",
+    "last_seq": 2401,
+    "service_started_utc": "2026-11-13T05:09:00.7445458Z",
+    "last_boot_utc": "2026-11-11T06:33:25.5000000Z"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.9",
+    "wait_to_kill_service_timeout_ms": 5000,
+    "pawnio": "2.2.0.0",
+    "elevated": true
+  },
+  "finished_at_utc": "2026-11-13T05:09:06.314275Z",
+  "success": true
+}

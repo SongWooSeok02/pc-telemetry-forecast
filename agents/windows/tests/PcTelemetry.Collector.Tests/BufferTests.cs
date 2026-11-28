@@ -421,6 +421,28 @@ public class UploaderTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task Unreadable_token_file_pauses_upload_and_recovers_when_restored()
+    {
+        // S2-02 권한 오류: 서비스 계정이 토큰 파일을 못 읽어도 수집·버퍼는 계속되고, 파일이 돌아오면 같은 배치부터 이어 보낸다.
+        Collect(6);
+        var tokenFile = Path.Combine(_dir.Path, "token");
+        var hidden = tokenFile + ".hidden";
+        File.Move(tokenFile, hidden);
+        var d = (await PumpAsync(1)).Single();
+        Assert.Equal(TimeSpan.FromSeconds(60), d);
+        Assert.Equal("paused_auth", _uploader.State);
+        Assert.Empty(_server.Requests);     // 토큰 없이 요청하지 않는다
+        var paused = Assert.Single(_events.OfType("upload_paused_auth"));
+        Assert.Equal("TOKEN_FILE_UNREADABLE", paused.Details["code"]);
+        Collect(3, from: 6);
+        File.Move(hidden, tokenFile);
+        await PumpAsync(10);
+        Assert.Single(_events.OfType("upload_auth_recovered"));
+        Assert.Equal("ok", _uploader.State);
+        Assert.Equal(Enumerable.Range(0, 9).Select(i => (long)i), _server.Accepted.SelectMany(b => b.Seqs));
+    }
+
     public void Dispose()
     {
         _uploader.Dispose();

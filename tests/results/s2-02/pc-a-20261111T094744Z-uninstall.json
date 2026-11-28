@@ -1,0 +1,46 @@
+{
+  "task": "S2-02",
+  "phase": "uninstall",
+  "pc_label": "pc-a",
+  "started_at_utc": "2026-11-11T09:47:38.959815Z",
+  "scenarios": [
+    {
+      "name": "uninstall",
+      "started_at_utc": "2026-11-11T09:47:38.960069Z",
+      "steps": [
+        "Uninstall-PcTelemetry.ps1 -RemoveData"
+      ],
+      "expected": "service, files, event source and data removed",
+      "actual": {
+        "exit": 0,
+        "residue": {
+          "service": false,
+          "event_source": false,
+          "install_dir": false,
+          "shortcut": false,
+          "data_root": false,
+          "data_items": [],
+          "user_shell_profiles": 1,
+          "pawnio_kept": true
+        }
+      },
+      "checks": {
+        "success": true,
+        "no_service": true,
+        "no_event_source": true,
+        "no_data": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-11T09:47:42.687979Z"
+    }
+  ],
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.9",
+    "wait_to_kill_service_timeout_ms": 5000,
+    "pawnio": "2.2.0.0",
+    "elevated": true
+  },
+  "finished_at_utc": "2026-11-11T09:47:44.769138Z",
+  "success": true
+}

@@ -6,11 +6,13 @@
 설계·검증 결과: [S1-02b 보고서](../../docs/collector/s1-02b-report.md), 센서 표: [sensor-support.md](../../docs/sensor-support.md).
 상태(S2-01): SQLite 미전송 버퍼·재전송·상한. **PC-A 장애 시나리오 실측, 다른 팀원 리뷰 전.**
 [S2-01 보고서](../../docs/collector/s2-01-report.md).
+상태(S2-02): Windows 서비스 수명주기·자동 복구·최소 권한. **PC-A 설치 서비스 실측, 다른 팀원 리뷰 전.**
+[S2-02 보고서](../../docs/collector/s2-02-report.md).
 
 | 경로 | 내용 |
 |---|---|
 | `src/PcTelemetry.Collector/` | LHM 비의존 핵심: 센서 매핑, 1초 루프, 부팅 세션·순번, 절전/시계 이벤트, 불변 배치·`ascii-json-v1` 해시, SQLite 미전송 버퍼(`SqliteBuffer`)·업로더(`Uploader`) |
-| `src/PcTelemetry.Agent/` | LHM 0.9.6 어댑터, `QueryUnbiasedInterruptTime` 시계, BootId, 콘솔/서비스 진입점, 상태 파일 |
+| `src/PcTelemetry.Agent/` | LHM 0.9.6 어댑터, `QueryUnbiasedInterruptTime` 시계, BootId, 콘솔/서비스 진입점, 상태 파일, 서비스 수명주기·이벤트 로그·접근 점검(`Service.cs`, S2-02) |
 | `tests/PcTelemetry.Collector.Tests/` | 가상 센서·가짜 시계 기반 단위 테스트, 계약 공유 해시 벡터 |
 | `Credentials.psm1`, `Register-Device.ps1` | S2-03 자격 증명 저장(DPAPI·ACL)·등록 IPC. 아래 [S2-03 절](#s2-03-자격-증명-및-등록-ipc) |
 | `spike/` | S1-02a 스파이크 도구(운영 코드 아님) |
@@ -37,10 +39,11 @@ python tests/run_agent_integration.py --exe $exe --seconds 600 --pc-label pc-a  
 
 상태 디렉터리(기본 `%ProgramData%\PcTelemetry\state`): `boot-session.json`(부팅 세션·순번 예약),
 `components.json`(하드웨어→component_id), `sensor-configs.json`·`sensor-configs/<id>.json`(불변 구성·등록 본문),
-`buffer.sqlite3`(S2-01 미전송 버퍼, 아래), `events.jsonl`, `stats.json`. 실제 PC 상태 디렉터리는 커밋하지 않는다.
+`buffer.sqlite3`(S2-01 미전송 버퍼, 아래), `agent.running`(S2-02 실행 표시), `events.jsonl`, `stats.json`. 실제 PC 상태 디렉터리는 커밋하지 않는다.
 
-토큰은 현재 `--token-file`에서 읽어 헤더에만 쓴다. S2-03 자격 증명 저장소(`Get-DeviceCredential`) 연동은
-설치 서비스(S2-02)와 함께 후속으로 한다. 서비스 자동 시작·설치는 S2-02/S1-06 범위다.
+토큰은 현재 `--token-file`에서 읽어 헤더에만 쓴다. S2-03 DPAPI 자격 증명 저장소(`device.dpapi`) 읽기와 등록 IPC
+호스팅은 S2-03 담당(B)과 형식·호출 방식을 합의한 뒤 후속으로 한다(S2-02에서는 설치 스크립트가 복사한
+`state\device.token`을 서비스 계정이 읽는지만 검증).
 
 ## S2-01 미전송 버퍼
 
@@ -66,6 +69,28 @@ python tests/run_agent_integration.py --exe $exe --seconds 600 --pc-label pc-a  
 - 토큰은 버퍼·이벤트·상태 파일에 쓰지 않는다(단위 테스트가 DB 파일·WAL 바이트를 검사).
 
 장애 복구 검증: `python tests/run_buffer_recovery.py --exe <exe> --scenario outage|kill|response-loss|cap-age|cap-bytes --pc-label pc-a`.
+
+## S2-02 Windows 서비스
+
+설치·등록은 [`desktop/windows/install/Install-PcTelemetry.ps1`](../../desktop/windows/install/Install-PcTelemetry.ps1)(S1-06)이 한다.
+
+| 항목 | 동작 |
+|---|---|
+| 계정·시작 | `PcTelemetryAgent`, LocalSystem(S1-02a 5.5), 자동 시작. 사용자 로그인·셸·WebView2와 무관하게 세션 0에서 실행 |
+| 최소 권한 | 필요 권한 `SeChangeNotifyPrivilege`만(`sc privs`, 서비스 SID `unrestricted`). 시작 점검이 실제 토큰 권한을 기록 |
+| 시작 점검 | `service_access_check` 이벤트: 계정 종류(이름 아님), 상태 폴더·버퍼·토큰 파일(열림 여부만), 드라이버 필요 센서의 권한 부족 수, 토큰 권한. 문제가 있으면 이벤트 로그 경고 |
+| 정상 종료 | SCM 중지·OS 종료: 수집 취소 → 미동결 샘플 동결 → 전송 취소(마무리 전송 최대 2초, `--stop-drain-seconds`) → SQLite 닫기 → `agent.running` 삭제. OS 서비스 종료 대기 한도(이 PC 5초) 안에 끝낸다 |
+| 비정상 종료 | 다음 시작 때 `agent.running`이 남아 있으면 `unclean_shutdown_detected`. 미동결 샘플·대기 배치는 S2-01 버퍼가 복원하고 순번은 예약 상한부터 이어 간다 |
+| 실패·복구 | 시작/수집 실패는 이벤트 로그(1002/1005)에 원인을 남기고 종료 코드 1로 끝낸다. SCM 복구(60초·60초·5분, `failureflag=1`)가 다시 시작한다. 센서 구성이 정해지기(워밍업·탐색) 전 실패는 1002, 이후는 1005 |
+| 업로더 실패 | 실행 중 업로더가 예외로 죽으면(예: SQLite 쓰기 오류) `upload_failed`(1019)를 남기고 수집을 정상 절차로 멈춘 뒤(동결·DB 닫기·`agent.running` 삭제) 1005·종료 코드 1로 끝내 SCM이 다시 시작한다. 중지 요청 뒤 종료 절차 중 실패는 기록만 하고 마무리 전송을 건너뛴다 |
+| 권한 오류 | 토큰 파일을 못 읽으면 전송만 멈추고(`upload_paused_auth`) 수집·버퍼는 계속, 파일이 돌아오면 `upload_auth_recovered`. 상태 폴더를 못 쓰면 시작 실패 → 복구 재시도 |
+
+이벤트 로그(Application, 원본 `PcTelemetryAgent`): 1000 시작, 1001 정상 종료(소요 ms), 1002 시작 실패, 1003 비정상 종료 감지,
+1004 접근 점검, 1005 수집 중 실패, 1010~1018 주요 수집 이벤트(부팅 세션·전송 재시도/복구·인증 일시정지/복구·격리·버퍼 초기화/상한 제거),
+1019 업로더 실패.
+토큰·계정 이름·호스트 이름은 쓰지 않는다. 0번은 .NET 서비스 호스트의 시작/중지 기록이다.
+
+검증: `python tests/run_service_lifecycle.py install|resume|uninstall ...`([tests/README](../../tests/README.md#s2-02-windows-서비스-수명주기)).
 
 ## S2-03 자격 증명 및 등록 IPC
 

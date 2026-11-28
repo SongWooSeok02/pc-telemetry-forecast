@@ -119,3 +119,61 @@ public sealed class BootSession
 
 public sealed class BootIdentityUnavailableException()
     : Exception("OS boot identity unavailable; collection is held (contract: boot_session_id)");
+
+/// <summary>
+/// S2-02 실행 표시. 시작 때 만들고 정상 종료(DB를 닫은 뒤)에 지운다. 시작 때 이미 있으면 이전 프로세스가
+/// 정상 종료하지 못한 것이다(강제 종료·전원 차단·충돌). 복원 자체는 SQLite 버퍼·부팅 세션이 하고, 이 표시는 기록용이다.
+/// </summary>
+public sealed class RunMarker
+{
+    public const string FileName = "agent.running";
+    private readonly string _path;
+
+    private RunMarker(string path, PreviousRun? previous)
+    {
+        _path = path;
+        Previous = previous;
+    }
+
+    /// <summary>이전 실행이 정상 종료하지 못했으면 그 실행 정보(읽지 못하면 값이 빈 기록). 정상 종료였으면 null.</summary>
+    public PreviousRun? Previous { get; }
+
+    public static RunMarker Acquire(StateStore store, string mode, DateTime nowUtc)
+    {
+        var path = store.PathOf(FileName);
+        PreviousRun? previous = null;
+        if (File.Exists(path))
+        {
+            try
+            {
+                previous = store.Load<PreviousRun>(FileName) ?? new PreviousRun();
+            }
+            catch (Exception e) when (e is JsonException or IOException)
+            {
+                // 쓰는 도중 끊긴 표시도 비정상 종료의 증거다.
+                previous = new PreviousRun();
+            }
+        }
+        store.Save(FileName, new PreviousRun { Mode = mode, Pid = Environment.ProcessId, StartedAtUtc = Utc.Format(nowUtc) });
+        return new RunMarker(path, previous);
+    }
+
+    /// <summary>정상 종료. 버퍼를 닫은 뒤 호출한다.</summary>
+    public void Release()
+    {
+        try
+        {
+            File.Delete(_path);
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+        }
+    }
+
+    public sealed record PreviousRun
+    {
+        public string? Mode { get; init; }
+        public int? Pid { get; init; }
+        public string? StartedAtUtc { get; init; }
+    }
+}

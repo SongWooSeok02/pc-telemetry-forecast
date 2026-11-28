@@ -1,0 +1,233 @@
+{
+  "task": "S2-02",
+  "phase": "resume",
+  "pc_label": "pc-a",
+  "started_at_utc": "2026-11-11T09:44:58.654376Z",
+  "scenarios": [
+    {
+      "name": "reboot",
+      "started_at_utc": "2026-11-11T09:46:34.412419Z",
+      "steps": [
+        "checkpoint (install/resume phase)",
+        "restart Windows",
+        "sign in",
+        "resume phase"
+      ],
+      "expected": "new boot session with seq from 0, service auto-started after boot, previous session stopped cleanly before shutdown (no unclean flag), all buffered samples delivered",
+      "actual": {
+        "accepted_controls": [
+          "STOPPABLE",
+          "NOT_PAUSABLE",
+          "ACCEPTS_SHUTDOWN"
+        ],
+        "process_session_id": 0,
+        "service_pid_same": false,
+        "collecting": true,
+        "drained": true,
+        "last_boot_utc_before": "2026-11-04T02:06:22.5003540Z",
+        "last_boot_utc_now": "2026-11-11T06:33:25.5000000Z",
+        "event_log_app": [
+          {
+            "id": 1012,
+            "time_utc": "2026-11-11T06:25:23.2049236Z"
+          },
+          {
+            "id": 0,
+            "time_utc": "2026-11-11T06:32:29.2334296Z"
+          },
+          {
+            "id": 1000,
+            "time_utc": "2026-11-11T06:32:29.2413143Z"
+          },
+          {
+            "id": 1010,
+            "time_utc": "2026-11-11T06:32:36.0211190Z"
+          },
+          {
+            "id": 1012,
+            "time_utc": "2026-11-11T06:32:38.1210810Z"
+          },
+          {
+            "id": 1004,
+            "time_utc": "2026-11-11T06:32:46.0461779Z"
+          },
+          {
+            "id": 0,
+            "time_utc": "2026-11-11T06:33:44.9764551Z"
+          },
+          {
+            "id": 1000,
+            "time_utc": "2026-11-11T06:33:44.9832511Z"
+          },
+          {
+            "id": 1010,
+            "time_utc": "2026-11-11T06:33:46.5364458Z"
+          },
+          {
+            "id": 1012,
+            "time_utc": "2026-11-11T06:33:48.6750666Z"
+          },
+          {
+            "id": 1004,
+            "time_utc": "2026-11-11T06:33:56.5986738Z"
+          },
+          {
+            "id": 1013,
+            "time_utc": "2026-11-11T09:45:09.5907127Z"
+          }
+        ],
+        "scm": [],
+        "kernel_boot_shutdown": [
+          {
+            "id": 13,
+            "time_utc": "2026-11-11T06:31:51.3930457Z"
+          },
+          {
+            "id": 12,
+            "time_utc": "2026-11-11T06:32:04.4949632Z"
+          },
+          {
+            "id": 13,
+            "time_utc": "2026-11-11T06:33:03.9232425Z"
+          },
+          {
+            "id": 12,
+            "time_utc": "2026-11-11T06:33:26.1475628Z"
+          }
+        ],
+        "winlogon": [
+          {
+            "id": 7002,
+            "time_utc": "2026-11-11T06:29:34.8487756Z"
+          },
+          {
+            "id": 7001,
+            "time_utc": "2026-11-11T06:33:53.1198774Z"
+          }
+        ],
+        "service_started_after_boot_s": 18.8,
+        "first_sample_after_boot_s": 23.1,
+        "previous_session_last_sample_utc": "2026-11-11T06:31:46.589890Z",
+        "os_shutdown_utc": "2026-11-11T06:33:03.9232425Z",
+        "boot_session_started_reason": [
+          "reboot",
+          "reboot"
+        ],
+        "unclean": [],
+        "previous_session_continuity_since_checkpoint": {
+          "samples": 387,
+          "seq_holes": 0,
+          "max_gap_s": 1.02,
+          "gaps_over_2_5s": []
+        },
+        "new_session": {
+          "first_seq": 0,
+          "samples": 11559
+        },
+        "new_session_continuity": {
+          "samples": 11559,
+          "seq_holes": 0,
+          "max_gap_s": 1.03,
+          "gaps_over_2_5s": []
+        },
+        "first_logon_after_boot_s": 27.6,
+        "first_logon_source": "winlogon_7001",
+        "service_started_before_logon": true,
+        "collected_before_logon": {
+          "samples": 5,
+          "seq_holes": 0,
+          "max_gap_s": 1.002,
+          "gaps_over_2_5s": []
+        }
+      },
+      "checks": {
+        "new_boot_session": true,
+        "reason_reboot": true,
+        "seq_from_zero": true,
+        "auto_started": true,
+        "previous_stopped_cleanly": true,
+        "drained": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-11T09:46:35.560289Z"
+    },
+    {
+      "name": "ledger_and_logs",
+      "started_at_utc": "2026-11-11T09:46:35.560352Z",
+      "steps": [
+        "compare server ledger with buffer",
+        "collect Windows event IDs"
+      ],
+      "expected": "no duplicate or conflicting samples, nothing pending/quarantined, seq unique per boot session",
+      "actual": {
+        "server_batches": 4335,
+        "server_sample_rows": 13003,
+        "boot_sessions": {
+          "02ce6c60…": {
+            "samples": 1414,
+            "first_seq": 0,
+            "last_seq": 3667
+          },
+          "3f2a44ea…": {
+            "samples": 24,
+            "first_seq": 0,
+            "last_seq": 23
+          },
+          "1db0a281…": {
+            "samples": 11565,
+            "first_seq": 0,
+            "last_seq": 11564
+          }
+        },
+        "buffer": {
+          "pending": 0,
+          "quarantined": 0,
+          "sent": 4335,
+          "open_samples": 2,
+          "gaps": 0
+        },
+        "replays": 0,
+        "event_log_app_counts": {
+          "1012": 3,
+          "0": 2,
+          "1000": 2,
+          "1010": 2,
+          "1004": 2,
+          "1013": 1
+        },
+        "event_log_scm_ids": []
+      },
+      "checks": {
+        "no_duplicate_samples": true,
+        "nothing_pending": true,
+        "nothing_quarantined": true
+      },
+      "success": true,
+      "finished_at_utc": "2026-11-11T09:46:37.829090Z"
+    }
+  ],
+  "build": {
+    "commit": "e54c4b54b02ecd0523a095b054e1f469cb855074",
+    "dirty": true,
+    "built_at_utc": "2026-11-11T06:00:23Z",
+    "dotnet_sdk": "10.0.300",
+    "agent_dll_sha256": "5ec0e29197e16a9f8a7801ccb130a49ec550d38de3f0015d22afdeac1bb6d4b2",
+    "installed_agent_dll_sha256": "5ec0e29197e16a9f8a7801ccb130a49ec550d38de3f0015d22afdeac1bb6d4b2",
+    "runner_commit": "e54c4b54b02ecd0523a095b054e1f469cb855074"
+  },
+  "checkpoint": {
+    "at_utc": "2026-11-11T09:46:39.019301Z",
+    "last_seq": 11567,
+    "service_started_utc": "2026-11-11T06:33:44.3129756Z",
+    "last_boot_utc": "2026-11-11T06:33:25.5000000Z"
+  },
+  "environment": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.9",
+    "wait_to_kill_service_timeout_ms": 5000,
+    "pawnio": "2.2.0.0",
+    "elevated": true
+  },
+  "finished_at_utc": "2026-11-11T09:46:42.667849Z",
+  "success": true
+}
