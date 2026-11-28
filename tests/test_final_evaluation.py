@@ -74,6 +74,12 @@ class FinalEvaluationTests(unittest.TestCase):
             final.Schedule(final.date("2030-01-01T09:00+09:00").replace(tzinfo=None), SCHEDULE.report_deadline)
         with self.assertRaisesRegex(ValueError, "before the holdout data end"):
             final.Schedule(SCHEDULE.report_deadline, SCHEDULE.report_deadline)
+        with self.assertRaisesRegex(ValueError, "whole seconds"):
+            final.Schedule(SCHEDULE.freeze_deadline, final.date("2030-01-03T09:00:00.5+09:00"))
+        model, freeze = self.fixture()
+        fractional = {**freeze, "policy": {**freeze["policy"], "report_deadline": "2030-01-03T09:00:00.500000+09:00"}}
+        with self.assertRaisesRegex(ValueError, "whole seconds"):
+            final.evaluate(fractional, model, {}, [], None, None, final.DATA_END, "reviewed")
 
     def test_incomplete_or_reused_inputs_hold_baseline(self):
         model, freeze = self.fixture()

@@ -36,6 +36,6 @@
   },
   "passed": true,
   "skip_note": "test_real_dangling_symlink_is_not_treated_as_free skips when the OS denies symlink creation (Windows without Developer Mode); the simulated dangling-symlink test still runs",
-  "includes": "#48 head f86bafa + configurable 48h schedule (owner comment 2026-11-27)",
+  "includes": "#48 head f86bafa + configurable 48h schedule (owner comment 2026-11-27) + whole-second deadline check",
   "schedule": "configurable via freeze --freeze-deadline/--report-deadline; no agreed new dates recorded yet; tests use synthetic 2030 windows"
 }

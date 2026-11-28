@@ -42,6 +42,10 @@ class Schedule:
         for value in (freeze_deadline, report_deadline):
             if value.tzinfo is None or value.utcoffset() is None:
                 raise ValueError("schedule deadlines must include timezone")
+            if value.microsecond:
+                # Telemetry rows sit on whole seconds; a fractional deadline would shift every
+                # boundary off that grid and make complete buffers look incomplete.
+                raise ValueError("schedule deadlines must be whole seconds")
         self.freeze_deadline, self.report_deadline = freeze_deadline, report_deadline
         self.data_end = report_deadline - timedelta(minutes=1)
         self.core_end = self.data_end - timedelta(seconds=model_pipeline.HORIZON)
@@ -429,6 +433,8 @@ def main() -> None:
                       model_pipeline.sha256(args.input) if args.input else None,
                       model_pipeline.sha256(args.labels) if args.labels else None, datetime.now(timezone.utc),
                       args.freeze_evidence if args.expected_freeze_sha256 else None)
+    # The deadline governs the decision timestamp at this last check before publication;
+    # writing the report/release pair to disk happens afterwards and is not time-bounded.
     if datetime.now(timezone.utc) > Schedule.from_policy(manifest["policy"]).report_deadline and "report_deadline_missed" not in report["decision"]["reasons"]:
         report["decision"]["reasons"].append("report_deadline_missed")
         report["decision"]["adopted"] = False
