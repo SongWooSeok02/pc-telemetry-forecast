@@ -42,10 +42,31 @@ test('invalid horizon, value, unit or PC cannot enter cache', () => {
   assert.throws(() => parsePredictions({ items: [{ ...prediction(), target_at: iso(now) }], truncated: false }, 'Cel'))
   assert.throws(() => parsePredictions({ items: [{ ...prediction(), value: Infinity }], truncated: false }, 'Cel'))
   assert.throws(() => parsePredictions({ items: [{ ...prediction(), unit: 'W' }], truncated: false }, 'Cel'))
+  assert.throws(() => parsePredictions({ items: [{ ...prediction(), unit: '' }], truncated: false }, 'Cel'))
   assert.throws(() => parsePredictions({ items: [{ ...prediction(), unit: undefined }], truncated: false }, 'Cel'))
+  assert.throws(() => parsePredictions({ items: [{ ...prediction(), unit: null, target_at: iso(now) }], truncated: false }, 'Cel'))
   assert.throws(() => parseActuals(actualBody([actual()], { unit: 'W' }), scope))
   assert.throws(() => parseActuals(actualBody([actual()], { machineId: 'pc-b' }), scope))
   assert.throws(() => parseActuals(actualBody([actual()], { resolution: '10s' }), scope))
+})
+test('exact legacy null-unit rows are omitted without blanking valid rows or bridging gaps', () => {
+  const mixed = parsePredictions({
+    items: [
+      prediction(now - 30_000),
+      { ...prediction(now - 20_000, 'legacy-v0'), unit: null },
+      prediction(now - 10_000),
+    ],
+    truncated: false,
+  }, 'Cel')
+  assert.equal(mixed.items.length, 2)
+  assert.deepEqual(mixed.items.map((p) => p.target_at), [iso(now - 30_000), iso(now - 10_000)])
+  assert.deepEqual(predictionSegments(mixed.items).map((segment) => segment.length), [1, 1])
+
+  const onlyLegacy = parsePredictions({
+    items: [{ ...prediction(now - 20_000, 'legacy-v0'), unit: null }],
+    truncated: false,
+  }, 'Cel')
+  assert.deepEqual(onlyLegacy.items, [])
 })
 test('late actual arrives through cursor, updates match and preserves forecast identity', async () => {
   const urls: string[] = []

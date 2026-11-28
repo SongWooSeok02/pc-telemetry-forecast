@@ -43,17 +43,21 @@ export function observedTimestampKey(value: string): string {
 
 export function parsePredictions(body: unknown, expectedUnit: string): { items: Prediction[]; truncated: boolean } {
   if (!record(body) || !Array.isArray(body.items) || typeof body.truncated !== 'boolean') throw new Error('예측 응답 형식 오류')
-  const items = body.items.map((item: unknown) => {
+  const items: Prediction[] = []
+  for (const item of body.items) {
     if (!record(item) || !timestamp(item.target_at) || !timestamp(item.generated_at)) throw new Error('예측 시각·단위·모델·값 응답 오류')
     const targetInstant = parseUtcInstant(item.target_at)
     const generatedInstant = parseUtcInstant(item.generated_at)
     if (targetInstant.seconds - generatedInstant.seconds !== 60 || targetInstant.fraction !== generatedInstant.fraction ||
-        item.unit !== expectedUnit || typeof item.model_version !== 'string' || !item.model_version ||
+        typeof item.model_version !== 'string' || !item.model_version ||
         !['ok', 'fallback', 'unavailable'].includes(String(item.status)) || !numberOrNull(item.value) ||
         (item.status === 'unavailable' ? item.value !== null : item.value === null) ||
         !(item.reason === null || typeof item.reason === 'string')) throw new Error('예측 시각·단위·모델·값 응답 오류')
-    return item as unknown as Prediction
-  })
+    // Legacy pre-006 rows carry unit: null; omit them rather than guessing a unit or blanking valid rows.
+    if (item.unit === null) continue
+    if (item.unit !== expectedUnit) throw new Error('예측 시각·단위·모델·값 응답 오류')
+    items.push(item as unknown as Prediction)
+  }
   return { items, truncated: body.truncated }
 }
 

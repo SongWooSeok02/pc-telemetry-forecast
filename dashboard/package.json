@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "test:history": "node --experimental-strip-types --test tests/historyQuery.test.ts",
     "test:scheduler": "node --experimental-strip-types --test tests/queryScheduler.test.ts",
-    "test:forecast": "node --experimental-strip-types --test tests/forecastData.test.ts tests/forecastRender.test.ts",
+    "test:forecast": "node --experimental-strip-types --test tests/forecastData.test.ts tests/forecastRender.test.ts tests/forecastHttpIntegration.test.ts",
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
